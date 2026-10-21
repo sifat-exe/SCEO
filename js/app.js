@@ -14,6 +14,9 @@
     resolvedActions: new Set(),
     readAlerts: new Set(),
     activeActionInModal: null,
+    activeRoomInModal: null,
+    heatmapMetric: 'kwhPerOccupiedHour', // 'kwhPerOccupiedHour' | 'totalKWh' | 'estimatedWasteKWh'
+    heatmapSort: 'metricDesc', // 'metricDesc' | 'wasteDesc' | 'totalDesc' | 'idAsc'
     consumptionChart: null,
     distributionChart: null,
     chartJsAvailable: typeof Chart !== 'undefined'
@@ -37,8 +40,55 @@
 
     // Views
     overviewView: document.getElementById('overviewView'),
+    heatmapView: document.getElementById('heatmapView'),
     placeholderView: document.getElementById('placeholderView'),
     btnReturnOverview: document.getElementById('btnReturnOverview'),
+
+    // Heatmap Controls & Summaries
+    heatmapBuildingFilter: document.getElementById('heatmapBuildingFilter'),
+    hmBtnRange7d: document.getElementById('hmBtnRange7d'),
+    hmBtnRange30d: document.getElementById('hmBtnRange30d'),
+    btnMetricIntensity: document.getElementById('btnMetricIntensity'),
+    btnMetricTotal: document.getElementById('btnMetricTotal'),
+    btnMetricWaste: document.getElementById('btnMetricWaste'),
+    heatmapSortSelect: document.getElementById('heatmapSortSelect'),
+    hmSummaryTotalEnergy: document.getElementById('hmSummaryTotalEnergy'),
+    hmSummaryTotalSub: document.getElementById('hmSummaryTotalSub'),
+    hmSummaryHighPriority: document.getElementById('hmSummaryHighPriority'),
+    hmSummaryHighSub: document.getElementById('hmSummaryHighSub'),
+    hmSummaryAvoidableEnergy: document.getElementById('hmSummaryAvoidableEnergy'),
+    hmSummaryAvoidablePercent: document.getElementById('hmSummaryAvoidablePercent'),
+    hmSummaryHighestRoom: document.getElementById('hmSummaryHighestRoom'),
+    hmSummaryHighestRate: document.getElementById('hmSummaryHighestRate'),
+    hmSummaryHighestDelta: document.getElementById('hmSummaryHighestDelta'),
+    hmSummaryHighestSub: document.getElementById('hmSummaryHighestSub'),
+    heatmapGridContainer: document.getElementById('heatmapGridContainer'),
+
+    // Room Detail Modal Elements
+    roomDetailModal: document.getElementById('roomDetailModal'),
+    roomModalBuildingBadge: document.getElementById('roomModalBuildingBadge'),
+    roomModalZone: document.getElementById('roomModalZone'),
+    roomModalTitle: document.getElementById('roomModalTitle'),
+    roomModalCloseBtn: document.getElementById('roomModalCloseBtn'),
+    btnModalCloseRoom: document.getElementById('btnModalCloseRoom'),
+    btnViewClassroomAnalytics: document.getElementById('btnViewClassroomAnalytics'),
+    roomModalStatusBadge: document.getElementById('roomModalStatusBadge'),
+    roomModalTypeTag: document.getElementById('roomModalTypeTag'),
+    roomModalTotalKWh: document.getElementById('roomModalTotalKWh'),
+    roomModalPeriodLabel: document.getElementById('roomModalPeriodLabel'),
+    roomModalOccupiedHours: document.getElementById('roomModalOccupiedHours'),
+    roomModalIntensity: document.getElementById('roomModalIntensity'),
+    roomModalIntensitySub: document.getElementById('roomModalIntensitySub'),
+    roomModalWasteKWh: document.getElementById('roomModalWasteKWh'),
+    roomModalWastePercent: document.getElementById('roomModalWastePercent'),
+    roomModalBenchmarkDesc: document.getElementById('roomModalBenchmarkDesc'),
+    roomModalBenchmarkDelta: document.getElementById('roomModalBenchmarkDelta'),
+    roomModalMeasuredBar: document.getElementById('roomModalMeasuredBar'),
+    roomModalMeasuredBarVal: document.getElementById('roomModalMeasuredBarVal'),
+    roomModalTargetBar: document.getElementById('roomModalTargetBar'),
+    roomModalTargetBarVal: document.getElementById('roomModalTargetBarVal'),
+    roomModalCausesList: document.getElementById('roomModalCausesList'),
+    roomModalActionsList: document.getElementById('roomModalActionsList'),
 
     // Placeholder View Elements
     placeholderCode: document.getElementById('placeholderCode'),
@@ -161,9 +211,24 @@
 
     if (viewKey === 'overview') {
       elements.overviewView.style.display = 'block';
+      if (elements.heatmapView) elements.heatmapView.style.display = 'none';
       elements.placeholderView.style.display = 'none';
       elements.topHeading.textContent = 'Campus Overview';
       elements.topBreadcrumb.textContent = 'Campus Management / Overview';
+    } else if (viewKey === 'energy-heatmap') {
+      elements.overviewView.style.display = 'none';
+      if (elements.heatmapView) elements.heatmapView.style.display = 'block';
+      elements.placeholderView.style.display = 'none';
+      elements.topHeading.textContent = 'Energy Waste Heatmap';
+      elements.topBreadcrumb.textContent = 'Campus Management / Energy Waste Heatmap';
+
+      // Sync building selector & date controls
+      if (elements.heatmapBuildingFilter) {
+        elements.heatmapBuildingFilter.value = state.selectedBuilding;
+      }
+      syncHeatmapDateButtons();
+      renderHeatmap();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       // Show Coming Soon Placeholder
       const modInfo = SCEO_DATA.navigationModules[viewKey] || {
@@ -174,11 +239,12 @@
       };
 
       elements.overviewView.style.display = 'none';
+      if (elements.heatmapView) elements.heatmapView.style.display = 'none';
       elements.placeholderView.style.display = 'block';
 
       elements.placeholderCode.textContent = modInfo.code || 'NEXT STAGE';
       elements.placeholderTitle.textContent = modInfo.title;
-      elements.placeholderDesc.textContent = `${modInfo.description} Full interactive modeling will be implemented in Step 2.`;
+      elements.placeholderDesc.textContent = `${modInfo.description} Full interactive modeling will be implemented in Step 3.`;
       
       elements.topHeading.textContent = modInfo.title;
       elements.topBreadcrumb.textContent = `Campus Management / ${modInfo.title}`;
@@ -811,10 +877,367 @@
   }
 
   /**
+   * Helper: Sync Heatmap date range buttons with active state
+   */
+  function syncHeatmapDateButtons() {
+    if (!elements.hmBtnRange7d || !elements.hmBtnRange30d) return;
+    if (state.dateRange === '7d') {
+      elements.hmBtnRange7d.classList.add('active');
+      elements.hmBtnRange30d.classList.remove('active');
+    } else {
+      elements.hmBtnRange30d.classList.add('active');
+      elements.hmBtnRange7d.classList.remove('active');
+    }
+  }
+
+  /**
+   * Render Energy Waste Heatmap (Step 2 Implementation)
+   */
+  function renderHeatmap() {
+    if (!elements.heatmapGridContainer) return;
+
+    const periodKey = state.dateRange === '30d' ? 'thirtyDays' : 'sevenDays';
+    const periodLabel = state.dateRange === '30d' ? 'Last 30 Days' : 'Last 7 Days';
+
+    // 1. Filter classrooms by current building scope
+    const allRooms = SCEO_DATA.classrooms;
+    const filteredRooms = allRooms.filter(room => {
+      if (state.selectedBuilding === 'all') return true;
+      return room.buildingId === state.selectedBuilding;
+    });
+
+    // 2. Calculate dynamic summary values from filtered dataset
+    const totalKWh = filteredRooms.reduce((acc, r) => acc + (r[periodKey]?.totalKWh || 0), 0);
+    const avoidableWasteKWh = filteredRooms.reduce((acc, r) => acc + (r[periodKey]?.estimatedWasteKWh || 0), 0);
+    const avoidablePercent = totalKWh > 0 ? ((avoidableWasteKWh / totalKWh) * 100).toFixed(1) : '0.0';
+    const highPriorityCount = filteredRooms.filter(r => {
+      const s = r[periodKey]?.status;
+      return s === 'red' || s === 'orange';
+    }).length;
+
+    // Find room with highest energy per occupied hour
+    let highestRoom = null;
+    let maxIntensity = -1;
+    filteredRooms.forEach(r => {
+      const intensity = r[periodKey]?.kwhPerOccupiedHour || 0;
+      if (intensity > maxIntensity) {
+        maxIntensity = intensity;
+        highestRoom = r;
+      }
+    });
+
+    // Update Summary Cards DOM
+    if (elements.hmSummaryTotalEnergy) {
+      elements.hmSummaryTotalEnergy.textContent = formatNumber(totalKWh);
+      elements.hmSummaryTotalSub.textContent = `Across ${filteredRooms.length} classrooms (${periodLabel})`;
+    }
+    if (elements.hmSummaryHighPriority) {
+      elements.hmSummaryHighPriority.textContent = highPriorityCount;
+      elements.hmSummaryHighSub.textContent = highPriorityCount > 0
+        ? `${highPriorityCount} rooms in orange/red status`
+        : 'All rooms within acceptable thresholds';
+    }
+    if (elements.hmSummaryAvoidableEnergy) {
+      elements.hmSummaryAvoidableEnergy.textContent = formatNumber(avoidableWasteKWh);
+      elements.hmSummaryAvoidablePercent.textContent = `${avoidablePercent}%`;
+    }
+    if (elements.hmSummaryHighestRoom) {
+      if (highestRoom) {
+        elements.hmSummaryHighestRoom.textContent = highestRoom.id;
+        elements.hmSummaryHighestRate.textContent = `${highestRoom[periodKey].kwhPerOccupiedHour} kWh/hr`;
+        const benchmark = highestRoom[periodKey].benchmarkKwhPerHour;
+        const delta = Math.round(((highestRoom[periodKey].kwhPerOccupiedHour - benchmark) / benchmark) * 100);
+        elements.hmSummaryHighestDelta.textContent = `${delta >= 0 ? '+' : ''}${delta}%`;
+        elements.hmSummaryHighestDelta.className = delta > 20 ? 'trend-badge warning' : 'trend-badge positive';
+        elements.hmSummaryHighestSub.textContent = `Target: ${benchmark} kWh/hr (${highestRoom.roomType})`;
+      } else {
+        elements.hmSummaryHighestRoom.textContent = 'None';
+        elements.hmSummaryHighestRate.textContent = '-';
+        elements.hmSummaryHighestDelta.textContent = '-';
+        elements.hmSummaryHighestSub.textContent = 'No rooms available';
+      }
+    }
+
+    // 3. Sort classrooms
+    const sortedRooms = [...filteredRooms].sort((a, b) => {
+      const mA = a[periodKey];
+      const mB = b[periodKey];
+      if (state.heatmapSort === 'wasteDesc') {
+        return (mB.estimatedWasteKWh || 0) - (mA.estimatedWasteKWh || 0);
+      } else if (state.heatmapSort === 'totalDesc') {
+        return (mB.totalKWh || 0) - (mA.totalKWh || 0);
+      } else if (state.heatmapSort === 'idAsc') {
+        return a.id.localeCompare(b.id);
+      } else {
+        // Default: metricDesc based on selected heatmapMetric
+        if (state.heatmapMetric === 'totalKWh') {
+          return (mB.totalKWh || 0) - (mA.totalKWh || 0);
+        } else if (state.heatmapMetric === 'estimatedWasteKWh') {
+          return (mB.estimatedWasteKWh || 0) - (mA.estimatedWasteKWh || 0);
+        } else {
+          return (mB.kwhPerOccupiedHour || 0) - (mA.kwhPerOccupiedHour || 0);
+        }
+      }
+    });
+
+    // 4. Group by building & build HTML
+    elements.heatmapGridContainer.innerHTML = '';
+
+    if (sortedRooms.length === 0) {
+      elements.heatmapGridContainer.innerHTML = `
+        <div class="card" style="padding: 40px; text-align: center; color: var(--color-text-muted);">
+          <h3>No classrooms match the current filter criteria.</h3>
+        </div>
+      `;
+      return;
+    }
+
+    // Determine building groups to render
+    const buildingsToRender = state.selectedBuilding === 'all'
+      ? SCEO_DATA.buildings
+      : SCEO_DATA.buildings.filter(b => b.id === state.selectedBuilding);
+
+    buildingsToRender.forEach(bldg => {
+      const bldgRooms = sortedRooms.filter(r => r.buildingId === bldg.id);
+      if (bldgRooms.length === 0) return;
+
+      const groupWrapper = document.createElement('div');
+      groupWrapper.className = 'heatmap-building-group';
+
+      const bldgTotalKWh = bldgRooms.reduce((acc, r) => acc + (r[periodKey]?.totalKWh || 0), 0);
+      const bldgWasteKWh = bldgRooms.reduce((acc, r) => acc + (r[periodKey]?.estimatedWasteKWh || 0), 0);
+
+      // Building Group Banner
+      const header = document.createElement('div');
+      header.className = 'building-group-header';
+      header.innerHTML = `
+        <div class="building-group-title-box">
+          <span class="bldg-badge-code" style="background-color: rgba(255, 255, 255, 0.2); color: #FFF;">${bldg.code}</span>
+          <span class="building-group-name">${bldg.name}</span>
+          <span style="font-size: 12px; opacity: 0.8;">(${bldgRooms.length} Classrooms Monitored)</span>
+        </div>
+        <div class="building-group-stats">
+          <span>Baseline: <strong>${bldg.currentBaselineKW} kW</strong></span>
+          <span>Period Consumption: <strong>${formatNumber(bldgTotalKWh)} kWh</strong></span>
+          <span style="color: #FCD34D;">Est. Waste: <strong>${formatNumber(bldgWasteKWh)} kWh</strong></span>
+        </div>
+      `;
+      groupWrapper.appendChild(header);
+
+      // Grid of Cards
+      const cardsGrid = document.createElement('div');
+      cardsGrid.className = 'heatmap-cards-grid';
+
+      bldgRooms.forEach(room => {
+        const metrics = room[periodKey];
+        const status = metrics.status || 'green';
+        const card = document.createElement('div');
+        card.className = `room-card status-${status}`;
+        card.setAttribute('data-room-id', room.id);
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('aria-label', `${room.name}, status ${metrics.statusLabel}`);
+
+        // Spotlight metric based on state.heatmapMetric
+        let spotlightLabel = 'Energy / Occupied Hr';
+        let spotlightValue = `${metrics.kwhPerOccupiedHour}`;
+        let spotlightUnit = 'kWh/hr';
+        let spotlightDeltaHtml = '';
+
+        if (state.heatmapMetric === 'totalKWh') {
+          spotlightLabel = 'Total Energy';
+          spotlightValue = formatNumber(metrics.totalKWh);
+          spotlightUnit = 'kWh';
+          const pct = ((metrics.totalKWh / bldgTotalKWh) * 100).toFixed(1);
+          spotlightDeltaHtml = `<span class="spotlight-delta" style="color: var(--color-primary);">${pct}% of bldg</span>`;
+        } else if (state.heatmapMetric === 'estimatedWasteKWh') {
+          spotlightLabel = 'Estimated Waste';
+          spotlightValue = formatNumber(metrics.estimatedWasteKWh);
+          spotlightUnit = 'kWh';
+          spotlightDeltaHtml = `<span class="spotlight-delta" style="color: ${metrics.estimatedWasteKWh > 10 ? 'var(--color-danger)' : 'var(--color-warning)'};">${metrics.wastePercentage}% waste</span>`;
+        } else {
+          // Default: kwhPerOccupiedHour
+          spotlightLabel = 'Energy / Occupied Hr';
+          spotlightValue = `${metrics.kwhPerOccupiedHour}`;
+          spotlightUnit = 'kWh/hr';
+          const diff = metrics.kwhPerOccupiedHour - metrics.benchmarkKwhPerHour;
+          const diffPct = Math.round((diff / metrics.benchmarkKwhPerHour) * 100);
+          const deltaColor = diff > 0 ? (diffPct > 35 ? 'var(--color-danger)' : 'var(--color-warning)') : 'var(--color-success)';
+          spotlightDeltaHtml = `<span class="spotlight-delta" style="color: ${deltaColor};">${diffPct >= 0 ? '+' : ''}${diffPct}% vs target</span>`;
+        }
+
+        card.innerHTML = `
+          <div class="room-card-header">
+            <div class="room-card-id-box">
+              <span class="room-id-tag">${room.id}</span>
+              <span class="room-meta-sub">${room.roomType} • ${room.capacity} seats • ${room.floor}</span>
+            </div>
+            <span class="room-status-pill ${status}">
+              ${metrics.statusLabel}
+            </span>
+          </div>
+
+          <div class="room-metric-spotlight">
+            <div class="spotlight-metric-info">
+              <span class="spotlight-metric-label">${spotlightLabel}</span>
+              <div class="spotlight-metric-val">
+                ${spotlightValue} <span>${spotlightUnit}</span>
+              </div>
+            </div>
+            ${spotlightDeltaHtml}
+          </div>
+
+          <div class="room-micro-metrics">
+            <div class="micro-metric-item">
+              <span class="micro-metric-label">Occupied</span>
+              <span class="micro-metric-value">${metrics.occupiedHours} hrs</span>
+            </div>
+            <div class="micro-metric-item">
+              <span class="micro-metric-label">Gross Draw</span>
+              <span class="micro-metric-value">${metrics.totalKWh} kWh</span>
+            </div>
+            <div class="micro-metric-item">
+              <span class="micro-metric-label">Est. Waste</span>
+              <span class="micro-metric-value" style="color: ${metrics.estimatedWasteKWh > 0 ? 'var(--color-danger)' : 'var(--color-success)'};">
+                ${metrics.estimatedWasteKWh} kWh
+              </span>
+            </div>
+          </div>
+
+          <div class="room-card-footer">
+            <div class="room-telemetry-tag">
+              <span style="width: 7px; height: 7px; border-radius: 50%; background-color: ${status === 'red' ? '#DC2626' : (status === 'orange' ? '#EA580C' : (status === 'yellow' ? '#CA8A04' : '#16A34A'))};"></span>
+              <span>${room.hvacStatus}</span>
+            </div>
+            <span class="room-inspect-link">
+              Inspect Room
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+          </div>
+        `;
+
+        card.addEventListener('click', () => openRoomModal(room.id));
+        card.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openRoomModal(room.id);
+          }
+        });
+
+        cardsGrid.appendChild(card);
+      });
+
+      groupWrapper.appendChild(cardsGrid);
+      elements.heatmapGridContainer.appendChild(groupWrapper);
+    });
+  }
+
+  /**
+   * Open Classroom Detail Modal (Step 2)
+   */
+  function openRoomModal(roomId) {
+    const room = SCEO_DATA.classrooms.find(r => r.id === roomId);
+    if (!room || !elements.roomDetailModal) return;
+
+    state.activeRoomInModal = room;
+    const periodKey = state.dateRange === '30d' ? 'thirtyDays' : 'sevenDays';
+    const periodLabel = state.dateRange === '30d' ? 'Last 30 Days' : 'Last 7 Days';
+    const metrics = room[periodKey];
+
+    // Populate Header & Meta
+    elements.roomModalBuildingBadge.textContent = room.buildingName;
+    elements.roomModalZone.textContent = `${room.hvacZone} • ${room.floor}`;
+    elements.roomModalTitle.textContent = `${room.name}`;
+
+    elements.roomModalStatusBadge.className = `room-status-badge ${metrics.status}`;
+    elements.roomModalStatusBadge.textContent = metrics.statusLabel;
+    elements.roomModalTypeTag.textContent = `${room.roomType} • Capacity: ${room.capacity} Seats • ${room.occupancyState}`;
+
+    // Populate 4 Stats Cards
+    elements.roomModalTotalKWh.textContent = formatNumber(metrics.totalKWh);
+    elements.roomModalPeriodLabel.textContent = periodLabel;
+    elements.roomModalOccupiedHours.textContent = metrics.occupiedHours;
+    elements.roomModalIntensity.textContent = metrics.kwhPerOccupiedHour;
+    
+    const intensityDiff = metrics.kwhPerOccupiedHour - metrics.benchmarkKwhPerHour;
+    const intensityDiffPct = Math.round((intensityDiff / metrics.benchmarkKwhPerHour) * 100);
+    elements.roomModalIntensitySub.textContent = `${intensityDiffPct >= 0 ? '+' : ''}${intensityDiffPct}% vs benchmark`;
+
+    elements.roomModalWasteKWh.textContent = formatNumber(metrics.estimatedWasteKWh);
+    elements.roomModalWastePercent.textContent = `${metrics.wastePercentage}% of room consumption`;
+
+    // Benchmark Comparison
+    elements.roomModalBenchmarkDesc.textContent = `Expected efficient target for ${room.roomType} (${room.capacity} seats): ${metrics.benchmarkKwhPerHour} kWh/hr.`;
+    
+    const deltaKWh = (metrics.kwhPerOccupiedHour - metrics.benchmarkKwhPerHour).toFixed(2);
+    if (deltaKWh > 0) {
+      elements.roomModalBenchmarkDelta.className = 'benchmark-delta-pill';
+      elements.roomModalBenchmarkDelta.textContent = `+${deltaKWh} kWh/hr above benchmark (+${intensityDiffPct}%)`;
+    } else {
+      elements.roomModalBenchmarkDelta.className = 'benchmark-delta-pill optimal';
+      elements.roomModalBenchmarkDelta.textContent = `${Math.abs(deltaKWh)} kWh/hr below baseline (Efficient)`;
+    }
+
+    // Benchmark Progress Bars
+    const maxBarRate = Math.max(metrics.kwhPerOccupiedHour, metrics.benchmarkKwhPerHour, 6) * 1.15;
+    const measuredPct = Math.min(100, Math.round((metrics.kwhPerOccupiedHour / maxBarRate) * 100));
+    const targetPct = Math.min(100, Math.round((metrics.benchmarkKwhPerHour / maxBarRate) * 100));
+
+    elements.roomModalMeasuredBar.style.width = `${measuredPct}%`;
+    elements.roomModalMeasuredBar.style.backgroundColor = metrics.status === 'red' ? '#DC2626' : (metrics.status === 'orange' ? '#EA580C' : (metrics.status === 'yellow' ? '#CA8A04' : '#16A34A'));
+    elements.roomModalMeasuredBarVal.textContent = `${metrics.kwhPerOccupiedHour} kWh/hr`;
+
+    elements.roomModalTargetBar.style.width = `${targetPct}%`;
+    elements.roomModalTargetBarVal.textContent = `${metrics.benchmarkKwhPerHour} kWh/hr`;
+
+    // Populate Causes of Waste List
+    elements.roomModalCausesList.innerHTML = '';
+    if (metrics.wasteCauses && metrics.wasteCauses.length > 0) {
+      metrics.wasteCauses.forEach(cause => {
+        const li = document.createElement('li');
+        li.textContent = cause;
+        elements.roomModalCausesList.appendChild(li);
+      });
+    } else {
+      const li = document.createElement('li');
+      li.style.color = 'var(--color-success-text)';
+      li.textContent = 'No significant waste indicators detected; operating within efficient envelope.';
+      elements.roomModalCausesList.appendChild(li);
+    }
+
+    // Populate Recommended Actions List
+    elements.roomModalActionsList.innerHTML = '';
+    if (metrics.recommendedActions && metrics.recommendedActions.length > 0) {
+      metrics.recommendedActions.forEach(action => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>${action}</span>
+        `;
+        elements.roomModalActionsList.appendChild(li);
+      });
+    }
+
+    // Show Modal
+    elements.roomDetailModal.classList.add('active');
+  }
+
+  /**
+   * Close Classroom Detail Modal
+   */
+  function closeRoomModal() {
+    if (!elements.roomDetailModal) return;
+    elements.roomDetailModal.classList.remove('active');
+    state.activeRoomInModal = null;
+  }
+
+  /**
    * Handle Building Scope Change
    */
   function handleBuildingChange(buildingId) {
     state.selectedBuilding = buildingId;
+    if (elements.buildingSelector) elements.buildingSelector.value = buildingId;
+    if (elements.heatmapBuildingFilter) elements.heatmapBuildingFilter.value = buildingId;
 
     updateKPIs();
     renderConsumptionChart();
@@ -822,6 +1245,10 @@
     renderPriorityActions();
     renderRecentAlerts();
     renderBuildingsTable();
+
+    if (state.currentView === 'energy-heatmap') {
+      renderHeatmap();
+    }
 
     const selectedName = buildingId === 'all'
       ? 'All Campus Buildings'
@@ -838,17 +1265,25 @@
     state.dateRange = range;
 
     if (range === '7d') {
-      elements.btnRange7d.classList.add('active');
-      elements.btnRange30d.classList.remove('active');
+      elements.btnRange7d?.classList.add('active');
+      elements.btnRange30d?.classList.remove('active');
+      elements.hmBtnRange7d?.classList.add('active');
+      elements.hmBtnRange30d?.classList.remove('active');
       showToast('Switched energy telemetry to Last 7 Days', 'info');
     } else {
-      elements.btnRange30d.classList.add('active');
-      elements.btnRange7d.classList.remove('active');
+      elements.btnRange30d?.classList.add('active');
+      elements.btnRange7d?.classList.remove('active');
+      elements.hmBtnRange30d?.classList.add('active');
+      elements.hmBtnRange7d?.classList.remove('active');
       showToast('Switched energy telemetry to Last 30 Days', 'info');
     }
 
     updateKPIs();
     renderConsumptionChart();
+
+    if (state.currentView === 'energy-heatmap') {
+      renderHeatmap();
+    }
   }
 
   /**
@@ -882,16 +1317,59 @@
       elements.sidebarOverlay.classList.remove('active');
     });
 
-    // 3. Building Selector Change
+    // 3. Building Selector Change (Topbar)
     elements.buildingSelector.addEventListener('change', (e) => {
       handleBuildingChange(e.target.value);
     });
 
-    // 4. Date Range Buttons
+    // Heatmap Building Filter Change
+    if (elements.heatmapBuildingFilter) {
+      elements.heatmapBuildingFilter.addEventListener('change', (e) => {
+        handleBuildingChange(e.target.value);
+      });
+    }
+
+    // 4. Date Range Buttons (Topbar & Overview)
     elements.btnRange7d.addEventListener('click', () => handleDateRangeChange('7d'));
     elements.btnRange30d.addEventListener('click', () => handleDateRangeChange('30d'));
 
-    // 5. Notifications Dropdown Toggle
+    // Heatmap Date Range Buttons
+    if (elements.hmBtnRange7d) {
+      elements.hmBtnRange7d.addEventListener('click', () => handleDateRangeChange('7d'));
+    }
+    if (elements.hmBtnRange30d) {
+      elements.hmBtnRange30d.addEventListener('click', () => handleDateRangeChange('30d'));
+    }
+
+    // 5. Heatmap Metric Switcher Buttons
+    const metricBtns = [
+      { btn: elements.btnMetricIntensity, metric: 'kwhPerOccupiedHour', label: 'Energy per Occupied Hour' },
+      { btn: elements.btnMetricTotal, metric: 'totalKWh', label: 'Total Energy (kWh)' },
+      { btn: elements.btnMetricWaste, metric: 'estimatedWasteKWh', label: 'Estimated Waste (kWh)' }
+    ];
+
+    metricBtns.forEach(item => {
+      if (item.btn) {
+        item.btn.addEventListener('click', () => {
+          if (state.heatmapMetric === item.metric) return;
+          state.heatmapMetric = item.metric;
+          metricBtns.forEach(m => m.btn.classList.remove('active'));
+          item.btn.classList.add('active');
+          renderHeatmap();
+          showToast(`Heatmap metric set to: ${item.label}`, 'info');
+        });
+      }
+    });
+
+    // Heatmap Sort Dropdown
+    if (elements.heatmapSortSelect) {
+      elements.heatmapSortSelect.addEventListener('change', (e) => {
+        state.heatmapSort = e.target.value;
+        renderHeatmap();
+      });
+    }
+
+    // 6. Notifications Dropdown Toggle
     elements.notificationsBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       const isActive = elements.notificationPopover.classList.toggle('active');
@@ -914,7 +1392,7 @@
       showToast('All notifications marked as read', 'success');
     });
 
-    // 6. Action Detail Modal Controls
+    // 7. Action Detail Modal Controls (Priority Actions)
     elements.modalCloseBtn.addEventListener('click', closeActionModal);
     elements.modalDismissBtn.addEventListener('click', closeActionModal);
     elements.modalResolveBtn.addEventListener('click', resolveCurrentAction);
@@ -926,11 +1404,39 @@
       }
     });
 
-    // 7. Global Keyboard Handlers (Escape closes open overlays)
+    // 8. Classroom Detail Modal Controls (Step 2)
+    if (elements.roomModalCloseBtn) {
+      elements.roomModalCloseBtn.addEventListener('click', closeRoomModal);
+    }
+    if (elements.btnModalCloseRoom) {
+      elements.btnModalCloseRoom.addEventListener('click', closeRoomModal);
+    }
+    if (elements.roomDetailModal) {
+      elements.roomDetailModal.addEventListener('click', (e) => {
+        if (e.target === elements.roomDetailModal) {
+          closeRoomModal();
+        }
+      });
+    }
+
+    // "View Classroom Analytics" action inside Classroom Modal
+    if (elements.btnViewClassroomAnalytics) {
+      elements.btnViewClassroomAnalytics.addEventListener('click', () => {
+        const roomId = state.activeRoomInModal ? state.activeRoomInModal.id : 'Classroom';
+        closeRoomModal();
+        switchView('classroom-analytics');
+        showToast(`Navigated to Classroom Analytics for ${roomId}`, 'info');
+      });
+    }
+
+    // 9. Global Keyboard Handlers (Escape closes open overlays)
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         if (elements.actionModal.classList.contains('active')) {
           closeActionModal();
+        }
+        if (elements.roomDetailModal && elements.roomDetailModal.classList.contains('active')) {
+          closeRoomModal();
         }
         if (elements.notificationPopover.classList.contains('active')) {
           elements.notificationPopover.classList.remove('active');
@@ -954,11 +1460,12 @@
     renderRecentAlerts();
     renderBuildingsTable();
     renderNotificationsPopover();
+    renderHeatmap();
     initEventListeners();
 
     // Initial welcome toast
     setTimeout(() => {
-      showToast('Welcome to Smart Campus Energy Optimizer (SCEO) • Foundation Loaded', 'info');
+      showToast('Welcome to Smart Campus Energy Optimizer (SCEO) • Step 2 Loaded', 'info');
     }, 400);
   }
 

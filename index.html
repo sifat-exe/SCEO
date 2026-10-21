@@ -534,7 +534,212 @@
         </section>
 
         <!-- ==================================================================
-             VIEW 2: COMING SOON PLACEHOLDER (For Modules 2 through 10)
+             VIEW 2: ENERGY WASTE HEATMAP (Step 2 Implementation)
+             ================================================================== -->
+        <section id="heatmapView" class="dashboard-content-section" style="display:none;" aria-label="Energy Waste Heatmap">
+          
+          <!-- Heatmap Header with Description -->
+          <div class="dashboard-header">
+            <div class="dashboard-heading-group">
+              <h2>Energy Waste Heatmap</h2>
+              <p>Identify high-consumption rooms and prioritize energy-saving opportunities.</p>
+            </div>
+
+            <div class="dashboard-controls">
+              <!-- Simulation Notice -->
+              <div class="simulation-tag">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m13 2-2 2.5V8l2-2.5V2z"></path>
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span>Simulated Room Telemetry &amp; Waste Analysis</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Heatmap Control Toolbar (Filters & Sorters) -->
+          <div class="heatmap-toolbar card">
+            <div class="toolbar-group">
+              <label for="heatmapBuildingFilter" class="toolbar-label">Building Scope:</label>
+              <div class="building-selector-wrapper">
+                <select id="heatmapBuildingFilter" class="building-select" aria-label="Filter heatmap by building">
+                  <option value="all">All Buildings (24 Rooms)</option>
+                  <option value="engineering">Engineering Building (10 Rooms)</option>
+                  <option value="science">Science Building (8 Rooms)</option>
+                  <option value="business">Business Building (6 Rooms)</option>
+                </select>
+                <span class="building-select-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </span>
+              </div>
+            </div>
+
+            <div class="toolbar-group">
+              <span class="toolbar-label">Period:</span>
+              <div class="date-range-switcher" role="group" aria-label="Select Date Range for Heatmap">
+                <button type="button" class="date-range-btn active" data-range="7d" id="hmBtnRange7d">Last 7 Days</button>
+                <button type="button" class="date-range-btn" data-range="30d" id="hmBtnRange30d">Last 30 Days</button>
+              </div>
+            </div>
+
+            <div class="toolbar-group">
+              <span class="toolbar-label">Heatmap Metric:</span>
+              <div class="metric-switcher" role="group" aria-label="Select Primary Heatmap Metric">
+                <button type="button" class="metric-pill active" data-metric="kwhPerOccupiedHour" id="btnMetricIntensity" title="Fair comparison based on utilization intensity">
+                  Energy / Occupied Hr
+                </button>
+                <button type="button" class="metric-pill" data-metric="totalKWh" id="btnMetricTotal" title="Gross electricity consumption in kWh">
+                  Total Energy (kWh)
+                </button>
+                <button type="button" class="metric-pill" data-metric="estimatedWasteKWh" id="btnMetricWaste" title="Identified recoverable waste in kWh">
+                  Estimated Waste (kWh)
+                </button>
+              </div>
+            </div>
+
+            <div class="toolbar-group">
+              <label for="heatmapSortSelect" class="toolbar-label">Sort Rooms:</label>
+              <div class="building-selector-wrapper">
+                <select id="heatmapSortSelect" class="building-select" aria-label="Sort classroom cards">
+                  <option value="metricDesc">Highest to Lowest (Active Metric)</option>
+                  <option value="wasteDesc">Highest to Lowest Waste (kWh)</option>
+                  <option value="totalDesc">Highest to Lowest Total (kWh)</option>
+                  <option value="idAsc">Classroom ID (A to Z)</option>
+                </select>
+                <span class="building-select-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Heatmap Summary Cards (Calculated Dynamically from Filtered Dataset) -->
+          <div class="kpi-grid heatmap-summary-grid">
+            <!-- 1. Total Energy Consumed -->
+            <div class="kpi-card kpi-primary">
+              <div class="kpi-card-header">
+                <span class="kpi-title">Total Energy Consumed</span>
+                <div class="kpi-icon-badge teal">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </div>
+              </div>
+              <div class="kpi-card-body">
+                <span class="kpi-value" id="hmSummaryTotalEnergy">2,480</span>
+                <span class="kpi-unit">kWh</span>
+              </div>
+              <div class="kpi-card-footer">
+                <span class="trend-badge positive">Filtered Sum</span>
+                <span id="hmSummaryTotalSub">Across 24 classrooms</span>
+              </div>
+            </div>
+
+            <!-- 2. High-Priority Rooms -->
+            <div class="kpi-card kpi-warning">
+              <div class="kpi-card-header">
+                <span class="kpi-title">High-Priority Rooms</span>
+                <div class="kpi-icon-badge amber">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </div>
+              </div>
+              <div class="kpi-card-body">
+                <span class="kpi-value" id="hmSummaryHighPriority">7</span>
+                <span class="kpi-unit">rooms</span>
+              </div>
+              <div class="kpi-card-footer">
+                <span class="trend-badge warning">Action Needed</span>
+                <span id="hmSummaryHighSub">Orange &amp; Red status</span>
+              </div>
+            </div>
+
+            <!-- 3. Estimated Avoidable Energy -->
+            <div class="kpi-card kpi-success">
+              <div class="kpi-card-header">
+                <span class="kpi-title">Estimated Avoidable Energy</span>
+                <div class="kpi-icon-badge green">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+              </div>
+              <div class="kpi-card-body">
+                <span class="kpi-value" id="hmSummaryAvoidableEnergy">186</span>
+                <span class="kpi-unit">kWh</span>
+              </div>
+              <div class="kpi-card-footer">
+                <span class="trend-badge positive" id="hmSummaryAvoidablePercent">7.5%</span>
+                <span>Of total building draw</span>
+              </div>
+            </div>
+
+            <!-- 4. Highest Intensity Room -->
+            <div class="kpi-card kpi-info">
+              <div class="kpi-card-header">
+                <span class="kpi-title">Highest Energy / Occupied Hr</span>
+                <div class="kpi-icon-badge blue">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                </div>
+              </div>
+              <div class="kpi-card-body">
+                <span class="kpi-value" style="font-size: var(--font-size-xl);" id="hmSummaryHighestRoom">ENG-101</span>
+                <span class="kpi-unit" id="hmSummaryHighestRate">8.4 kWh/hr</span>
+              </div>
+              <div class="kpi-card-footer">
+                <span class="trend-badge warning" id="hmSummaryHighestDelta">+75%</span>
+                <span id="hmSummaryHighestSub">Above benchmark target</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Heatmap Color Legend & Fairness Explanatory Note -->
+          <div class="heatmap-legend-card card">
+            <div class="legend-content-row">
+              <div class="legend-scale-title">Heatmap Status Classification:</div>
+              <div class="legend-indicators-group">
+                <div class="legend-chip-item">
+                  <span class="legend-swatch green"></span>
+                  <div class="legend-chip-text">
+                    <strong>Low Relative Consumption</strong>
+                    <span>Optimal performance within baseline</span>
+                  </div>
+                </div>
+                <div class="legend-chip-item">
+                  <span class="legend-swatch yellow"></span>
+                  <div class="legend-chip-text">
+                    <strong>Moderate Consumption</strong>
+                    <span>Acceptable efficiency, minor optimization potential</span>
+                  </div>
+                </div>
+                <div class="legend-chip-item">
+                  <span class="legend-swatch orange"></span>
+                  <div class="legend-chip-text">
+                    <strong>High Consumption</strong>
+                    <span>Elevated intensity relative to schedule; audit suggested</span>
+                  </div>
+                </div>
+                <div class="legend-chip-item">
+                  <span class="legend-swatch red"></span>
+                  <div class="legend-chip-text">
+                    <strong>Very High / Waste Issue</strong>
+                    <span>Severe after-hours leakage or thermal override active</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="legend-fairness-note">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span><strong>Fair Comparison Policy:</strong> Room status is weighted against energy consumed per occupied hour, room capacity, and functional type benchmarks. Large lecture halls are not penalized merely for having high aggregate total energy when utilization is proportionally high.</span>
+            </div>
+          </div>
+
+          <!-- Heatmap Interactive Classroom Grid -->
+          <div id="heatmapGridContainer" class="heatmap-buildings-container">
+            <!-- Dynamically populated by JavaScript -->
+          </div>
+
+        </section>
+
+        <!-- ==================================================================
+             VIEW 3: COMING SOON PLACEHOLDER (For Modules 3 through 10)
              ================================================================== -->
         <section id="placeholderView" class="placeholder-view" aria-label="Module Coming Soon">
           <div class="placeholder-card">
@@ -633,6 +838,136 @@
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
           Mark as Addressed
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       CLASSROOM DETAIL MODAL (Step 2 Implementation)
+       ====================================================================== -->
+  <div id="roomDetailModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="roomModalTitle">
+    <div class="modal-container modal-container-lg">
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="modal-label" id="roomModalBuildingBadge">Engineering Building</span>
+            <span class="bldg-badge-code" id="roomModalZone">Zone-ENG-L1</span>
+          </div>
+          <h3 id="roomModalTitle">ENG 101 - Lecture Theater Alpha</h3>
+        </div>
+        <button id="roomModalCloseBtn" class="modal-close-btn" type="button" aria-label="Close room details">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Room Status & Metadata Banner -->
+        <div class="room-modal-banner" id="roomModalBanner">
+          <div class="room-modal-meta-left">
+            <span class="room-status-badge red" id="roomModalStatusBadge">Very High / Waste Issue</span>
+            <span class="room-type-tag" id="roomModalTypeTag">Lecture Theater • 120 Seats • Level 1</span>
+          </div>
+          <div class="room-modal-meta-right">
+            <span class="simulation-tag-sm">⚡ Telemetry Simulated</span>
+          </div>
+        </div>
+
+        <!-- 4 Primary Metrics Grid -->
+        <div class="room-modal-stats-grid">
+          <div class="room-stat-card">
+            <span class="stat-label">Total Energy</span>
+            <div class="stat-value-row">
+              <span class="stat-val" id="roomModalTotalKWh">210</span>
+              <span class="stat-unit">kWh</span>
+            </div>
+            <span class="stat-sub" id="roomModalPeriodLabel">Last 7 Days</span>
+          </div>
+
+          <div class="room-stat-card">
+            <span class="stat-label">Occupied Hours</span>
+            <div class="stat-value-row">
+              <span class="stat-val" id="roomModalOccupiedHours">25</span>
+              <span class="stat-unit">hours</span>
+            </div>
+            <span class="stat-sub">Based on schedule &amp; PIR</span>
+          </div>
+
+          <div class="room-stat-card highlighted">
+            <span class="stat-label">Energy / Occupied Hr</span>
+            <div class="stat-value-row">
+              <span class="stat-val" id="roomModalIntensity">8.4</span>
+              <span class="stat-unit">kWh/hr</span>
+            </div>
+            <span class="stat-sub" id="roomModalIntensitySub">+75% vs room benchmark</span>
+          </div>
+
+          <div class="room-stat-card warning">
+            <span class="stat-label">Estimated Waste</span>
+            <div class="stat-value-row">
+              <span class="stat-val" id="roomModalWasteKWh">52</span>
+              <span class="stat-unit">kWh</span>
+            </div>
+            <span class="stat-sub" id="roomModalWastePercent">24.8% of room consumption</span>
+          </div>
+        </div>
+
+        <!-- Benchmark Comparison Bar -->
+        <div class="room-benchmark-box">
+          <div class="benchmark-header">
+            <div>
+              <span class="modal-label">Fair Campus Benchmark Comparison</span>
+              <p class="benchmark-desc" id="roomModalBenchmarkDesc">Target benchmark for Lecture Theater (120 capacity): 4.8 kWh/hr</p>
+            </div>
+            <span class="benchmark-delta-pill" id="roomModalBenchmarkDelta">+3.6 kWh/hr over target</span>
+          </div>
+
+          <div class="benchmark-bars-visual">
+            <div class="benchmark-bar-row">
+              <span class="bar-name">Room Measured:</span>
+              <div class="progress-track" style="flex: 1; height: 10px;">
+                <div class="progress-fill" id="roomModalMeasuredBar" style="width: 84%; background-color: var(--color-danger);"></div>
+              </div>
+              <span class="bar-num" id="roomModalMeasuredBarVal">8.4 kWh/hr</span>
+            </div>
+            <div class="benchmark-bar-row">
+              <span class="bar-name">Type Baseline:</span>
+              <div class="progress-track" style="flex: 1; height: 10px;">
+                <div class="progress-fill" id="roomModalTargetBar" style="width: 48%; background-color: var(--color-text-muted);"></div>
+              </div>
+              <span class="bar-num" id="roomModalTargetBarVal">4.8 kWh/hr</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Causes of Waste -->
+        <div class="modal-detail-row">
+          <span class="modal-label">Main Possible Causes of Waste</span>
+          <ul class="waste-causes-list" id="roomModalCausesList">
+            <!-- Populated via JS -->
+          </ul>
+        </div>
+
+        <!-- Recommended Actions -->
+        <div class="modal-detail-row">
+          <span class="modal-label">Recommended Remediation Actions</span>
+          <ul class="recommended-actions-list" id="roomModalActionsList">
+            <!-- Populated via JS -->
+          </ul>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btnModalCloseRoom" type="button" class="btn-secondary">Close</button>
+        <button id="btnViewClassroomAnalytics" type="button" class="btn-primary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -2px;">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+            <path d="M6 6h10M6 10h10M6 14h6"></path>
+          </svg>
+          View Classroom Analytics
         </button>
       </div>
     </div>
