@@ -69,7 +69,7 @@
             </button>
           </li>
 
-          <!-- 3. Classroom Analytics -->
+          <!-- 3. Classroom Analytics (Active Step 3) -->
           <li class="nav-item" data-view="classroom-analytics">
             <button class="nav-link" type="button">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -77,7 +77,6 @@
                 <path d="M6 6h10M6 10h10M6 14h6"></path>
               </svg>
               <span>Classroom Analytics</span>
-              <span class="nav-badge soon">Next</span>
             </button>
           </li>
 
@@ -739,7 +738,429 @@
         </section>
 
         <!-- ==================================================================
-             VIEW 3: COMING SOON PLACEHOLDER (For Modules 3 through 10)
+             VIEW 3: CLASSROOM ANALYTICS (Step 3 Implementation)
+             ================================================================== -->
+        <section id="classroomAnalyticsView" class="dashboard-content-section" style="display:none;" aria-label="Classroom Analytics">
+          
+          <!-- Dashboard Header with Title & Subtitle -->
+          <div class="dashboard-header">
+            <div class="dashboard-heading-group">
+              <h2>Classroom Analytics</h2>
+              <p>Understand energy patterns, compare classroom performance, and identify saving opportunities.</p>
+            </div>
+
+            <div class="dashboard-controls">
+              <!-- Simulation Tag -->
+              <div class="simulation-tag">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span>Fictional demo data • Simulated readings &amp; estimates</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Analytics Control Toolbar (Building filter, Classroom selector, Date range, Comparison selector) -->
+          <div class="analytics-toolbar card">
+            <div class="toolbar-group">
+              <label for="caBuildingFilter" class="toolbar-label">Building Scope:</label>
+              <div class="building-selector-wrapper">
+                <select id="caBuildingFilter" class="building-select" aria-label="Filter analytics by building">
+                  <option value="all">All Buildings (24 Rooms)</option>
+                  <option value="engineering">Engineering Building (10 Rooms)</option>
+                  <option value="science">Science Building (8 Rooms)</option>
+                  <option value="business">Business Building (6 Rooms)</option>
+                </select>
+                <span class="building-select-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </span>
+              </div>
+            </div>
+
+            <div class="toolbar-group">
+              <label for="caRoomSelect" class="toolbar-label">Classroom Selector:</label>
+              <div class="building-selector-wrapper">
+                <select id="caRoomSelect" class="building-select room-select" aria-label="Select classroom for detailed analytics">
+                  <!-- Populated dynamically via JS from SCEO_DATA.classrooms -->
+                </select>
+                <span class="building-select-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </span>
+              </div>
+            </div>
+
+            <div class="toolbar-group">
+              <span class="toolbar-label">Date Range:</span>
+              <div class="date-range-switcher" role="group" aria-label="Select Date Range for Analytics">
+                <button type="button" class="date-range-btn active" data-range="7d" id="caBtnRange7d">Last 7 Days</button>
+                <button type="button" class="date-range-btn" data-range="30d" id="caBtnRange30d">Last 30 Days</button>
+              </div>
+            </div>
+
+            <div class="toolbar-group">
+              <label for="caCompareSelect" class="toolbar-label">Compare With:</label>
+              <div class="building-selector-wrapper">
+                <select id="caCompareSelect" class="building-select room-select" aria-label="Select comparison classroom">
+                  <!-- Populated dynamically via JS -->
+                </select>
+                <span class="building-select-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Room Meta Banner (Showing Type, Capacity, Current Telemetry, and Floor) -->
+          <div class="room-meta-banner card" id="caRoomMetaBanner">
+            <!-- Populated dynamically via JS -->
+          </div>
+
+          <!-- Classroom Performance Summary Cards (5 Key Metrics) -->
+          <div class="kpi-grid analytics-summary-grid">
+            <!-- 1. Total Energy Consumed (kWh) -->
+            <div class="kpi-card kpi-primary">
+              <div class="kpi-card-header">
+                <span class="kpi-title">Total Energy Consumed</span>
+                <div class="kpi-icon-badge teal">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </div>
+              </div>
+              <div class="kpi-card-body">
+                <span class="kpi-value" id="caKpiTotalEnergy">--</span>
+                <span class="kpi-unit">kWh</span>
+              </div>
+              <div class="kpi-card-footer">
+                <span class="trend-badge positive" id="caKpiTotalBadge">Simulated Draw</span>
+                <span id="caKpiTotalSub">Period cumulative</span>
+              </div>
+            </div>
+
+            <!-- 2. Energy per Occupied Hour (kWh/hour) -->
+            <div class="kpi-card kpi-info">
+              <div class="kpi-card-header">
+                <span class="kpi-title">Energy / Occupied Hour</span>
+                <div class="kpi-icon-badge blue">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                </div>
+              </div>
+              <div class="kpi-card-body">
+                <span class="kpi-value" id="caKpiIntensity">--</span>
+                <span class="kpi-unit">kWh/hour</span>
+              </div>
+              <div class="kpi-card-footer">
+                <span class="trend-badge" id="caKpiIntensityBadge">Fair Metric</span>
+                <span id="caKpiIntensitySub">Baseline target: --</span>
+              </div>
+            </div>
+
+            <!-- 3. Occupied Hours -->
+            <div class="kpi-card kpi-neutral">
+              <div class="kpi-card-header">
+                <span class="kpi-title">Occupied Hours</span>
+                <div class="kpi-icon-badge gray">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+              </div>
+              <div class="kpi-card-body">
+                <span class="kpi-value" id="caKpiOccupiedHours">--</span>
+                <span class="kpi-unit">hours</span>
+              </div>
+              <div class="kpi-card-footer">
+                <span class="trend-badge positive" id="caKpiOccupiedPercent">Simulated</span>
+                <span id="caKpiOccupiedSub">Academic schedule + PIR</span>
+              </div>
+            </div>
+
+            <!-- 4. Estimated Avoidable Energy (kWh) -->
+            <div class="kpi-card kpi-warning">
+              <div class="kpi-card-header">
+                <span class="kpi-title">Estimated Avoidable Energy</span>
+                <div class="kpi-icon-badge amber">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+              </div>
+              <div class="kpi-card-body">
+                <span class="kpi-value" id="caKpiAvoidableEnergy">--</span>
+                <span class="kpi-unit">kWh</span>
+              </div>
+              <div class="kpi-card-footer">
+                <span class="trend-badge warning" id="caKpiAvoidablePercent">--% Waste</span>
+                <span id="caKpiAvoidableSub">Estimated avoidable</span>
+              </div>
+            </div>
+
+            <!-- 5. Performance Compared with Similar Classrooms -->
+            <div class="kpi-card kpi-benchmark">
+              <div class="kpi-card-header">
+                <span class="kpi-title">vs. Similar Classrooms</span>
+                <div class="kpi-icon-badge purple">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+              </div>
+              <div class="kpi-card-body">
+                <span class="kpi-value" id="caKpiBenchmarkDelta">--</span>
+                <span class="kpi-unit" id="caKpiBenchmarkUnit">vs category</span>
+              </div>
+              <div class="kpi-card-footer">
+                <span class="trend-badge" id="caKpiBenchmarkBadge">--</span>
+                <span id="caKpiBenchmarkSub">Category average</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Energy Consumption Charts Grid -->
+          <div class="analytics-charts-grid">
+            <!-- Chart A: Daily Energy Consumption -->
+            <div class="card chart-card">
+              <div class="chart-card-header">
+                <div>
+                  <h3 class="chart-title">Daily Energy Consumption</h3>
+                  <p class="chart-subtitle" id="caDailyChartSub">Daily energy consumed (kWh) for selected classroom across active period</p>
+                </div>
+                <div class="chart-legend-pills">
+                  <span class="chart-legend-indicator"><span class="legend-dot" style="background:#176B73;"></span> Daily kWh</span>
+                  <span class="chart-legend-indicator"><span class="legend-dot" style="background:#94A3B8;"></span> Baseline Target</span>
+                </div>
+              </div>
+              <div class="chart-canvas-wrapper" style="min-height: 280px; position: relative;">
+                <canvas id="caDailyChart" aria-label="Daily Energy Consumption Chart"></canvas>
+                <div id="caDailyChartFallback" class="chart-fallback" style="display:none;"></div>
+              </div>
+            </div>
+
+            <!-- Chart B: Occupancy vs. Energy -->
+            <div class="card chart-card">
+              <div class="chart-card-header">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <h3 class="chart-title">Occupancy vs. Energy Profile</h3>
+                    <span class="simulation-tag-sm">Simulated Telemetry</span>
+                  </div>
+                  <p class="chart-subtitle">Analyze power draw during teaching sessions vs. unoccupied after-hours leakage</p>
+                </div>
+                <div class="chart-legend-pills">
+                  <span class="chart-legend-indicator"><span class="legend-dot" style="background:#0284C7;"></span> Power Draw (kW)</span>
+                  <span class="chart-legend-indicator"><span class="legend-dot" style="background:#16A34A;"></span> Scheduled Occupancy</span>
+                </div>
+              </div>
+              <div class="chart-canvas-wrapper" style="min-height: 280px; position: relative;">
+                <canvas id="caOccupancyChart" aria-label="Occupancy versus Energy Chart"></canvas>
+                <div id="caOccupancyChartFallback" class="chart-fallback" style="display:none;"></div>
+              </div>
+              <!-- Occupancy Pattern Indicators Callout -->
+              <div class="occupancy-pattern-callout" id="caOccupancyCallout">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart C: Classroom Comparison (Fair Benchmarking) -->
+          <div class="card chart-card">
+            <div class="chart-card-header">
+              <div>
+                <h3 class="chart-title">Classroom Comparison &amp; Category Benchmark</h3>
+                <p class="chart-subtitle" id="caComparisonChartSub">Fair comparison weighted by utilization hours and room type</p>
+              </div>
+              <div class="comparison-metric-toggles" role="group" aria-label="Select comparison metric">
+                <button type="button" class="metric-pill active" data-comp-metric="kwhPerOccupiedHour" id="btnCompIntensity">Energy / Occupied Hr</button>
+                <button type="button" class="metric-pill" data-comp-metric="estimatedWasteKWh" id="btnCompWaste">Avoidable Waste (kWh)</button>
+                <button type="button" class="metric-pill" data-comp-metric="totalKWh" id="btnCompTotal">Total Energy (kWh)</button>
+              </div>
+            </div>
+            <div class="chart-canvas-wrapper" style="min-height: 280px; position: relative;">
+              <canvas id="caComparisonChart" aria-label="Classroom Comparison Chart"></canvas>
+              <div id="caComparisonChartFallback" class="chart-fallback" style="display:none;"></div>
+            </div>
+            <div class="comparison-summary-bar" id="caComparisonSummaryBar">
+              <!-- Injected via JS -->
+            </div>
+          </div>
+
+          <!-- Insights & Recommendations + Saving Opportunity Estimator (2 Column Grid) -->
+          <div class="analytics-split-grid">
+            <!-- Insights & Recommendations Section -->
+            <div class="card insights-card">
+              <div class="card-header-with-actions">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <div class="kpi-icon-badge amber" style="width: 28px; height: 28px;">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <h3 class="card-section-title">Automated Insights &amp; Recommendations</h3>
+                  </div>
+                  <p class="chart-subtitle" style="margin-top: 4px;">Dynamic analysis generated from simulated room telemetry and schedule records</p>
+                </div>
+                <button type="button" class="btn-secondary btn-sm" id="caBtnViewInHeatmap" title="Locate classroom in spatial Heatmap">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  <span>View in Energy Heatmap</span>
+                </button>
+              </div>
+
+              <div class="insights-list-container" id="caInsightsList">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+
+            <!-- Saving Opportunity Estimator Section -->
+            <div class="card estimator-card">
+              <div class="estimator-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div class="kpi-icon-badge green" style="width: 28px; height: 28px;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  </div>
+                  <h3 class="card-section-title">Saving Opportunity Estimator</h3>
+                </div>
+                <span class="simulation-tag-sm">Planning &amp; What-If Tool</span>
+              </div>
+              <p class="chart-subtitle" style="margin-top: 4px; margin-bottom: 16px;">
+                Calculate potential energy and cost savings by eliminating avoidable operational waste.
+              </p>
+
+              <!-- Estimator Controls Form -->
+              <div class="estimator-form-grid">
+                <div class="estimator-field">
+                  <label for="estAvoidableKW" class="estimator-label">
+                    Avoidable Power (kW):
+                    <span class="field-hint">Continuous waste draw</span>
+                  </label>
+                  <div class="input-with-unit">
+                    <input type="number" id="estAvoidableKW" class="estimator-input" min="0" max="100" step="0.1" value="2.5">
+                    <span class="input-unit">kW</span>
+                  </div>
+                </div>
+
+                <div class="estimator-field">
+                  <label for="estHoursPerDay" class="estimator-label">
+                    Avoidable Hours / Day:
+                    <span class="field-hint">Hours HVAC/lights stay on needlessly</span>
+                  </label>
+                  <div class="input-with-unit">
+                    <input type="number" id="estHoursPerDay" class="estimator-input" min="0" max="24" step="0.5" value="4.0">
+                    <span class="input-unit">hrs</span>
+                  </div>
+                </div>
+
+                <div class="estimator-field">
+                  <label for="estDays" class="estimator-label">
+                    Duration (Days):
+                    <span class="field-hint">Horizon for optimization</span>
+                  </label>
+                  <div class="input-with-unit">
+                    <input type="number" id="estDays" class="estimator-input" min="1" max="365" step="1" value="30">
+                    <span class="input-unit">days</span>
+                  </div>
+                </div>
+
+                <div class="estimator-field">
+                  <label for="estTariff" class="estimator-label">
+                    Electricity Tariff:
+                    <span class="field-hint">Demo university rate</span>
+                  </label>
+                  <div class="input-with-unit">
+                    <input type="number" id="estTariff" class="estimator-input" min="0" max="2" step="0.01" value="0.18">
+                    <span class="input-unit">$/kWh</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Action Presets -->
+              <div class="estimator-presets-row">
+                <button type="button" class="btn-preset active" data-days="7" id="btnEstPreset7d">7 Days</button>
+                <button type="button" class="btn-preset" data-days="30" id="btnEstPreset30d">30 Days</button>
+                <button type="button" class="btn-preset" data-days="90" id="btnEstPreset90d">Semester (90d)</button>
+                <button type="button" class="btn-preset" data-days="180" id="btnEstPreset180d">Academic Year (180d)</button>
+                <button type="button" class="btn-load-room-waste" id="btnLoadRoomWaste" title="Load parameters from the selected classroom">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                  Sync Room Data
+                </button>
+              </div>
+
+              <!-- Estimator Calculation Results Display -->
+              <div class="estimator-results-box">
+                <div class="result-tile">
+                  <span class="result-label">Potential Energy Savings</span>
+                  <div class="result-val-row">
+                    <span class="result-number" id="estResultKWh">300</span>
+                    <span class="result-unit">kWh</span>
+                  </div>
+                  <span class="result-sub" id="estResultKWhSub">avoidable kW × hours/day × days</span>
+                </div>
+
+                <div class="result-tile highlighted">
+                  <span class="result-label">Estimated Cost Savings</span>
+                  <div class="result-val-row">
+                    <span class="result-number" id="estResultCost">$54.00</span>
+                  </div>
+                  <span class="result-sub" id="estResultCostSub">at $0.18 per kWh</span>
+                </div>
+
+                <div class="result-tile">
+                  <span class="result-label">CO₂ Emissions Reduction</span>
+                  <div class="result-val-row">
+                    <span class="result-number" id="estResultCO2">126</span>
+                    <span class="result-unit">kg CO₂</span>
+                  </div>
+                  <span class="result-sub">Grid emissions factor ~0.42 kg/kWh</span>
+                </div>
+              </div>
+
+              <div class="estimator-disclaimer">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                <span><strong>Planning Tool Disclaimer:</strong> Results are simulated estimates for planning and prioritization, not guaranteed billing reductions. Actual savings depend on equipment efficiency and ambient weather.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Room Comparison Table Section -->
+          <div class="card table-card">
+            <div class="card-header-with-actions">
+              <div>
+                <h3 class="card-section-title">Campus Classrooms Performance Comparison</h3>
+                <p class="chart-subtitle">Compare all monitored spaces across consumption, occupancy intensity, and actionable waste</p>
+              </div>
+              <div class="table-actions-group">
+                <div class="table-search-box">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <input type="text" id="caTableSearchInput" class="table-search-input" placeholder="Search classroom ID or type..." aria-label="Search rooms table">
+                </div>
+                <span class="table-count-badge" id="caTableCountBadge">Showing 24 rooms</span>
+              </div>
+            </div>
+
+            <!-- Responsive Table Container -->
+            <div class="table-responsive-wrapper">
+              <table class="analytics-table" id="caRoomsTable">
+                <thead>
+                  <tr>
+                    <th scope="col">Classroom ID</th>
+                    <th scope="col">Building</th>
+                    <th scope="col">Room Type / Capacity</th>
+                    <th scope="col">Total Energy (kWh)</th>
+                    <th scope="col">Occupied Hours</th>
+                    <th scope="col">Energy / Occupied Hr</th>
+                    <th scope="col">Avoidable Waste</th>
+                    <th scope="col">Performance Status</th>
+                    <th scope="col" style="text-align: right;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="caRoomsTableBody">
+                  <!-- Dynamically populated via JS -->
+                </tbody>
+              </table>
+              <div id="caTableEmptyState" class="table-empty-state" style="display: none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <h4>No classrooms match your filter</h4>
+                <p>Try selecting "All Buildings" or clearing your search term.</p>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ==================================================================
+             VIEW 4: COMING SOON PLACEHOLDER (For Modules 4 through 10)
              ================================================================== -->
         <section id="placeholderView" class="placeholder-view" aria-label="Module Coming Soon">
           <div class="placeholder-card">

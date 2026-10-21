@@ -19,7 +19,18 @@
     heatmapSort: 'metricDesc', // 'metricDesc' | 'wasteDesc' | 'totalDesc' | 'idAsc'
     consumptionChart: null,
     distributionChart: null,
-    chartJsAvailable: typeof Chart !== 'undefined'
+    chartJsAvailable: typeof Chart !== 'undefined',
+
+    // Step 3: Classroom Analytics State
+    selectedClassroom: 'ENG-101',
+    comparedClassroom: 'ENG-102',
+    classroomDateRange: '7d', // '7d' | '30d'
+    classroomBuildingFilter: 'all', // 'all' | 'engineering' | 'science' | 'business'
+    comparisonMetric: 'kwhPerOccupiedHour', // 'kwhPerOccupiedHour' | 'estimatedWasteKWh' | 'totalKWh'
+    tableSearchQuery: '',
+    caDailyChart: null,
+    caOccupancyChart: null,
+    caComparisonChart: null
   };
 
   // DOM Elements Cache
@@ -141,6 +152,74 @@
     modalAction: document.getElementById('modalAction'),
     modalImpact: document.getElementById('modalImpact'),
 
+    // Step 3: Classroom Analytics View Elements
+    classroomAnalyticsView: document.getElementById('classroomAnalyticsView'),
+    caBuildingFilter: document.getElementById('caBuildingFilter'),
+    caRoomSelect: document.getElementById('caRoomSelect'),
+    caBtnRange7d: document.getElementById('caBtnRange7d'),
+    caBtnRange30d: document.getElementById('caBtnRange30d'),
+    caCompareSelect: document.getElementById('caCompareSelect'),
+    caRoomMetaBanner: document.getElementById('caRoomMetaBanner'),
+
+    // Classroom KPI Cards
+    caKpiTotalEnergy: document.getElementById('caKpiTotalEnergy'),
+    caKpiTotalBadge: document.getElementById('caKpiTotalBadge'),
+    caKpiTotalSub: document.getElementById('caKpiTotalSub'),
+    caKpiIntensity: document.getElementById('caKpiIntensity'),
+    caKpiIntensityBadge: document.getElementById('caKpiIntensityBadge'),
+    caKpiIntensitySub: document.getElementById('caKpiIntensitySub'),
+    caKpiOccupiedHours: document.getElementById('caKpiOccupiedHours'),
+    caKpiOccupiedPercent: document.getElementById('caKpiOccupiedPercent'),
+    caKpiOccupiedSub: document.getElementById('caKpiOccupiedSub'),
+    caKpiAvoidableEnergy: document.getElementById('caKpiAvoidableEnergy'),
+    caKpiAvoidablePercent: document.getElementById('caKpiAvoidablePercent'),
+    caKpiAvoidableSub: document.getElementById('caKpiAvoidableSub'),
+    caKpiBenchmarkDelta: document.getElementById('caKpiBenchmarkDelta'),
+    caKpiBenchmarkUnit: document.getElementById('caKpiBenchmarkUnit'),
+    caKpiBenchmarkBadge: document.getElementById('caKpiBenchmarkBadge'),
+    caKpiBenchmarkSub: document.getElementById('caKpiBenchmarkSub'),
+
+    // Classroom Charts
+    caDailyChartCanvas: document.getElementById('caDailyChart'),
+    caDailyChartSub: document.getElementById('caDailyChartSub'),
+    caDailyChartFallback: document.getElementById('caDailyChartFallback'),
+    caOccupancyChartCanvas: document.getElementById('caOccupancyChart'),
+    caOccupancyCallout: document.getElementById('caOccupancyCallout'),
+    caOccupancyChartFallback: document.getElementById('caOccupancyChartFallback'),
+    caComparisonChartCanvas: document.getElementById('caComparisonChart'),
+    caComparisonChartSub: document.getElementById('caComparisonChartSub'),
+    caComparisonSummaryBar: document.getElementById('caComparisonSummaryBar'),
+    caComparisonChartFallback: document.getElementById('caComparisonChartFallback'),
+    btnCompIntensity: document.getElementById('btnCompIntensity'),
+    btnCompWaste: document.getElementById('btnCompWaste'),
+    btnCompTotal: document.getElementById('btnCompTotal'),
+
+    // Insights & Recommendations
+    caInsightsList: document.getElementById('caInsightsList'),
+    caBtnViewInHeatmap: document.getElementById('caBtnViewInHeatmap'),
+
+    // Estimator
+    estAvoidableKW: document.getElementById('estAvoidableKW'),
+    estHoursPerDay: document.getElementById('estHoursPerDay'),
+    estDays: document.getElementById('estDays'),
+    estTariff: document.getElementById('estTariff'),
+    btnEstPreset7d: document.getElementById('btnEstPreset7d'),
+    btnEstPreset30d: document.getElementById('btnEstPreset30d'),
+    btnEstPreset90d: document.getElementById('btnEstPreset90d'),
+    btnEstPreset180d: document.getElementById('btnEstPreset180d'),
+    btnLoadRoomWaste: document.getElementById('btnLoadRoomWaste'),
+    estResultKWh: document.getElementById('estResultKWh'),
+    estResultKWhSub: document.getElementById('estResultKWhSub'),
+    estResultCost: document.getElementById('estResultCost'),
+    estResultCostSub: document.getElementById('estResultCostSub'),
+    estResultCO2: document.getElementById('estResultCO2'),
+
+    // Table
+    caTableSearchInput: document.getElementById('caTableSearchInput'),
+    caTableCountBadge: document.getElementById('caTableCountBadge'),
+    caRoomsTableBody: document.getElementById('caRoomsTableBody'),
+    caTableEmptyState: document.getElementById('caTableEmptyState'),
+
     // Toast
     toastContainer: document.getElementById('toastContainer')
   };
@@ -212,12 +291,14 @@
     if (viewKey === 'overview') {
       elements.overviewView.style.display = 'block';
       if (elements.heatmapView) elements.heatmapView.style.display = 'none';
+      if (elements.classroomAnalyticsView) elements.classroomAnalyticsView.style.display = 'none';
       elements.placeholderView.style.display = 'none';
       elements.topHeading.textContent = 'Campus Overview';
       elements.topBreadcrumb.textContent = 'Campus Management / Overview';
     } else if (viewKey === 'energy-heatmap') {
       elements.overviewView.style.display = 'none';
       if (elements.heatmapView) elements.heatmapView.style.display = 'block';
+      if (elements.classroomAnalyticsView) elements.classroomAnalyticsView.style.display = 'none';
       elements.placeholderView.style.display = 'none';
       elements.topHeading.textContent = 'Energy Waste Heatmap';
       elements.topBreadcrumb.textContent = 'Campus Management / Energy Waste Heatmap';
@@ -228,6 +309,22 @@
       }
       syncHeatmapDateButtons();
       renderHeatmap();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (viewKey === 'classroom-analytics') {
+      elements.overviewView.style.display = 'none';
+      if (elements.heatmapView) elements.heatmapView.style.display = 'none';
+      if (elements.classroomAnalyticsView) elements.classroomAnalyticsView.style.display = 'block';
+      elements.placeholderView.style.display = 'none';
+      elements.topHeading.textContent = 'Classroom Analytics';
+      elements.topBreadcrumb.textContent = 'Campus Management / Classroom Analytics';
+
+      // Sync building filter and date buttons
+      if (elements.caBuildingFilter) {
+        elements.caBuildingFilter.value = state.classroomBuildingFilter;
+      }
+      syncClassroomDateButtons();
+      populateClassroomSelectors();
+      renderClassroomAnalytics();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       // Show Coming Soon Placeholder
@@ -244,7 +341,7 @@
 
       elements.placeholderCode.textContent = modInfo.code || 'NEXT STAGE';
       elements.placeholderTitle.textContent = modInfo.title;
-      elements.placeholderDesc.textContent = `${modInfo.description} Full interactive modeling will be implemented in Step 3.`;
+      elements.placeholderDesc.textContent = `${modInfo.description} Full interactive modeling will be implemented in the next build stage.`;
       
       elements.topHeading.textContent = modInfo.title;
       elements.topBreadcrumb.textContent = `Campus Management / ${modInfo.title}`;
@@ -1032,6 +1129,7 @@
         const metrics = room[periodKey];
         const status = metrics.status || 'green';
         const card = document.createElement('div');
+        card.id = `roomCard-${room.id}`;
         card.className = `room-card status-${status}`;
         card.setAttribute('data-room-id', room.id);
         card.setAttribute('role', 'button');
@@ -1231,6 +1329,1035 @@
     state.activeRoomInModal = null;
   }
 
+  /* ==========================================================================
+     CLASSROOM ANALYTICS (Step 3 Implementation)
+     ========================================================================== */
+
+  /**
+   * Sync Date Range Buttons for Classroom Analytics
+   */
+  function syncClassroomDateButtons() {
+    if (!elements.caBtnRange7d || !elements.caBtnRange30d) return;
+    if (state.classroomDateRange === '7d') {
+      elements.caBtnRange7d.classList.add('active');
+      elements.caBtnRange30d.classList.remove('active');
+    } else {
+      elements.caBtnRange7d.classList.remove('active');
+      elements.caBtnRange30d.classList.add('active');
+    }
+  }
+
+  /**
+   * Populate Classroom and Comparison Selectors based on Building Filter
+   */
+  function populateClassroomSelectors() {
+    if (!elements.caRoomSelect || !elements.caCompareSelect) return;
+
+    const bldgFilter = state.classroomBuildingFilter;
+    const availableRooms = bldgFilter === 'all'
+      ? SCEO_DATA.classrooms
+      : SCEO_DATA.classrooms.filter(r => r.buildingId === bldgFilter);
+
+    // If currently selected room is not in available rooms, default to first available
+    const hasSelected = availableRooms.some(r => r.id === state.selectedClassroom);
+    if (!hasSelected && availableRooms.length > 0) {
+      state.selectedClassroom = availableRooms[0].id;
+    }
+
+    // Populate Target Classroom Selector
+    elements.caRoomSelect.innerHTML = '';
+    availableRooms.forEach(room => {
+      const opt = document.createElement('option');
+      opt.value = room.id;
+      opt.textContent = `${room.id} - ${room.roomType} (${room.capacity} seats)`;
+      if (room.id === state.selectedClassroom) opt.selected = true;
+      elements.caRoomSelect.appendChild(opt);
+    });
+
+    // Populate Comparison Classroom Selector (includes all campus rooms)
+    elements.caCompareSelect.innerHTML = '';
+    const compRooms = SCEO_DATA.classrooms;
+    if (!state.comparedClassroom || state.comparedClassroom === state.selectedClassroom) {
+      const other = compRooms.find(r => r.id !== state.selectedClassroom) || compRooms[0];
+      state.comparedClassroom = other ? other.id : '';
+    }
+
+    compRooms.forEach(room => {
+      const opt = document.createElement('option');
+      opt.value = room.id;
+      opt.textContent = `${room.id} (${room.roomType}, ${room.capacity} seats)`;
+      if (room.id === state.comparedClassroom) opt.selected = true;
+      elements.caCompareSelect.appendChild(opt);
+    });
+  }
+
+  /**
+   * Master Renderer for Classroom Analytics
+   */
+  function renderClassroomAnalytics() {
+    if (!elements.classroomAnalyticsView) return;
+
+    // Get active room
+    let room = SCEO_DATA.classrooms.find(r => r.id === state.selectedClassroom);
+    if (!room) {
+      room = SCEO_DATA.classrooms[0];
+      if (room) state.selectedClassroom = room.id;
+    }
+    if (!room) return;
+
+    // Get comparison room
+    let comparedRoom = SCEO_DATA.classrooms.find(r => r.id === state.comparedClassroom);
+    if (!comparedRoom || comparedRoom.id === room.id) {
+      comparedRoom = SCEO_DATA.classrooms.find(r => r.id !== room.id) || room;
+      state.comparedClassroom = comparedRoom.id;
+    }
+
+    renderClassroomMetaBanner(room);
+    renderClassroomSummaryCards(room);
+    renderClassroomDailyChart(room);
+    renderClassroomOccupancyChart(room);
+    renderClassroomComparisonChart(room, comparedRoom);
+    renderClassroomInsights(room, comparedRoom);
+    renderClassroomComparisonTable();
+    calculateSavingOpportunity();
+  }
+
+  /**
+   * Render Room Meta Banner
+   */
+  function renderClassroomMetaBanner(room) {
+    if (!elements.caRoomMetaBanner) return;
+
+    const periodKey = state.classroomDateRange === '30d' ? 'thirtyDays' : 'sevenDays';
+    const periodData = room[periodKey] || room.sevenDays;
+    const status = periodData.status || 'green';
+
+    let statusPillClass = 'green';
+    let statusPillLabel = 'Low Relative Consumption';
+    if (status === 'red') {
+      statusPillClass = 'red';
+      statusPillLabel = 'Very High / Waste Issue';
+    } else if (status === 'orange') {
+      statusPillClass = 'orange';
+      statusPillLabel = 'High Consumption';
+    } else if (status === 'yellow') {
+      statusPillClass = 'yellow';
+      statusPillLabel = 'Moderate Consumption';
+    }
+
+    elements.caRoomMetaBanner.innerHTML = `
+      <div class="room-meta-info-left">
+        <div class="room-meta-title-group">
+          <h3>${room.name}</h3>
+        </div>
+        <div class="room-meta-badges">
+          <span class="room-meta-chip primary">${room.buildingName}</span>
+          <span class="room-meta-chip">${room.roomType}</span>
+          <span class="room-meta-chip">${room.capacity} Seats</span>
+          <span class="room-meta-chip">${room.floor} • ${room.hvacZone}</span>
+        </div>
+      </div>
+      <div class="room-meta-info-right">
+        <div class="telemetry-live-pill" title="Simulated real-time draw">
+          <span class="dot"></span>
+          <span>Live Draw: ${room.currentPowerKW} kW</span>
+        </div>
+        <span class="room-status-badge ${statusPillClass}">${statusPillLabel}</span>
+      </div>
+    `;
+  }
+
+  /**
+   * Render 5 Performance Summary Cards
+   */
+  function renderClassroomSummaryCards(room) {
+    const is30d = state.classroomDateRange === '30d';
+    const periodKey = is30d ? 'thirtyDays' : 'sevenDays';
+    const periodData = room[periodKey] || room.sevenDays || {};
+
+    const totalKWh = Number(periodData.totalKWh) || 0;
+    const occupiedHours = Number(periodData.occupiedHours) || 0;
+    const avoidableKWh = Number(periodData.estimatedWasteKWh) || 0;
+    const wastePercent = Number(periodData.wastePercentage) || 0;
+    const benchmark = Number(periodData.benchmarkKwhPerHour) || 4.5;
+
+    // Safe Intensity Calculation (prevent divide-by-zero)
+    const intensity = occupiedHours > 0
+      ? (totalKWh / occupiedHours).toFixed(1)
+      : (periodData.kwhPerOccupiedHour ? periodData.kwhPerOccupiedHour.toFixed(1) : '0.0');
+
+    // 1. Total Energy Consumed
+    if (elements.caKpiTotalEnergy) elements.caKpiTotalEnergy.textContent = totalKWh.toLocaleString('en-US');
+    if (elements.caKpiTotalSub) elements.caKpiTotalSub.textContent = `Period total (${is30d ? '30 days' : '7 days'})`;
+    if (elements.caKpiTotalBadge) {
+      elements.caKpiTotalBadge.textContent = 'Simulated Draw';
+      elements.caKpiTotalBadge.className = 'trend-badge positive';
+    }
+
+    // 2. Energy per Occupied Hour
+    if (elements.caKpiIntensity) elements.caKpiIntensity.textContent = intensity;
+    if (elements.caKpiIntensitySub) elements.caKpiIntensitySub.textContent = `Benchmark target: ${benchmark} kWh/hr`;
+    if (elements.caKpiIntensityBadge) {
+      const diffVsTarget = benchmark > 0 ? Math.round(((parseFloat(intensity) - benchmark) / benchmark) * 100) : 0;
+      if (diffVsTarget > 15) {
+        elements.caKpiIntensityBadge.textContent = `+${diffVsTarget}% vs target`;
+        elements.caKpiIntensityBadge.className = 'trend-badge warning';
+      } else if (diffVsTarget <= 0) {
+        elements.caKpiIntensityBadge.textContent = `${diffVsTarget}% efficient`;
+        elements.caKpiIntensityBadge.className = 'trend-badge positive';
+      } else {
+        elements.caKpiIntensityBadge.textContent = `+${diffVsTarget}% acceptable`;
+        elements.caKpiIntensityBadge.className = 'trend-badge';
+      }
+    }
+
+    // 3. Occupied Hours
+    if (elements.caKpiOccupiedHours) elements.caKpiOccupiedHours.textContent = occupiedHours.toLocaleString('en-US');
+    if (elements.caKpiOccupiedPercent) {
+      const maxAcademicHrs = is30d ? 200 : 50;
+      const utilPct = maxAcademicHrs > 0 ? Math.min(100, Math.round((occupiedHours / maxAcademicHrs) * 100)) : 0;
+      elements.caKpiOccupiedPercent.textContent = `${utilPct}% Utilized`;
+      elements.caKpiOccupiedPercent.className = 'trend-badge positive';
+    }
+    if (elements.caKpiOccupiedSub) elements.caKpiOccupiedSub.textContent = 'Timetable + PIR schedule';
+
+    // 4. Estimated Avoidable Energy
+    if (elements.caKpiAvoidableEnergy) elements.caKpiAvoidableEnergy.textContent = avoidableKWh.toLocaleString('en-US');
+    if (elements.caKpiAvoidablePercent) {
+      elements.caKpiAvoidablePercent.textContent = `${wastePercent}% Waste`;
+      elements.caKpiAvoidablePercent.className = wastePercent > 12 ? 'trend-badge warning' : 'trend-badge positive';
+    }
+    if (elements.caKpiAvoidableSub) elements.caKpiAvoidableSub.textContent = 'Estimated recoverable waste';
+
+    // 5. Performance Compared with Similar Classrooms
+    const similarRooms = SCEO_DATA.classrooms.filter(r => r.roomType === room.roomType);
+    const roomsToCompare = similarRooms.length > 1 ? similarRooms : SCEO_DATA.classrooms;
+
+    let totalSimIntensity = 0;
+    let validCount = 0;
+    roomsToCompare.forEach(r => {
+      const m = r[periodKey] || r.sevenDays;
+      if (m && m.kwhPerOccupiedHour) {
+        totalSimIntensity += m.kwhPerOccupiedHour;
+        validCount++;
+      }
+    });
+
+    const categoryAvgIntensity = validCount > 0 ? (totalSimIntensity / validCount) : benchmark;
+    const diffPct = categoryAvgIntensity > 0
+      ? Math.round(((parseFloat(intensity) - categoryAvgIntensity) / categoryAvgIntensity) * 100)
+      : 0;
+
+    if (elements.caKpiBenchmarkDelta) {
+      elements.caKpiBenchmarkDelta.textContent = `${diffPct >= 0 ? '+' : ''}${diffPct}%`;
+    }
+    if (elements.caKpiBenchmarkUnit) {
+      elements.caKpiBenchmarkUnit.textContent = `vs ${room.roomType}s`;
+    }
+    if (elements.caKpiBenchmarkSub) {
+      elements.caKpiBenchmarkSub.textContent = `Category avg: ${categoryAvgIntensity.toFixed(1)} kWh/hr`;
+    }
+    if (elements.caKpiBenchmarkBadge) {
+      if (diffPct > 15) {
+        elements.caKpiBenchmarkBadge.textContent = 'High Relative Draw';
+        elements.caKpiBenchmarkBadge.className = 'trend-badge warning';
+      } else if (diffPct < -5) {
+        elements.caKpiBenchmarkBadge.textContent = 'Better Than Avg';
+        elements.caKpiBenchmarkBadge.className = 'trend-badge positive';
+      } else {
+        elements.caKpiBenchmarkBadge.textContent = 'Typical Performance';
+        elements.caKpiBenchmarkBadge.className = 'trend-badge';
+      }
+    }
+  }
+
+  /**
+   * Helper: Generate Daily Readings for a Classroom that sum exactly to totalKWh
+   */
+  function generateRoomDailyData(room, is30d) {
+    const periodKey = is30d ? 'thirtyDays' : 'sevenDays';
+    const periodData = room[periodKey] || room.sevenDays;
+    const totalKWh = periodData.totalKWh || 100;
+    const isWasteful = periodData.status === 'red' || periodData.status === 'orange';
+
+    if (!is30d) {
+      // 7 days weights: Mon, Tue, Wed, Thu, Fri, Sat, Sun
+      const weights = isWasteful
+        ? [0.16, 0.17, 0.18, 0.17, 0.16, 0.08, 0.08]
+        : [0.18, 0.19, 0.20, 0.19, 0.18, 0.03, 0.03];
+      
+      let sum = 0;
+      const daily = weights.map((w, idx) => {
+        if (idx === weights.length - 1) {
+          return Math.max(1, totalKWh - sum);
+        }
+        const val = Math.round(totalKWh * w);
+        sum += val;
+        return val;
+      });
+
+      // Baseline target curve
+      const baselineVal = Math.round((periodData.benchmarkKwhPerHour || 4.5) * (periodData.occupiedHours / 5) * 0.9);
+      const baseline = daily.map((_, i) => (i >= 5 ? Math.round(baselineVal * 0.25) : baselineVal));
+
+      return {
+        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        consumption: daily,
+        baseline: baseline
+      };
+    } else {
+      // 30 days
+      const labels = Array.from({ length: 30 }, (_, i) => `D${i + 1}`);
+      const baseDaily = totalKWh / 30;
+      let sum = 0;
+      const daily = labels.map((_, i) => {
+        const isWeekend = (i % 7 >= 5);
+        const factor = isWeekend ? (isWasteful ? 0.6 : 0.25) : 1.15;
+        if (i === 29) {
+          return Math.max(1, totalKWh - sum);
+        }
+        const val = Math.round(baseDaily * factor);
+        sum += val;
+        return val;
+      });
+
+      const baselineDaily = Math.round(baseDaily * 0.75);
+      const baseline = labels.map((_, i) => (i % 7 >= 5 ? Math.round(baselineDaily * 0.3) : baselineDaily));
+
+      return {
+        labels: labels,
+        consumption: daily,
+        baseline: baseline
+      };
+    }
+  }
+
+  /**
+   * Render Chart A: Daily Energy Consumption
+   */
+  function renderClassroomDailyChart(room) {
+    const is30d = state.classroomDateRange === '30d';
+    const dailyData = generateRoomDailyData(room, is30d);
+
+    if (elements.caDailyChartSub) {
+      elements.caDailyChartSub.textContent = `Daily energy consumed (${is30d ? '30 days' : '7 days'}) for ${room.id} vs baseline target`;
+    }
+
+    if (state.chartJsAvailable && elements.caDailyChartCanvas) {
+      if (elements.caDailyChartFallback) elements.caDailyChartFallback.style.display = 'none';
+      elements.caDailyChartCanvas.style.display = 'block';
+
+      if (state.caDailyChart) {
+        state.caDailyChart.data.labels = dailyData.labels;
+        state.caDailyChart.data.datasets[0].data = dailyData.consumption;
+        state.caDailyChart.data.datasets[0].label = `${room.id} Daily kWh`;
+        state.caDailyChart.data.datasets[1].data = dailyData.baseline;
+        state.caDailyChart.update();
+      } else {
+        const ctx = elements.caDailyChartCanvas.getContext('2d');
+        state.caDailyChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: dailyData.labels,
+            datasets: [
+              {
+                type: 'bar',
+                label: `${room.id} Daily kWh`,
+                data: dailyData.consumption,
+                backgroundColor: 'rgba(23, 107, 115, 0.85)',
+                hoverBackgroundColor: '#12545A',
+                borderRadius: 4,
+                order: 2
+              },
+              {
+                type: 'line',
+                label: 'Baseline Target',
+                data: dailyData.baseline,
+                borderColor: '#94A3B8',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                pointBackgroundColor: '#94A3B8',
+                pointRadius: is30d ? 0 : 3,
+                fill: false,
+                tension: 0.2,
+                order: 1
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#0F172A',
+                titleFont: { family: 'Inter', size: 12 },
+                bodyFont: { family: 'Inter', size: 12 },
+                padding: 10,
+                callbacks: {
+                  label: (context) => ` ${context.dataset.label}: ${context.parsed.y} kWh`
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { font: { family: 'Inter', size: 11 }, color: '#64748B' }
+              },
+              y: {
+                beginAtZero: true,
+                grid: { color: 'rgba(226, 232, 240, 0.8)' },
+                ticks: {
+                  font: { family: 'Inter', size: 11 },
+                  color: '#64748B',
+                  callback: (value) => `${value} kWh`
+                }
+              }
+            }
+          }
+        });
+      }
+    } else if (elements.caDailyChartFallback) {
+      elements.caDailyChartCanvas.style.display = 'none';
+      elements.caDailyChartFallback.style.display = 'flex';
+      elements.caDailyChartFallback.innerHTML = `
+        <div style="display: flex; gap: 8px; align-items: flex-end; height: 180px; width: 100%; padding: 10px;">
+          ${dailyData.consumption.slice(0, 7).map((val, i) => `
+            <div style="flex: 1; text-align: center;">
+              <div style="background: #176B73; height: ${Math.min(140, Math.max(10, val * 3))}px; border-radius: 4px;"></div>
+              <div style="font-size: 11px; margin-top: 4px; color: #64748B;">${dailyData.labels[i]}</div>
+              <div style="font-size: 10px; font-weight: 600;">${val}k</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+  }
+
+  /**
+   * Render Chart B: Occupancy vs. Energy Profile (24h Typical Day)
+   */
+  function renderClassroomOccupancyChart(room) {
+    const periodKey = state.classroomDateRange === '30d' ? 'thirtyDays' : 'sevenDays';
+    const periodData = room[periodKey] || room.sevenDays;
+    const isWasteful = periodData.status === 'red' || periodData.status === 'orange';
+
+    const hours = ['00:00', '02:00', '04:00', '06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'];
+    
+    // Scheduled occupancy: 1 = Occupied (classes in session), 0 = Empty
+    const occupancySchedule = [0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0];
+
+    // Power curve generation (kW)
+    const peakKW = parseFloat((room.capacity * 0.045 + 2.2).toFixed(1));
+    const idleKW = isWasteful ? parseFloat((peakKW * 0.65).toFixed(1)) : parseFloat((peakKW * 0.15).toFixed(1));
+    const nightKW = isWasteful ? parseFloat((peakKW * 0.45).toFixed(1)) : parseFloat((peakKW * 0.08).toFixed(1));
+
+    const powerReadings = [
+      nightKW, nightKW, nightKW, parseFloat((nightKW * 1.1).toFixed(1)),
+      parseFloat((peakKW * 0.5).toFixed(1)), // 08:00 morning warmup
+      peakKW,                                // 10:00 class peak
+      parseFloat((peakKW * 0.9).toFixed(1)), // 12:00 midday class
+      peakKW,                                // 14:00 afternoon class
+      parseFloat((peakKW * 0.95).toFixed(1)),// 16:00 late class
+      idleKW,                                // 18:00 after classes finish (leakage in wasteful rooms!)
+      parseFloat((idleKW * 0.9).toFixed(1)), // 20:00 evening idle
+      nightKW                                // 22:00 night baseload
+    ];
+
+    if (state.chartJsAvailable && elements.caOccupancyChartCanvas) {
+      if (elements.caOccupancyChartFallback) elements.caOccupancyChartFallback.style.display = 'none';
+      elements.caOccupancyChartCanvas.style.display = 'block';
+
+      if (state.caOccupancyChart) {
+        state.caOccupancyChart.data.datasets[0].data = powerReadings;
+        state.caOccupancyChart.data.datasets[0].label = `${room.id} Power Draw (kW)`;
+        state.caOccupancyChart.data.datasets[1].data = occupancySchedule;
+        state.caOccupancyChart.update();
+      } else {
+        const ctx = elements.caOccupancyChartCanvas.getContext('2d');
+        state.caOccupancyChart = new Chart(ctx, {
+          data: {
+            labels: hours,
+            datasets: [
+              {
+                type: 'bar',
+                label: `${room.id} Power Draw (kW)`,
+                data: powerReadings,
+                backgroundColor: 'rgba(2, 132, 199, 0.75)',
+                hoverBackgroundColor: '#0284C7',
+                borderRadius: 4,
+                yAxisID: 'y',
+                order: 2
+              },
+              {
+                type: 'line',
+                label: 'Scheduled Occupancy',
+                data: occupancySchedule,
+                borderColor: '#16A34A',
+                backgroundColor: 'rgba(22, 163, 74, 0.12)',
+                borderWidth: 2.5,
+                stepped: 'before',
+                fill: true,
+                pointRadius: 3,
+                pointBackgroundColor: '#16A34A',
+                yAxisID: 'y1',
+                order: 1
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#0F172A',
+                titleFont: { family: 'Inter', size: 12 },
+                bodyFont: { family: 'Inter', size: 12 },
+                padding: 10,
+                callbacks: {
+                  label: (ctx) => {
+                    if (ctx.datasetIndex === 0) return ` Power Draw: ${ctx.parsed.y} kW`;
+                    return ` Status: ${ctx.parsed.y === 1 ? 'Classes Active (Occupied)' : 'No Classes (Empty)'}`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { font: { family: 'Inter', size: 11 }, color: '#64748B' }
+              },
+              y: {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                beginAtZero: true,
+                grid: { color: 'rgba(226, 232, 240, 0.8)' },
+                ticks: {
+                  font: { family: 'Inter', size: 11 },
+                  color: '#64748B',
+                  callback: (value) => `${value} kW`
+                }
+              },
+              y1: {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                min: 0,
+                max: 1.4,
+                grid: { drawOnChartArea: false },
+                ticks: {
+                  font: { family: 'Inter', size: 10 },
+                  color: '#16A34A',
+                  stepSize: 1,
+                  callback: (value) => (value === 1 ? 'Occupied' : (value === 0 ? 'Empty' : ''))
+                }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    // Populate Callout box with 3 required pattern indicators
+    if (elements.caOccupancyCallout) {
+      const afterHoursNote = isWasteful
+        ? `Draw persists at ${idleKW} kW between 18:00 and 22:00 after classes dismiss due to override.`
+        : `Power drops cleanly to ${idleKW} kW standby immediately upon 18:00 class dismissal.`;
+
+      const emptyPeriodNote = isWasteful
+        ? `Overnight baseline remains elevated at ${nightKW} kW (target eco-standby is 0.5 kW).`
+        : `Overnight baseline draw sits at an efficient ${nightKW} kW standby level.`;
+
+      elements.caOccupancyCallout.innerHTML = `
+        <div class="pattern-pill">
+          <div class="pattern-icon green">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <div class="pattern-text-group">
+            <span class="pattern-title">High Draw During Occupancy</span>
+            <span class="pattern-desc">Peak ${peakKW} kW draw during 09:00-17:00 teaching timetable.</span>
+          </div>
+        </div>
+
+        <div class="pattern-pill">
+          <div class="pattern-icon ${isWasteful ? 'amber' : 'green'}">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="pattern-text-group">
+            <span class="pattern-title">After-Hours (Classes Concluded)</span>
+            <span class="pattern-desc">${afterHoursNote}</span>
+          </div>
+        </div>
+
+        <div class="pattern-pill">
+          <div class="pattern-icon ${isWasteful ? 'red' : 'green'}">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div class="pattern-text-group">
+            <span class="pattern-title">Unoccupied Night Periods</span>
+            <span class="pattern-desc">${emptyPeriodNote}</span>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  /**
+   * Render Chart C: Classroom Comparison (Fair Benchmarking)
+   */
+  function renderClassroomComparisonChart(room, comparedRoom) {
+    const periodKey = state.classroomDateRange === '30d' ? 'thirtyDays' : 'sevenDays';
+    const p1 = room[periodKey] || room.sevenDays;
+    const p2 = comparedRoom[periodKey] || comparedRoom.sevenDays;
+
+    // Category Average (similar rooms)
+    const similarRooms = SCEO_DATA.classrooms.filter(r => r.roomType === room.roomType);
+    const roomsToAverage = similarRooms.length > 0 ? similarRooms : SCEO_DATA.classrooms;
+
+    let avgIntensity = 0;
+    let avgWaste = 0;
+    let avgTotal = 0;
+
+    roomsToAverage.forEach(r => {
+      const m = r[periodKey] || r.sevenDays;
+      avgIntensity += (m.kwhPerOccupiedHour || 0);
+      avgWaste += (m.estimatedWasteKWh || 0);
+      avgTotal += (m.totalKWh || 0);
+    });
+
+    avgIntensity = parseFloat((avgIntensity / roomsToAverage.length).toFixed(1));
+    avgWaste = Math.round(avgWaste / roomsToAverage.length);
+    avgTotal = Math.round(avgTotal / roomsToAverage.length);
+
+    let metricLabel = 'Energy / Occupied Hr (kWh/hour)';
+    let val1 = p1.kwhPerOccupiedHour || 0;
+    let val2 = p2.kwhPerOccupiedHour || 0;
+    let valAvg = avgIntensity;
+    let unit = 'kWh/hr';
+
+    if (state.comparisonMetric === 'estimatedWasteKWh') {
+      metricLabel = 'Estimated Avoidable Energy (kWh)';
+      val1 = p1.estimatedWasteKWh || 0;
+      val2 = p2.estimatedWasteKWh || 0;
+      valAvg = avgWaste;
+      unit = 'kWh';
+    } else if (state.comparisonMetric === 'totalKWh') {
+      metricLabel = 'Total Energy Consumed (kWh)';
+      val1 = p1.totalKWh || 0;
+      val2 = p2.totalKWh || 0;
+      valAvg = avgTotal;
+      unit = 'kWh';
+    }
+
+    const labels = [
+      `${room.id} (${room.roomType})`,
+      `${comparedRoom.id} (${comparedRoom.roomType})`,
+      `${room.roomType} Category Avg`
+    ];
+
+    if (state.chartJsAvailable && elements.caComparisonChartCanvas) {
+      if (elements.caComparisonChartFallback) elements.caComparisonChartFallback.style.display = 'none';
+      elements.caComparisonChartCanvas.style.display = 'block';
+
+      if (state.caComparisonChart) {
+        state.caComparisonChart.data.labels = labels;
+        state.caComparisonChart.data.datasets[0].data = [val1, val2, valAvg];
+        state.caComparisonChart.data.datasets[0].label = metricLabel;
+        state.caComparisonChart.update();
+      } else {
+        const ctx = elements.caComparisonChartCanvas.getContext('2d');
+        state.caComparisonChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: metricLabel,
+                data: [val1, val2, valAvg],
+                backgroundColor: ['#176B73', '#0284C7', '#94A3B8'],
+                hoverBackgroundColor: ['#12545A', '#0369A1', '#64748B'],
+                borderRadius: 6,
+                maxBarThickness: 60
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#0F172A',
+                titleFont: { family: 'Inter', size: 12 },
+                bodyFont: { family: 'Inter', size: 12 },
+                padding: 10,
+                callbacks: {
+                  label: (ctx) => ` ${metricLabel}: ${ctx.parsed.y} ${unit}`
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { font: { family: 'Inter', size: 11 }, color: '#475569' }
+              },
+              y: {
+                beginAtZero: true,
+                grid: { color: 'rgba(226, 232, 240, 0.8)' },
+                ticks: {
+                  font: { family: 'Inter', size: 11 },
+                  color: '#64748B',
+                  callback: (value) => `${value} ${unit}`
+                }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    // Comparison summary bar explaining fair benchmarking
+    if (elements.caComparisonSummaryBar) {
+      const intensity1 = p1.kwhPerOccupiedHour || 0;
+      const intensity2 = p2.kwhPerOccupiedHour || 0;
+      const diffVsCompared = intensity2 > 0 ? Math.round(((intensity1 - intensity2) / intensity2) * 100) : 0;
+      const diffVsCat = avgIntensity > 0 ? Math.round(((intensity1 - avgIntensity) / avgIntensity) * 100) : 0;
+
+      let explanationText = '';
+      let barClass = 'comparison-summary-bar';
+
+      if (diffVsCat > 20) {
+        barClass += ' warning';
+        explanationText = `<strong>Fair Benchmark Analysis:</strong> ${room.id} (${room.capacity} seats) draws <strong>${intensity1} kWh/hr</strong>, which is <strong>${diffVsCompared >= 0 ? '+' : ''}${diffVsCompared}%</strong> compared to ${comparedRoom.id} (${intensity2} kWh/hr) and <strong>+${diffVsCat}%</strong> above the ${room.roomType} campus benchmark (${avgIntensity} kWh/hr). Normalizing by occupied hours confirms that elevated consumption is driven by after-hours leakage, not high class attendance.`;
+      } else {
+        explanationText = `<strong>Fair Benchmark Analysis:</strong> ${room.id} draws <strong>${intensity1} kWh/hr</strong>, comparing favorably with ${comparedRoom.id} (${intensity2} kWh/hr) and the ${room.roomType} average (${avgIntensity} kWh/hr). Utilization intensity remains within optimal operational baselines.`;
+      }
+
+      elements.caComparisonSummaryBar.className = barClass;
+      elements.caComparisonSummaryBar.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <div>${explanationText}</div>
+      `;
+    }
+  }
+
+  /**
+   * Render Automated Insights and Recommendations
+   */
+  function renderClassroomInsights(room, comparedRoom) {
+    if (!elements.caInsightsList) return;
+
+    const periodKey = state.classroomDateRange === '30d' ? 'thirtyDays' : 'sevenDays';
+    const periodData = room[periodKey] || room.sevenDays;
+    const is30d = state.classroomDateRange === '30d';
+
+    const intensity = periodData.kwhPerOccupiedHour || 0;
+    const benchmark = periodData.benchmarkKwhPerHour || 4.5;
+    const wasteKWh = periodData.estimatedWasteKWh || 0;
+    const wastePct = periodData.wastePercentage || 0;
+
+    const insights = [];
+
+    // 1. Benchmark Comparison Insight
+    const diffPct = benchmark > 0 ? Math.round(((intensity - benchmark) / benchmark) * 100) : 0;
+    if (diffPct > 10) {
+      insights.push({
+        type: 'amber',
+        tag: `${diffPct}% Over Benchmark`,
+        title: 'Energy Intensity Exceeds Target Baseline',
+        desc: `This room consumes ${intensity} kWh per occupied hour, which is ${diffPct}% higher than the standard target benchmark (${benchmark} kWh/hr) for ${room.roomType} spaces.`
+      });
+    } else {
+      insights.push({
+        type: 'green',
+        tag: 'Within Target',
+        title: 'Energy Intensity Operating at Efficient Level',
+        desc: `This room's draw of ${intensity} kWh per occupied hour aligns with or performs better than the standard benchmark of ${benchmark} kWh/hr.`
+      });
+    }
+
+    // 2. Unoccupied Leakage / Simulated Occupancy Pattern
+    if (wasteKWh > 10) {
+      insights.push({
+        type: 'red',
+        tag: 'Unscheduled Consumption',
+        title: 'Electricity Consumption Outside Scheduled Occupancy',
+        desc: `Simulated telemetry indicates ${wasteKWh} kWh (${wastePct}% of room total) occurs outside scheduled lecture hours, primarily during evening idle and weekend standby.`
+      });
+    } else {
+      insights.push({
+        type: 'blue',
+        tag: 'Tight Schedule Alignment',
+        title: 'Minimal Standby & After-Hours Consumption',
+        desc: `Standby electricity draw after academic periods remains low (${wasteKWh} kWh estimated idle), indicating reliable shutdown compliance.`
+      });
+    }
+
+    // 3. Operational Cause from Dataset
+    const primaryCause = (periodData.wasteCauses && periodData.wasteCauses[0])
+      ? periodData.wasteCauses[0]
+      : 'Continuous standby load detected when room is empty.';
+    insights.push({
+      type: 'amber',
+      tag: 'Primary Root Cause',
+      title: 'Observed Telemetry Anomaly',
+      desc: primaryCause
+    });
+
+    // 4. Remediation Practice from Dataset
+    const primaryAction = (periodData.recommendedActions && periodData.recommendedActions[0])
+      ? periodData.recommendedActions[0]
+      : 'Review lighting and air-conditioning shutdown practices after classes.';
+    insights.push({
+      type: 'blue',
+      tag: 'Recommended Action',
+      title: 'Actionable Remediation Procedure',
+      desc: primaryAction
+    });
+
+    // 5. Estimated Financial & CO2 Impact
+    const costSavings = (wasteKWh * 0.18).toFixed(2);
+    const co2Savings = Math.round(wasteKWh * 0.42);
+    insights.push({
+      type: 'green',
+      tag: 'Opportunity',
+      title: 'Estimated Energy Conservation Recovery',
+      desc: `Eliminating avoidable waste in ${room.id} recovers an estimated $${costSavings} and prevents ${co2Savings} kg CO₂ emissions across ${is30d ? '30 days' : '7 days'}.`
+    });
+
+    // Render list
+    elements.caInsightsList.innerHTML = '';
+    insights.forEach(item => {
+      const card = document.createElement('div');
+      card.className = `insight-card-item ${item.type}`;
+      card.innerHTML = `
+        <div class="insight-icon-box ${item.type}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+        </div>
+        <div class="insight-content-box">
+          <div class="insight-header-row">
+            <span class="insight-title">${item.title}</span>
+            <span class="insight-tag ${item.type}">${item.tag}</span>
+          </div>
+          <p class="insight-desc">${item.desc}</p>
+        </div>
+      `;
+      elements.caInsightsList.appendChild(card);
+    });
+  }
+
+  /**
+   * Render Room Comparison Table
+   */
+  function renderClassroomComparisonTable() {
+    if (!elements.caRoomsTableBody) return;
+
+    const bldgFilter = state.classroomBuildingFilter;
+    const query = (state.tableSearchQuery || '').toLowerCase();
+    const periodKey = state.classroomDateRange === '30d' ? 'thirtyDays' : 'sevenDays';
+
+    let rooms = SCEO_DATA.classrooms;
+
+    // Filter by building
+    if (bldgFilter !== 'all') {
+      rooms = rooms.filter(r => r.buildingId === bldgFilter);
+    }
+
+    // Filter by search query
+    if (query) {
+      rooms = rooms.filter(r => 
+        r.id.toLowerCase().includes(query) ||
+        r.name.toLowerCase().includes(query) ||
+        r.roomType.toLowerCase().includes(query) ||
+        r.buildingName.toLowerCase().includes(query)
+      );
+    }
+
+    // Update count badge
+    if (elements.caTableCountBadge) {
+      elements.caTableCountBadge.textContent = `Showing ${rooms.length} of ${SCEO_DATA.classrooms.length} rooms`;
+    }
+
+    // Empty state handling
+    if (rooms.length === 0) {
+      elements.caRoomsTableBody.innerHTML = '';
+      if (elements.caTableEmptyState) elements.caTableEmptyState.style.display = 'block';
+      return;
+    }
+
+    if (elements.caTableEmptyState) elements.caTableEmptyState.style.display = 'none';
+
+    elements.caRoomsTableBody.innerHTML = '';
+
+    rooms.forEach(room => {
+      const m = room[periodKey] || room.sevenDays;
+      const isSelected = room.id === state.selectedClassroom;
+      const status = m.status || 'green';
+
+      let statusBadgeHtml = '';
+      if (status === 'green') {
+        statusBadgeHtml = `<span class="table-status-pill efficient">Efficient</span>`;
+      } else if (status === 'yellow') {
+        statusBadgeHtml = `<span class="table-status-pill typical">Typical</span>`;
+      } else if (status === 'orange') {
+        statusBadgeHtml = `<span class="table-status-pill review">Needs Review</span>`;
+      } else {
+        statusBadgeHtml = `<span class="table-status-pill priority">High Priority</span>`;
+      }
+
+      const tr = document.createElement('tr');
+      if (isSelected) tr.className = 'selected-room-row';
+      tr.setAttribute('data-room-id', room.id);
+
+      tr.innerHTML = `
+        <td>
+          <div class="room-id-cell">
+            ${isSelected ? '<span class="table-active-indicator" title="Currently Selected"></span>' : ''}
+            <span>${room.id}</span>
+          </div>
+        </td>
+        <td>${room.buildingName}</td>
+        <td>${room.roomType} (${room.capacity} seats)</td>
+        <td style="font-weight: 600;">${(m.totalKWh || 0).toLocaleString('en-US')} kWh</td>
+        <td>${m.occupiedHours || 0} hrs</td>
+        <td style="font-weight: 600; color: ${m.kwhPerOccupiedHour > (m.benchmarkKwhPerHour || 4.5) ? 'var(--color-warning-text)' : 'inherit'};">
+          ${m.kwhPerOccupiedHour || 0} kWh/hr
+        </td>
+        <td>
+          <span style="font-weight: 600; color: ${m.estimatedWasteKWh > 15 ? 'var(--color-danger-text)' : 'inherit'};">
+            ${m.estimatedWasteKWh || 0} kWh
+          </span>
+          <span style="font-size: 11px; color: var(--color-text-muted);">(${m.wastePercentage || 0}%)</span>
+        </td>
+        <td>${statusBadgeHtml}</td>
+        <td style="text-align: right;">
+          <button type="button" class="btn-select-room-row" data-room-id="${room.id}">
+            ${isSelected ? 'Active' : 'Select'}
+          </button>
+        </td>
+      `;
+
+      // Row click selection
+      tr.addEventListener('click', () => {
+        selectClassroom(room.id);
+      });
+
+      elements.caRoomsTableBody.appendChild(tr);
+    });
+  }
+
+  /**
+   * Action: Select a classroom and update Classroom Analytics
+   */
+  function selectClassroom(roomId) {
+    const room = SCEO_DATA.classrooms.find(r => r.id === roomId);
+    if (!room) return;
+
+    state.selectedClassroom = roomId;
+    if (elements.caRoomSelect) elements.caRoomSelect.value = roomId;
+
+    renderClassroomAnalytics();
+    showToast(`Loaded analytics for ${room.id} (${room.name})`, 'info');
+  }
+
+  /**
+   * Interactive Saving Opportunity Estimator Calculation
+   */
+  function calculateSavingOpportunity() {
+    if (!elements.estAvoidableKW || !elements.estHoursPerDay || !elements.estDays || !elements.estTariff) return;
+
+    let kw = parseFloat(elements.estAvoidableKW.value);
+    let hours = parseFloat(elements.estHoursPerDay.value);
+    let days = parseFloat(elements.estDays.value);
+    let tariff = parseFloat(elements.estTariff.value);
+
+    // Validation & Safe Sanitization
+    if (isNaN(kw) || kw < 0) kw = 0;
+    if (isNaN(hours) || hours < 0) hours = 0;
+    if (hours > 24) hours = 24;
+    if (isNaN(days) || days < 1) days = 1;
+    if (isNaN(tariff) || tariff < 0) tariff = 0;
+
+    const potentialSavingsKWh = kw * hours * days;
+    const estimatedCostSavings = potentialSavingsKWh * tariff;
+    const co2Reduction = potentialSavingsKWh * 0.42;
+
+    if (elements.estResultKWh) elements.estResultKWh.textContent = Math.round(potentialSavingsKWh).toLocaleString('en-US');
+    if (elements.estResultKWhSub) elements.estResultKWhSub.textContent = `${kw.toFixed(1)} kW × ${hours.toFixed(1)} hrs/day × ${days} days`;
+    if (elements.estResultCost) elements.estResultCost.textContent = `$${estimatedCostSavings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    if (elements.estResultCostSub) elements.estResultCostSub.textContent = `at $${tariff.toFixed(2)} per kWh`;
+    if (elements.estResultCO2) elements.estResultCO2.textContent = Math.round(co2Reduction).toLocaleString('en-US');
+  }
+
+  /**
+   * Sync Selected Room's Parameters to Estimator
+   */
+  function syncSelectedRoomToEstimator() {
+    const room = SCEO_DATA.classrooms.find(r => r.id === state.selectedClassroom);
+    if (!room) return;
+
+    const is30d = state.classroomDateRange === '30d';
+    const periodKey = is30d ? 'thirtyDays' : 'sevenDays';
+    const periodData = room[periodKey] || room.sevenDays;
+
+    const wasteKWh = periodData.estimatedWasteKWh || 15;
+    const durationDays = is30d ? 30 : 7;
+    const hoursPerDay = 4.0;
+    const computedKW = Math.max(0.5, parseFloat((wasteKWh / (durationDays * hoursPerDay)).toFixed(1)));
+
+    if (elements.estAvoidableKW) elements.estAvoidableKW.value = computedKW;
+    if (elements.estHoursPerDay) elements.estHoursPerDay.value = hoursPerDay;
+    if (elements.estDays) elements.estDays.value = durationDays;
+
+    // Update preset pills active state
+    const presets = [elements.btnEstPreset7d, elements.btnEstPreset30d, elements.btnEstPreset90d, elements.btnEstPreset180d];
+    presets.forEach(btn => {
+      if (btn) {
+        if (parseInt(btn.getAttribute('data-days'), 10) === durationDays) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      }
+    });
+
+    calculateSavingOpportunity();
+    showToast(`Loaded waste parameters from ${room.id} (${computedKW} kW @ 4h/day)`, 'success');
+  }
+
+  /**
+   * Action: Locate Selected Classroom in Energy Heatmap
+   */
+  function locateRoomInHeatmap(roomId) {
+    const room = SCEO_DATA.classrooms.find(r => r.id === roomId) || SCEO_DATA.classrooms[0];
+    if (!room) return;
+
+    // Switch view to energy-heatmap
+    switchView('energy-heatmap');
+
+    // Filter heatmap to that building
+    state.selectedBuilding = room.buildingId;
+    if (elements.buildingSelector) elements.buildingSelector.value = room.buildingId;
+    if (elements.heatmapBuildingFilter) elements.heatmapBuildingFilter.value = room.buildingId;
+    renderHeatmap();
+
+    // Scroll to room card and highlight
+    setTimeout(() => {
+      const card = document.getElementById(`roomCard-${room.id}`) || document.querySelector(`[data-room-id="${room.id}"]`);
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        card.classList.add('highlight-target');
+        setTimeout(() => card.classList.remove('highlight-target'), 3500);
+      }
+      showToast(`Located ${room.id} in Energy Heatmap`, 'info');
+    }, 150);
+  }
+
   /**
    * Handle Building Scope Change
    */
@@ -1422,14 +2549,135 @@
     // "View Classroom Analytics" action inside Classroom Modal
     if (elements.btnViewClassroomAnalytics) {
       elements.btnViewClassroomAnalytics.addEventListener('click', () => {
-        const roomId = state.activeRoomInModal ? state.activeRoomInModal.id : 'Classroom';
+        const room = state.activeRoomInModal || SCEO_DATA.classrooms[0];
         closeRoomModal();
+        state.selectedClassroom = room.id;
+        state.classroomBuildingFilter = 'all';
+        if (elements.caBuildingFilter) elements.caBuildingFilter.value = 'all';
         switchView('classroom-analytics');
-        showToast(`Navigated to Classroom Analytics for ${roomId}`, 'info');
+        showToast(`Viewing Classroom Analytics for ${room.id}`, 'info');
       });
     }
 
-    // 9. Global Keyboard Handlers (Escape closes open overlays)
+    // 10. Classroom Analytics Controls (Step 3)
+    if (elements.caBuildingFilter) {
+      elements.caBuildingFilter.addEventListener('change', (e) => {
+        state.classroomBuildingFilter = e.target.value;
+        populateClassroomSelectors();
+        renderClassroomAnalytics();
+      });
+    }
+
+    if (elements.caRoomSelect) {
+      elements.caRoomSelect.addEventListener('change', (e) => {
+        selectClassroom(e.target.value);
+      });
+    }
+
+    if (elements.caCompareSelect) {
+      elements.caCompareSelect.addEventListener('change', (e) => {
+        state.comparedClassroom = e.target.value;
+        const room = SCEO_DATA.classrooms.find(r => r.id === state.selectedClassroom);
+        const comp = SCEO_DATA.classrooms.find(r => r.id === state.comparedClassroom);
+        if (room && comp) {
+          renderClassroomComparisonChart(room, comp);
+          renderClassroomInsights(room, comp);
+        }
+      });
+    }
+
+    // Classroom Analytics Date Range Buttons
+    if (elements.caBtnRange7d) {
+      elements.caBtnRange7d.addEventListener('click', () => {
+        if (state.classroomDateRange === '7d') return;
+        state.classroomDateRange = '7d';
+        syncClassroomDateButtons();
+        renderClassroomAnalytics();
+      });
+    }
+
+    if (elements.caBtnRange30d) {
+      elements.caBtnRange30d.addEventListener('click', () => {
+        if (state.classroomDateRange === '30d') return;
+        state.classroomDateRange = '30d';
+        syncClassroomDateButtons();
+        renderClassroomAnalytics();
+      });
+    }
+
+    // Comparison Metric Switcher
+    const compMetricBtns = [
+      { btn: elements.btnCompIntensity, metric: 'kwhPerOccupiedHour' },
+      { btn: elements.btnCompWaste, metric: 'estimatedWasteKWh' },
+      { btn: elements.btnCompTotal, metric: 'totalKWh' }
+    ];
+
+    compMetricBtns.forEach(item => {
+      if (item.btn) {
+        item.btn.addEventListener('click', () => {
+          if (state.comparisonMetric === item.metric) return;
+          state.comparisonMetric = item.metric;
+          compMetricBtns.forEach(m => {
+            if (m.btn) m.btn.classList.remove('active');
+          });
+          item.btn.classList.add('active');
+          const room = SCEO_DATA.classrooms.find(r => r.id === state.selectedClassroom);
+          const comp = SCEO_DATA.classrooms.find(r => r.id === state.comparedClassroom);
+          if (room && comp) renderClassroomComparisonChart(room, comp);
+        });
+      }
+    });
+
+    // View in Energy Heatmap button
+    if (elements.caBtnViewInHeatmap) {
+      elements.caBtnViewInHeatmap.addEventListener('click', () => {
+        locateRoomInHeatmap(state.selectedClassroom);
+      });
+    }
+
+    // Saving Opportunity Estimator Real-time Reactive Listeners
+    const estimatorInputs = [elements.estAvoidableKW, elements.estHoursPerDay, elements.estDays, elements.estTariff];
+    estimatorInputs.forEach(input => {
+      if (input) {
+        input.addEventListener('input', calculateSavingOpportunity);
+      }
+    });
+
+    // Estimator Preset Buttons
+    const estPresetBtns = [
+      { btn: elements.btnEstPreset7d, days: 7 },
+      { btn: elements.btnEstPreset30d, days: 30 },
+      { btn: elements.btnEstPreset90d, days: 90 },
+      { btn: elements.btnEstPreset180d, days: 180 }
+    ];
+
+    estPresetBtns.forEach(p => {
+      if (p.btn) {
+        p.btn.addEventListener('click', () => {
+          if (elements.estDays) elements.estDays.value = p.days;
+          estPresetBtns.forEach(b => {
+            if (b.btn) b.btn.classList.remove('active');
+          });
+          p.btn.classList.add('active');
+          calculateSavingOpportunity();
+        });
+      }
+    });
+
+    // Load Room Waste button
+    if (elements.btnLoadRoomWaste) {
+      elements.btnLoadRoomWaste.addEventListener('click', syncSelectedRoomToEstimator);
+    }
+
+    // Classroom Table Search Filter
+    if (elements.caTableSearchInput) {
+      elements.caTableSearchInput.addEventListener('input', (e) => {
+        state.tableSearchQuery = e.target.value;
+        renderClassroomComparisonTable();
+      });
+    }
+
+    // 11. Global Keyboard Handlers (Escape closes open overlays)
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         if (elements.actionModal.classList.contains('active')) {
@@ -1461,11 +2709,12 @@
     renderBuildingsTable();
     renderNotificationsPopover();
     renderHeatmap();
+    populateClassroomSelectors();
     initEventListeners();
 
     // Initial welcome toast
     setTimeout(() => {
-      showToast('Welcome to Smart Campus Energy Optimizer (SCEO) • Step 2 Loaded', 'info');
+      showToast('Welcome to Smart Campus Energy Optimizer (SCEO) • Step 3 Loaded', 'info');
     }, 400);
   }
 
