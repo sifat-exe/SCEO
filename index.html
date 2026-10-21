@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Campus Energy Optimizer (SCEO) - University Energy Management</title>
+  <meta name="description" content="Monitor energy use, identify waste, and improve sustainability across university campus facilities with Smart Campus Energy Optimizer.">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Application Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Chart.js CDN for Telemetry Visualizations (with graceful local fallback) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Overlay for Mobile Sidebar Drawer -->
+  <div id="sidebarOverlay" class="sidebar-overlay" aria-hidden="true"></div>
+
+  <div class="app-wrapper">
+    <!-- ======================================================================
+         SIDEBAR NAVIGATION
+         ====================================================================== -->
+    <aside id="sidebar" class="sidebar" aria-label="Main Navigation">
+      <div class="sidebar-header">
+        <div class="brand-container">
+          <div class="brand-icon" aria-hidden="true">
+            <!-- Combined Leaf + Lightning Bolt SVG -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+              <path d="M21 21c-3-3-4-7-4-11 4 0 8 1 11 4-1 3-3 5-7 7z" stroke-width="1.5" opacity="0.6"/>
+            </svg>
+          </div>
+          <div class="brand-info">
+            <span class="brand-title">Smart Campus Energy</span>
+            <span class="brand-tagline">CAMPUS ENERGY MANAGEMENT</span>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav-container">
+        <div class="sidebar-section-label">Operations & Telemetry</div>
+        <ul class="nav-list" id="sidebarNavList">
+          <!-- 1. Overview (Implemented) -->
+          <li class="nav-item active" data-view="overview">
+            <button class="nav-link" type="button" aria-current="page">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+                <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+              </svg>
+              <span>Overview</span>
+            </button>
+          </li>
+
+          <!-- 2. Energy Heatmap -->
+          <li class="nav-item" data-view="energy-heatmap">
+            <button class="nav-link" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg>
+              <span>Energy Heatmap</span>
+            </button>
+          </li>
+
+          <!-- 3. Classroom Analytics -->
+          <li class="nav-item" data-view="classroom-analytics">
+            <button class="nav-link" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+                <path d="M6 6h10M6 10h10M6 14h6"></path>
+              </svg>
+              <span>Classroom Analytics</span>
+              <span class="nav-badge soon">Next</span>
+            </button>
+          </li>
+
+          <!-- 4. Timetable Optimizer -->
+          <li class="nav-item" data-view="timetable-optimizer">
+            <button class="nav-link" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <span>Timetable Optimizer</span>
+              <span class="nav-badge soon">Next</span>
+            </button>
+          </li>
+
+          <!-- 5. Alerts & Actions -->
+          <li class="nav-item" data-view="alerts-actions">
+            <button class="nav-link" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              <span>Alerts &amp; Actions</span>
+              <span class="nav-badge soon">Next</span>
+            </button>
+          </li>
+
+          <!-- 6. Smart Controls -->
+          <li class="nav-item" data-view="smart-controls">
+            <button class="nav-link" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="4" y1="21" x2="4" y2="14"></line>
+                <line x1="4" y1="10" x2="4" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12" y2="3"></line>
+                <line x1="20" y1="21" x2="20" y2="16"></line>
+                <line x1="20" y1="12" x2="20" y2="3"></line>
+                <line x1="1" y1="14" x2="7" y2="14"></line>
+                <line x1="9" y1="8" x2="15" y2="8"></line>
+                <line x1="17" y1="16" x2="23" y2="16"></line>
+              </svg>
+              <span>Smart Controls</span>
+              <span class="nav-badge soon">Next</span>
+            </button>
+          </li>
+
+          <!-- 7. Maintenance -->
+          <li class="nav-item" data-view="maintenance">
+            <button class="nav-link" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+              </svg>
+              <span>Maintenance</span>
+              <span class="nav-badge soon">Next</span>
+            </button>
+          </li>
+
+          <!-- 8. Department Challenge -->
+          <li class="nav-item" data-view="dept-challenge">
+            <button class="nav-link" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                <path d="M4 22h16"></path>
+                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+              </svg>
+              <span>Department Challenge</span>
+              <span class="nav-badge soon">Next</span>
+            </button>
+          </li>
+
+          <!-- 9. Savings & Reports -->
+          <li class="nav-item" data-view="savings-reports">
+            <button class="nav-link" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+              <span>Savings &amp; Reports</span>
+              <span class="nav-badge soon">Next</span>
+            </button>
+          </li>
+
+          <!-- 10. Settings -->
+          <li class="nav-item" data-view="settings">
+            <button class="nav-link" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+              <span>Settings</span>
+              <span class="nav-badge soon">Next</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="system-status-pill">
+          <span class="status-indicator-dot"></span>
+          <span>Telemetry Active • SCEO v1.0</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ======================================================================
+         MAIN CONTENT AREA
+         ====================================================================== -->
+    <div class="main-content-wrapper">
+      
+      <!-- Top Navigation Bar -->
+      <header class="top-bar">
+        <div class="top-bar-left">
+          <button id="mobileMenuBtn" class="mobile-menu-btn" type="button" aria-label="Toggle Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <div class="page-title-box">
+            <span class="page-breadcrumb" id="topBreadcrumb">Campus Management / Overview</span>
+            <h1 class="top-page-heading" id="topHeading">Campus Overview</h1>
+          </div>
+        </div>
+
+        <div class="top-bar-right">
+          <!-- Simulated Demo Environment Badge -->
+          <div class="demo-env-badge" title="Telemetry data is simulated for demo evaluation">
+            <span class="dot"></span>
+            <span>Simulated Demo Env</span>
+          </div>
+
+          <!-- Building Selector -->
+          <div class="building-selector-wrapper">
+            <label for="buildingSelector" class="visually-hidden" style="display:none;">Select Campus Building</label>
+            <select id="buildingSelector" class="building-select" aria-label="Filter by Building">
+              <option value="all">All Buildings</option>
+              <option value="engineering">Engineering Building</option>
+              <option value="science">Science Building</option>
+              <option value="business">Business Building</option>
+            </select>
+            <span class="building-select-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </span>
+          </div>
+
+          <!-- Notification Bell & Counter -->
+          <div class="notifications-wrapper">
+            <button id="notificationsBtn" class="notification-btn" type="button" aria-label="View recent alerts and notices" aria-expanded="false">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              <span id="notifBadge" class="notification-badge">8</span>
+            </button>
+
+            <!-- Notifications Popover Dropdown -->
+            <div id="notificationPopover" class="notification-popover" role="dialog" aria-label="Recent Alerts">
+              <div class="notif-popover-header">
+                <h4>System Alerts &amp; Telemetry</h4>
+                <button id="clearAllNotifsBtn" class="notif-clear-btn" type="button">Mark all read</button>
+              </div>
+              <div class="notif-popover-body" id="notifPopoverList">
+                <!-- Injected via JavaScript -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Demo Administrator Avatar -->
+          <div class="user-profile-badge" title="Demo Administrator Profile">
+            <div class="user-avatar">AD</div>
+            <div class="user-meta">
+              <span class="user-name">Dr. A. Davis</span>
+              <span class="user-role">Facilities Lead</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Scrollable Content Container -->
+      <main class="page-container" id="mainContainer">
+
+        <!-- ==================================================================
+             VIEW 1: CAMPUS OVERVIEW DASHBOARD (Active View)
+             ================================================================== -->
+        <section id="overviewView" class="dashboard-content-section" aria-label="Campus Overview">
+          
+          <!-- Top Dashboard Header with Controls -->
+          <div class="dashboard-header">
+            <div class="dashboard-heading-group">
+              <h2>Campus Overview</h2>
+              <p>Monitor energy use. Identify waste. Improve efficiency.</p>
+            </div>
+
+            <div class="dashboard-controls">
+              <!-- Date Range Selector -->
+              <div class="date-range-switcher" role="group" aria-label="Select Date Range">
+                <button type="button" class="date-range-btn active" data-range="7d" id="btnRange7d">Last 7 Days</button>
+                <button type="button" class="date-range-btn" data-range="30d" id="btnRange30d">Last 30 Days</button>
+              </div>
+
+              <!-- Simulation Label -->
+              <div class="simulation-tag">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m13 2-2 2.5V8l2-2.5V2z"></path>
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span>Fictional telemetry for demo evaluation</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==============================================================
+               KPI CARDS ROW (4 Metric Cards)
+               ============================================================== -->
+          <div class="kpi-grid">
+            <!-- 1. Total Energy Consumed -->
+            <div class="kpi-card kpi-primary">
+              <div class="kpi-card-header">
+                <span class="kpi-title">Total Energy Consumed</span>
+                <div class="kpi-icon-badge teal">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                  </svg>
+                </div>
+              </div>
+              <div class="kpi-card-body">
+                <span class="kpi-value" id="kpiTotalEnergy">2,480</span>
+                <span class="kpi-unit">kWh</span>
+              </div>
+              <div class="kpi-card-footer">
+                <span class="trend-badge positive">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                  8.0%
+                </span>
+                <span id="kpiTotalEnergySub">vs. previous period</span>
+              </div>
+            </div>
+
+            <!-- 2. Potential Energy Savings -->
+            <div class="kpi-card kpi-success">
+              <div class="kpi-card-header">
+                <span class="kpi-title">Potential Energy Savings</span>
+                <div class="kpi-icon-badge green">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                  </svg>
+                </div>
+              </div>
+              <div class="kpi-card-body">
+                <span class="kpi-value" id="kpiPotentialSavings">186</span>
+                <span class="kpi-unit">kWh</span>
+              </div>
+              <div class="kpi-card-footer">
+                <span class="trend-badge positive">7.5%</span>
+                <span id="kpiSavingsSub">Recoverable after-hours waste</span>
+              </div>
+            </div>
+
+            <!-- 3. Active Alerts -->
+            <div class="kpi-card kpi-warning">
+              <div class="kpi-card-header">
+                <span class="kpi-title">Active Alerts</span>
+                <div class="kpi-icon-badge amber">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                </div>
+              </div>
+              <div class="kpi-card-body">
+                <span class="kpi-value" id="kpiActiveAlerts">8</span>
+                <span class="kpi-unit">anomalies</span>
+              </div>
+              <div class="kpi-card-footer">
+                <span class="trend-badge warning">2 Critical</span>
+                <span id="kpiAlertsSub">Across 3 buildings</span>
+              </div>
+            </div>
+
+            <!-- 4. Monitored Classrooms -->
+            <div class="kpi-card kpi-info">
+              <div class="kpi-card-header">
+                <span class="kpi-title">Monitored Classrooms</span>
+                <div class="kpi-icon-badge blue">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                  </svg>
+                </div>
+              </div>
+              <div class="kpi-card-body">
+                <span class="kpi-value" id="kpiMonitoredRooms">24</span>
+                <span class="kpi-unit">rooms</span>
+              </div>
+              <div class="kpi-card-footer">
+                <span class="trend-badge positive">100%</span>
+                <span id="kpiRoomsSub">Telemetry sensors online</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==============================================================
+               CHARTS SECTION (Consumption Trend & Building Distribution)
+               ============================================================== -->
+          <div class="charts-grid">
+            
+            <!-- Main Electricity Consumption Chart -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <h3 id="chartMainTitle">Daily Electricity Consumption</h3>
+                  <p id="chartMainSubtitle">Simulated daily electricity consumption (kWh) with baseline overlay</p>
+                </div>
+                <div class="card-actions">
+                  <span class="card-badge" id="chartBuildingScope">All Campus Buildings</span>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="chart-wrapper">
+                  <!-- Chart.js Canvas -->
+                  <canvas id="consumptionChart" aria-label="Daily Electricity Consumption Chart"></canvas>
+                  
+                  <!-- Graceful CSS/SVG Fallback if CDN fails or is offline -->
+                  <div id="chartFallback" class="chart-fallback-container" aria-hidden="true">
+                    <div class="fallback-bar-chart" id="fallbackBarsContainer">
+                      <!-- Populated via JS if Chart.js is unavailable -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card-footer chart-footer-legend">
+                <div class="legend-item">
+                  <span class="legend-color-dot" style="background-color: #176B73;"></span>
+                  <span>Daily Electricity Consumption</span>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-color-dot" style="background-color: #CBD5E1;"></span>
+                  <span>Target Efficient Baseline</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Energy Performance Distribution Across Buildings -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <h3>Building Distribution</h3>
+                  <p>Energy share across 3 campus facilities</p>
+                </div>
+                <div class="card-actions">
+                  <span class="card-badge">7-Day Aggregated</span>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="chart-wrapper" style="height: 180px;">
+                  <canvas id="buildingDistributionChart" aria-label="Building Energy Share Doughnut Chart"></canvas>
+                </div>
+                <div class="building-comparison-list" id="buildingComparisonList">
+                  <!-- Injected via JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==============================================================
+               OPERATIONAL SECTION (Priority Actions & Recent Alerts)
+               ============================================================== -->
+          <div class="operations-grid">
+            
+            <!-- Priority Actions -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <h3>Priority Actions</h3>
+                  <p>Recommended interventions to eliminate identified energy waste</p>
+                </div>
+                <div class="card-actions">
+                  <span class="card-badge" id="actionsCountBadge">3 Active</span>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="priority-actions-list" id="priorityActionsList">
+                  <!-- Injected via JavaScript from data.js -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Alerts -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <h3>Recent Alerts</h3>
+                  <p>Automated telemetry anomaly detections by room</p>
+                </div>
+                <div class="card-actions">
+                  <span class="card-badge" id="alertsFilterStatus">Live Telemetry</span>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="alerts-list" id="recentAlertsList">
+                  <!-- Injected via JavaScript from data.js -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==============================================================
+               ENERGY PERFORMANCE BY BUILDING TABLE
+               ============================================================== -->
+          <div class="card building-table-section">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3>Energy Performance by Building</h3>
+                <p>Comparison of consumption, efficiency status, and floor space</p>
+              </div>
+              <div class="card-actions">
+                <span class="card-badge">Campus Facilities Audit</span>
+              </div>
+            </div>
+            <div class="table-responsive-wrapper">
+              <table class="performance-table" id="buildingsTable">
+                <thead>
+                  <tr>
+                    <th>Building Name</th>
+                    <th>Classrooms Monitored</th>
+                    <th>Gross Floor Area</th>
+                    <th>Consumption (kWh)</th>
+                    <th>Campus Share</th>
+                    <th>Efficiency Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="buildingsTableBody">
+                  <!-- Populated via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ==================================================================
+             VIEW 2: COMING SOON PLACEHOLDER (For Modules 2 through 10)
+             ================================================================== -->
+        <section id="placeholderView" class="placeholder-view" aria-label="Module Coming Soon">
+          <div class="placeholder-card">
+            <div class="placeholder-icon-box" id="placeholderIconBox">
+              <!-- Dynamic SVG -->
+            </div>
+            <span class="placeholder-code" id="placeholderCode">MODULE-02</span>
+            <h2 class="placeholder-title" id="placeholderTitle">Energy Heatmap</h2>
+            <p class="placeholder-desc" id="placeholderDesc">
+              Coming in the next build step. This module is currently undergoing simulation modeling.
+            </p>
+
+            <div class="placeholder-feature-box">
+              <div class="placeholder-feature-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Planned Module Capabilities</span>
+              </div>
+              <ul class="placeholder-feature-list" id="placeholderFeatureList">
+                <!-- Dynamically populated from data.js -->
+              </ul>
+            </div>
+
+            <button type="button" class="btn-return-overview" id="btnReturnOverview">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+              <span>Return to Campus Overview</span>
+            </button>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       ACTION DETAIL MODAL
+       ====================================================================== -->
+  <div id="actionModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <span class="modal-label" id="modalCategory">HVAC &amp; Air Handling</span>
+          <h3 id="modalTitle">Priority Action Details</h3>
+        </div>
+        <button id="modalCloseBtn" class="modal-close-btn" type="button" aria-label="Close modal">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-metric-box">
+          <div>
+            <div class="modal-label">Severity Level</div>
+            <span id="modalSeverity" class="severity-pill high">High Priority</span>
+          </div>
+          <div>
+            <div class="modal-label">Target Facility</div>
+            <span id="modalBuilding" style="font-weight: 600; font-size: 13px;">Engineering Building</span>
+          </div>
+          <div>
+            <div class="modal-label">Potential Recovery</div>
+            <span id="modalSavings" style="font-weight: 700; color: var(--color-primary); font-size: 13px;">42 kWh / night</span>
+          </div>
+        </div>
+
+        <div class="modal-detail-row">
+          <span class="modal-label">Investigation Findings</span>
+          <p id="modalDetails" class="modal-text"></p>
+        </div>
+
+        <div class="modal-detail-row">
+          <span class="modal-label">Affected Classrooms &amp; Zones</span>
+          <div id="modalRooms" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px;"></div>
+        </div>
+
+        <div class="modal-detail-row">
+          <span class="modal-label">Recommended Remediation</span>
+          <p id="modalAction" class="modal-text" style="font-weight: 500; color: var(--color-text-main);"></p>
+        </div>
+
+        <div class="modal-detail-row">
+          <span class="modal-label">Simulated Financial &amp; Energy Impact</span>
+          <p id="modalImpact" class="modal-text" style="font-style: italic; color: var(--color-success-text);"></p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="modalDismissBtn" type="button" class="btn-secondary">Close</button>
+        <button id="modalResolveBtn" type="button" class="btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px; vertical-align: -2px;">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Mark as Addressed
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       TOAST NOTIFICATION CONTAINER
+       ====================================================================== -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- JavaScript Modules -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
