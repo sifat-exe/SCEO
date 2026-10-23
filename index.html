@@ -69,7 +69,7 @@
             </button>
           </li>
 
-          <!-- 3. Classroom Analytics (Active Step 3) -->
+          <!-- 3. Classroom Analytics -->
           <li class="nav-item" data-view="classroom-analytics">
             <button class="nav-link" type="button">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -122,7 +122,7 @@
             </button>
           </li>
 
-          <!-- 7. Maintenance (Active Step 7A) -->
+          <!-- 7. Maintenance -->
           <li class="nav-item" data-view="maintenance">
             <button class="nav-link" type="button">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -132,7 +132,7 @@
             </button>
           </li>
 
-          <!-- 8. Department Challenge (Active Step 7B) -->
+          <!-- 8. Department Challenge -->
           <li class="nav-item" data-view="dept-challenge">
             <button class="nav-link" type="button">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -256,9 +256,14 @@
             </div>
           </div>
 
-          <!-- Demo Administrator Avatar -->
-          <div class="user-profile-badge" title="Demo Administrator Profile">
-            <div class="user-avatar">AD</div>
+          <!-- Demo Administrator Profile -->
+          <div class="user-profile-badge" title="Dr. A. Davis - Facilities Lead">
+            <div class="user-avatar" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
             <div class="user-meta">
               <span class="user-name">Dr. A. Davis</span>
               <span class="user-role">Facilities Lead</span>
@@ -279,13 +284,13 @@
           <div class="dashboard-header">
             <div class="dashboard-heading-group">
               <h2>Campus Overview</h2>
-              <p>Monitor energy use. Identify waste. Improve efficiency.</p>
+              <p>Monitor energy use, identify waste, and evaluate efficiency gains across campus facilities.</p>
             </div>
 
             <div class="dashboard-controls">
-              <!-- Start Guided Demo Entry Point (Requirement 1) -->
+              <!-- Start Guided Demo Entry Point -->
               <button type="button" class="btn btn-primary btn-start-guided-demo" id="btnStartGuidedDemo" title="Launch guided 6-stage energy optimization demonstration">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; vertical-align: -2px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; vertical-align: -2px;">
                   <polygon points="5 3 19 12 5 21 5 3"></polygon>
                 </svg>
                 <span>Start Guided Demo</span>
@@ -295,17 +300,6 @@
               <div class="date-range-switcher" role="group" aria-label="Select Date Range">
                 <button type="button" class="date-range-btn active" data-range="7d" id="btnRange7d">Last 7 Days</button>
                 <button type="button" class="date-range-btn" data-range="30d" id="btnRange30d">Last 30 Days</button>
-              </div>
-
-              <!-- Simulation Label -->
-              <div class="simulation-tag">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="m13 2-2 2.5V8l2-2.5V2z"></path>
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <line x1="12" y1="16" x2="12" y2="12"></line>
-                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                </svg>
-                <span>Fictional telemetry for demo evaluation</span>
               </div>
             </div>
           </div>
@@ -552,19 +546,6 @@
               <h2>Energy Waste Heatmap</h2>
               <p>Identify high-consumption rooms and prioritize energy-saving opportunities.</p>
             </div>
-
-            <div class="dashboard-controls">
-              <!-- Simulation Notice -->
-              <div class="simulation-tag">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="m13 2-2 2.5V8l2-2.5V2z"></path>
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <line x1="12" y1="16" x2="12" y2="12"></line>
-                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                </svg>
-                <span>Simulated Room Telemetry &amp; Waste Analysis</span>
-              </div>
-            </div>
           </div>
 
           <!-- Heatmap Control Toolbar (Filters & Sorters) -->
@@ -577,6 +558,23 @@
                   <option value="engineering">Engineering Building (10 Rooms)</option>
                   <option value="science">Science Building (8 Rooms)</option>
                   <option value="business">Business Building (6 Rooms)</option>
+                </select>
+                <span class="building-select-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </span>
+              </div>
+            </div>
+
+            <!-- Priority Filter -->
+            <div class="toolbar-group">
+              <label for="heatmapPriorityFilter" class="toolbar-label">Priority Filter:</label>
+              <div class="building-selector-wrapper">
+                <select id="heatmapPriorityFilter" class="building-select" aria-label="Filter heatmap by priority">
+                  <option value="all">All Priorities</option>
+                  <option value="low">Low Priority</option>
+                  <option value="medium">Medium Priority</option>
+                  <option value="high">High Priority</option>
+                  <option value="nodata">No Data</option>
                 </select>
                 <span class="building-select-icon" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
@@ -620,6 +618,23 @@
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
                 </span>
               </div>
+            </div>
+
+            <!-- Search by Room Identifier -->
+            <div class="toolbar-group" style="flex: 1; min-width: 170px;">
+              <label for="heatmapSearchInput" class="toolbar-label">Search Room:</label>
+              <div class="table-search-box" style="width: 100%;">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="search" id="heatmapSearchInput" class="table-search-input" placeholder="Room ID (e.g. ENG-101)..." aria-label="Search rooms by identifier">
+              </div>
+            </div>
+
+            <!-- Clear Filters Action -->
+            <div class="toolbar-group" style="display: flex; align-items: flex-end;">
+              <button type="button" id="btnHeatmapClearFilters" class="btn-alerts-reset" title="Reset all heatmap filters and search" style="height: 38px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                <span>Clear Filters</span>
+              </button>
             </div>
           </div>
 
@@ -701,34 +716,34 @@
           <!-- Heatmap Color Legend & Fairness Explanatory Note -->
           <div class="heatmap-legend-card card">
             <div class="legend-content-row">
-              <div class="legend-scale-title">Heatmap Status Classification:</div>
+              <div class="legend-scale-title">Priority Classification:</div>
               <div class="legend-indicators-group">
                 <div class="legend-chip-item">
-                  <span class="legend-swatch green"></span>
+                  <span class="legend-swatch low"></span>
                   <div class="legend-chip-text">
-                    <strong>Low Relative Consumption</strong>
-                    <span>Optimal performance within baseline</span>
+                    <strong>Low Priority</strong>
+                    <span>Optimal envelope (&lt; benchmark)</span>
                   </div>
                 </div>
                 <div class="legend-chip-item">
-                  <span class="legend-swatch yellow"></span>
+                  <span class="legend-swatch medium"></span>
                   <div class="legend-chip-text">
-                    <strong>Moderate Consumption</strong>
-                    <span>Acceptable efficiency, minor optimization potential</span>
+                    <strong>Medium Priority</strong>
+                    <span>Acceptable efficiency, minor potential</span>
                   </div>
                 </div>
                 <div class="legend-chip-item">
-                  <span class="legend-swatch orange"></span>
+                  <span class="legend-swatch high"></span>
                   <div class="legend-chip-text">
-                    <strong>High Consumption</strong>
-                    <span>Elevated intensity relative to schedule; audit suggested</span>
+                    <strong>High Priority</strong>
+                    <span>Elevated intensity or waste issue</span>
                   </div>
                 </div>
                 <div class="legend-chip-item">
-                  <span class="legend-swatch red"></span>
+                  <span class="legend-swatch nodata"></span>
                   <div class="legend-chip-text">
-                    <strong>Very High / Waste Issue</strong>
-                    <span>Severe after-hours leakage or thermal override active</span>
+                    <strong>No Data</strong>
+                    <span>Missing readings or offline telemetry</span>
                   </div>
                 </div>
               </div>
@@ -755,19 +770,7 @@
           <div class="dashboard-header">
             <div class="dashboard-heading-group">
               <h2>Classroom Analytics</h2>
-              <p>Understand energy patterns, compare classroom performance, and identify saving opportunities.</p>
-            </div>
-
-            <div class="dashboard-controls">
-              <!-- Simulation Tag -->
-              <div class="simulation-tag">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <line x1="12" y1="16" x2="12" y2="12"></line>
-                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                </svg>
-                <span>Fictional demo data • Simulated readings &amp; estimates</span>
-              </div>
+              <p>Analyze classroom load profiles, evaluate schedule correlation, and optimize consumption efficiency.</p>
             </div>
           </div>
 
@@ -1179,31 +1182,6 @@
               <h2 class="section-title">Timetable Optimizer</h2>
               <p class="section-subtitle">Reduce avoidable energy use through smarter classroom scheduling.</p>
             </div>
-            <div class="header-badge-group">
-              <span class="badge-fictional-demo">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                Demo Mode &bull; Simulated Timetable
-              </span>
-            </div>
-          </div>
-
-          <!-- Prototype Notice & Reset Bar -->
-          <div class="tt-disclaimer-banner">
-            <div class="tt-disclaimer-content">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="tt-disclaimer-icon">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="16" x2="12" y2="12"></line>
-                <line x1="12" y1="8" x2="12.01" y2="8"></line>
-              </svg>
-              <div>
-                <strong>Simulated Prototype Notice:</strong>
-                <span>All academic schedules, room allocations, and energy calculations are fictional demo data. Accepting suggestions updates the prototype state only — no real university timetable has been changed.</span>
-              </div>
-            </div>
-            <button type="button" id="btnTtResetDemo" class="btn-tt-reset" title="Reset accepted and dismissed demo changes to baseline">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
-              <span>Reset Demo State</span>
-            </button>
           </div>
 
           <!-- Timetable Optimizer Toolbar -->
@@ -1257,6 +1235,14 @@
               <button type="button" class="btn-conflict-toggle" id="btnTtToggleConflict" title="Toggle sample conflict to test conflict checker engine">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                 <span id="btnTtToggleConflictText">Simulate Sample Conflict</span>
+              </button>
+            </div>
+
+            <!-- Reset State Action -->
+            <div class="toolbar-group">
+              <button type="button" id="btnTtResetDemo" class="btn-conflict-toggle" title="Reset accepted and dismissed timetable changes to baseline">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                <span>Reset Baseline</span>
               </button>
             </div>
           </div>
@@ -1432,37 +1418,6 @@
               <h2 class="section-title">Alerts &amp; Actions</h2>
               <p class="section-subtitle">Detect potential energy waste and turn insights into practical action.</p>
             </div>
-            <div class="header-badge-group">
-              <span class="badge-fictional-demo">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                Demo Mode &bull; Simulated Anomaly Detection
-              </span>
-            </div>
-          </div>
-
-          <!-- Prototype Notice & Analysis Control Banner -->
-          <div class="alerts-disclaimer-banner">
-            <div class="alerts-disclaimer-content">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="alerts-disclaimer-icon">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="16" x2="12" y2="12"></line>
-                <line x1="12" y1="8" x2="12.01" y2="8"></line>
-              </svg>
-              <div>
-                <strong>Simulated Telemetry Notice:</strong>
-                <span>All anomalies and alert states are generated from simulated demo models. Missing or inconsistent readings are identified as data-quality issues and must not be interpreted as proof of energy waste.</span>
-              </div>
-            </div>
-            <div class="alerts-banner-actions">
-              <button type="button" id="btnRunAlertAnalysis" class="btn-run-analysis" title="Re-evaluate rules against classroom dataset">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                <span>Run Demo Alert Analysis</span>
-              </button>
-              <button type="button" id="btnResetAlertStates" class="btn-alerts-reset" title="Reset all alert statuses to default demo state">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
-                <span>Reset Demo States</span>
-              </button>
-            </div>
           </div>
 
           <!-- Alerts Controls Toolbar -->
@@ -1505,7 +1460,7 @@
             <div class="toolbar-group">
               <label for="alertDateFilter" class="filter-label">Recency:</label>
               <select id="alertDateFilter" class="form-select alert-select-control" aria-label="Filter alerts by date recency">
-                <option value="all">All Simulated Records</option>
+                <option value="all">All Records</option>
                 <option value="today">Today</option>
                 <option value="yesterday">Yesterday</option>
                 <option value="older">Older Records</option>
@@ -1518,6 +1473,18 @@
                 <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 <input type="search" id="alertSearchInput" class="table-search-input" placeholder="Search by alert, room ID, or rule..." aria-label="Search alerts">
               </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="toolbar-group" style="display: flex; gap: 8px; align-items: flex-end;">
+              <button type="button" id="btnRunAlertAnalysis" class="btn-run-analysis" title="Re-evaluate rules against classroom dataset">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <span>Run Analysis</span>
+              </button>
+              <button type="button" id="btnResetAlertStates" class="btn-alerts-reset" title="Reset all alert statuses to default state">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                <span>Reset States</span>
+              </button>
             </div>
           </div>
 
@@ -1580,7 +1547,7 @@
                 <span class="metric-value text-success" id="kpiResolvedAlerts">1</span>
                 <span class="metric-unit text-success">resolved</span>
               </div>
-              <p class="metric-subtext" id="kpiResolvedAlertsSub">Marked addressed in prototype</p>
+              <p class="metric-subtext" id="kpiResolvedAlertsSub">Marked addressed this period</p>
             </div>
           </div>
 
@@ -1662,23 +1629,17 @@
               <h2 class="section-title">Smart Controls Simulator</h2>
               <p class="section-subtitle">Simulate energy-saving actions for unoccupied classrooms.</p>
             </div>
-            <div class="header-badge-group">
-              <span class="badge-fictional-demo">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                Demo Mode &bull; Simulated Controls &amp; Logic
-              </span>
-            </div>
           </div>
 
-          <!-- Prominent Notice Banner (Requirement 1 & 4) -->
+          <!-- Simulation Scope Banner -->
           <div class="smart-controls-notice-banner">
             <div class="sc-notice-content">
               <div class="sc-notice-icon-box">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
               </div>
               <div>
-                <strong class="sc-notice-title">Simulation only &mdash; no physical devices are connected.</strong>
-                <p class="sc-notice-desc">All classroom device states, occupancy sensors, power ratings, and automated shutdown routines are simulated models within the browser prototype. No relays, physical HVAC systems, or electrical grids are accessed.</p>
+                <strong class="sc-notice-title">Simulated Control Environment</strong>
+                <p class="sc-notice-desc">Classroom states, device power ratings, and automated shutdown routines are computed through client simulation models.</p>
               </div>
             </div>
             <div class="sc-notice-status-box">
@@ -1958,28 +1919,22 @@
               <h2 class="section-title">Preventive Maintenance</h2>
               <p class="section-subtitle">Track equipment issues before they lead to energy waste.</p>
             </div>
-            <div class="header-badge-group">
-              <span class="badge-fictional-demo">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                Demo Mode &bull; Asset Register &amp; Work Orders
-              </span>
-            </div>
           </div>
 
-          <!-- Prominent Notice Banner (Requirement 1 & 3) -->
+          <!-- Preventive Asset Intelligence Banner -->
           <div class="smart-controls-notice-banner maint-notice-banner">
             <div class="sc-notice-content">
-              <div class="sc-notice-icon-box" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+              <div class="sc-notice-icon-box" style="background: var(--color-warning-subtle); color: var(--color-warning);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
               </div>
               <div>
-                <strong class="sc-notice-title">Simulation only &mdash; fictional equipment records &amp; demo diagnostic telemetry.</strong>
-                <p class="sc-notice-desc">All asset conditions, diagnostic alerts, and maintenance logs are simulated models. Unusually high electricity draw can indicate a problem (e.g. clogged filters or uncalibrated dampers) but does not prove mechanical failure without physical inspection.</p>
+                <strong class="sc-notice-title">Preventive Asset Intelligence</strong>
+                <p class="sc-notice-desc">Asset health and service indicators are modeled to prioritize inspection before efficiency degrades.</p>
               </div>
             </div>
             <div class="sc-notice-status-box">
               <div class="sc-status-pill active" id="maintStatusPill">
-                <span class="status-pulse-dot" style="background: #f59e0b; box-shadow: 0 0 8px #f59e0b;"></span>
+                <span class="status-pulse-dot" style="background: var(--color-warning); box-shadow: 0 0 8px var(--color-warning);"></span>
                 <span id="maintStatusText">Asset Register Active</span>
               </div>
             </div>
@@ -2174,28 +2129,22 @@
               <h2 class="section-title">Department Energy Challenge</h2>
               <p class="section-subtitle">Encourage fair, measurable energy-saving improvements across campus.</p>
             </div>
-            <div class="header-badge-group">
-              <span class="badge-fictional-demo">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                Demo Mode &bull; Normalized Scoring &amp; Gamification
-              </span>
-            </div>
           </div>
 
-          <!-- Prominent Notice Banner (Requirement 7 & 9) -->
+          <!-- Department Challenge Intelligence Banner -->
           <div class="smart-controls-notice-banner dept-notice-banner">
             <div class="sc-notice-content">
-              <div class="sc-notice-icon-box" style="background: rgba(168, 85, 247, 0.15); color: #a855f7;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+              <div class="sc-notice-icon-box" style="background: var(--color-surface-tint); color: var(--color-primary-teal);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
               </div>
               <div>
-                <strong class="sc-notice-title">Simulated campus competition &mdash; normalized scoring models.</strong>
-                <p class="sc-notice-desc">All rankings, participation points, and consumption deltas are demo models. Departments vary in size, room counts, and lab equipment. To ensure fairness, rankings incorporate normalized consumption (kWh per occupied hour), verified energy-saving actions, and participation&mdash;rather than rewarding departments simply for having fewer rooms.</p>
+                <strong class="sc-notice-title">Normalized Department Scoring</strong>
+                <p class="sc-notice-desc">Rankings evaluate normalized consumption (kWh per occupied hour), verified energy-saving actions, and participation for equitable comparison across buildings.</p>
               </div>
             </div>
             <div class="sc-notice-status-box">
               <div class="sc-status-pill active" id="deptStatusPill">
-                <span class="status-pulse-dot" style="background: #a855f7; box-shadow: 0 0 8px #a855f7;"></span>
+                <span class="status-pulse-dot" style="background: var(--color-primary-teal); box-shadow: 0 0 8px var(--color-primary-teal);"></span>
                 <span id="deptStatusText">Fall 2026 Active</span>
               </div>
             </div>
@@ -2365,15 +2314,15 @@
                   <span class="filter-label" style="display: block; margin-bottom: 8px;">Configured Challenge Achievements:</span>
                   <div class="dept-achievements-badges-row">
                     <div class="dept-badge-explainer">
-                      <span class="dept-achieve-pill amber">⚡ Energy Saver</span>
+                      <span class="dept-achieve-pill amber">Energy Saver</span>
                       <span>Awarded for &ge; 7.0% verified reduction vs normalized baseline.</span>
                     </div>
                     <div class="dept-badge-explainer">
-                      <span class="dept-achieve-pill teal">📈 Consistent Improver</span>
+                      <span class="dept-achieve-pill teal">Consistent Improver</span>
                       <span>Awarded for steady reductions across 2+ consecutive evaluation periods.</span>
                     </div>
                     <div class="dept-badge-explainer">
-                      <span class="dept-achieve-pill purple">🏆 Action Champion</span>
+                      <span class="dept-achieve-pill purple">Action Champion</span>
                       <span>Awarded for completing 3 or more verified energy-saving actions.</span>
                     </div>
                   </div>
@@ -3143,8 +3092,8 @@
                   </svg>
                 </div>
                 <div>
-                  <h2 class="settings-card-title">Prototype Demo Data Management</h2>
-                  <p class="settings-card-subtitle">Manage browser storage state and restore demo scenarios for live evaluation.</p>
+                  <h2 class="settings-card-title">Demo Telemetry &amp; State Controls</h2>
+                  <p class="settings-card-subtitle">Manage browser session state and restore demonstration scenarios.</p>
                 </div>
               </div>
 
@@ -3158,7 +3107,7 @@
                 <!-- Master Reset -->
                 <div class="danger-action-box">
                   <div>
-                    <h3 class="danger-box-title">Restore Initial Demo State (Master Reset)</h3>
+                    <h3 class="danger-box-title">Restore Baseline Demo State</h3>
                     <p class="danger-box-desc">
                       Resets all 24 classrooms, alert triages, maintenance records, timetable suggestions, and challenge points to initial factory demo baseline.
                     </p>
@@ -3231,8 +3180,8 @@
                 <!-- Telemetry Diagnostics Metadata Table -->
                 <div class="telemetry-meta-box">
                   <div class="meta-row">
-                    <span class="meta-label">Prototype Release:</span>
-                    <span class="meta-val">SCEO v1.0.0-PROTOTYPE (Step 8 Final Integration Pass)</span>
+                    <span class="meta-label">System Release:</span>
+                    <span class="meta-val">SCEO Enterprise v1.2 (Interactive Simulation Engine)</span>
                   </div>
                   <div class="meta-row">
                     <span class="meta-label">Monitored Scope:</span>
@@ -3386,7 +3335,7 @@
             <span class="room-type-tag" id="roomModalTypeTag">Lecture Theater • 120 Seats • Level 1</span>
           </div>
           <div class="room-modal-meta-right">
-            <span class="simulation-tag-sm">⚡ Telemetry Simulated</span>
+            <span class="simulation-tag-sm">Telemetry Simulated</span>
           </div>
         </div>
 
@@ -3455,6 +3404,13 @@
               <span class="bar-num" id="roomModalTargetBarVal">4.8 kWh/hr</span>
             </div>
           </div>
+        <!-- Room Active Alerts Notice (Shown when active alerts exist) -->
+        <div id="roomModalAlertsBox" class="room-modal-alerts-box" style="display: none;"></div>
+
+        <!-- Installed Equipment & Connected Systems -->
+        <div class="modal-detail-row" id="roomModalEquipmentSection">
+          <span class="modal-label">Installed Equipment &amp; Connected Systems</span>
+          <div class="room-modal-devices-grid" id="roomModalEquipmentList"></div>
         </div>
 
         <!-- Main Causes of Waste -->
