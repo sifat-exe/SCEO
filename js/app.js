@@ -6,6 +6,98 @@
 (function () {
   'use strict';
 
+  // ==========================================================================
+  // SCEO Core Calculation Functions (Mathematical Models & Guardrails)
+  // Audited for test cases: Intensity, Potential Savings, Tariffs & Improvement
+  // ==========================================================================
+  const SCEO_CALCULATIONS = {
+    /**
+     * A. Energy Intensity (kWh per occupied hour)
+     * Consumption (kWh) / Occupied hours (hrs)
+     * Edge cases: zero occupied hours, negative, null, or empty data -> returns 0.0
+     */
+    calculateEnergyIntensity: function (consumptionKWh, occupiedHours) {
+      const consumption = Number(consumptionKWh);
+      const hours = Number(occupiedHours);
+      if (isNaN(consumption) || isNaN(hours) || hours <= 0 || consumption <= 0) {
+        return 0.0;
+      }
+      return Math.round((consumption / hours) * 10) / 10;
+    },
+
+    /**
+     * B. Potential Energy Savings (kWh)
+     * Avoidable power (kW) * Avoidable operating time (hours) * days
+     * Edge cases: negative or NaN inputs -> safely returns 0.0
+     */
+    calculatePotentialSavings: function (avoidableKW, avoidableOperatingHours, days = 1) {
+      const kw = Number(avoidableKW);
+      const hours = Number(avoidableOperatingHours);
+      const d = Number(days);
+      if (isNaN(kw) || isNaN(hours) || kw <= 0 || hours <= 0) {
+        return 0.0;
+      }
+      const safeDays = isNaN(d) || d < 1 ? 1 : d;
+      const res = kw * hours * safeDays;
+      return Math.round(res * 100) / 100;
+    },
+
+    /**
+     * C. Estimated Cost Savings (Currency Units / $)
+     * Estimated savings (kWh) * Electricity tariff ($/kWh)
+     * Edge cases: missing/negative rate or zero savings -> safely returns 0.0
+     */
+    calculateCostSavings: function (savingsKWh, tariff) {
+      const savings = Number(savingsKWh);
+      const rate = Number(tariff);
+      if (isNaN(savings) || isNaN(rate) || savings <= 0 || rate <= 0) {
+        return 0.0;
+      }
+      return Math.round(savings * rate * 100) / 100;
+    },
+
+    /**
+     * D. Improvement (% Reduction)
+     * ((Baseline - Current) / Baseline) * 100
+     * Edge cases: missing baseline (null/undefined), baseline <= 0, or missing current
+     * -> safely returns null (rendered as "N/A — No Baseline", never NaN or Infinity)
+     */
+    calculateImprovement: function (baselineKWh, currentKWh) {
+      if (baselineKWh === null || baselineKWh === undefined || isNaN(Number(baselineKWh))) {
+        return null;
+      }
+      const base = Number(baselineKWh);
+      if (base <= 0) return null;
+      if (currentKWh === null || currentKWh === undefined || isNaN(Number(currentKWh))) {
+        return null;
+      }
+      const curr = Number(currentKWh);
+      const pct = ((base - curr) / base) * 100;
+      return Math.round(pct * 10) / 10;
+    },
+
+    /**
+     * Dataset Average Helper
+     * Safe average calculation for arrays, preventing NaN or division by zero on empty sets
+     */
+    calculateDatasetAverages: function (items, key) {
+      if (!Array.isArray(items) || items.length === 0) return 0.0;
+      let sum = 0;
+      let count = 0;
+      items.forEach(item => {
+        const val = item && typeof item === 'object' ? Number(item[key]) : Number(item);
+        if (!isNaN(val)) {
+          sum += val;
+          count++;
+        }
+      });
+      return count > 0 ? Math.round((sum / count) * 10) / 10 : 0.0;
+    }
+  };
+
+  // Expose on window for direct verification, automated tests, and console audit
+  window.SCEO_CALCULATIONS = SCEO_CALCULATIONS;
+
   // Application State
   const state = {
     currentView: 'overview',
@@ -82,11 +174,55 @@
 
     deptActivePeriod: 'month', // 'month' | 'semester' | 'academic_year'
     deptActiveDeptId: 'dept_science',
-    deptData: [] // Loaded from storage or SCEO_DATA.departmentChallengeModule.departments
+    deptData: [], // Loaded from storage or SCEO_DATA.departmentChallengeModule.departments
+
+    // Step 8: Savings Reports & Settings State
+    reportsBuildingFilter: 'all', // 'all' | 'engineering' | 'science' | 'business'
+    reportsDateRange: '7d', // '7d' | '30d' | 'custom'
+    reportsCustomStartDate: '2026-10-01',
+    reportsCustomEndDate: '2026-10-21',
+    reportsMetricFilter: 'all', // 'all' | 'avoidable' | 'total' | 'intensity' | 'cost'
+    reportsBldgSortCol: 'consumption',
+    reportsBldgSortDir: 'desc',
+    reportsClassroomSearch: '',
+    reportsClassroomSort: 'avoidable_desc',
+    savingsTrendChart: null,
+
+    tariffUSD: 0.18, // Contracted $/kWh rate (editable in Settings)
+    demandChargeUSD: 14.50, // $/kW capacity charge
+    carbonFactor: 0.42, // kg CO2e / kWh grid intensity
+
+    // Step 10: Competition Guided Demo Mode State
+    guidedDemoActive: false,
+    guidedDemoStage: 1,
+    activeSpotlightElement: null
   };
 
   // DOM Elements Cache
   const elements = {
+    // Step 10: Competition Guided Demo Elements
+    btnStartGuidedDemo: document.getElementById('btnStartGuidedDemo'),
+    btnTopStartDemo: document.getElementById('btnTopStartDemo'),
+    guidedDemoDock: document.getElementById('guidedDemoDock'),
+    demoStagePill: document.getElementById('demoStagePill'),
+    demoViewPill: document.getElementById('demoViewPill'),
+    demoScenarioTag: document.getElementById('demoScenarioTag'),
+    btnDemoResetScenario: document.getElementById('btnDemoResetScenario'),
+    btnDemoSkip: document.getElementById('btnDemoSkip'),
+    btnDemoSkipText: document.getElementById('btnDemoSkipText'),
+    demoProgressTrack: document.getElementById('demoProgressTrack'),
+    demoStageTitle: document.getElementById('demoStageTitle'),
+    demoTextWhatSeeing: document.getElementById('demoTextWhatSeeing'),
+    demoTextWhyMatters: document.getElementById('demoTextWhyMatters'),
+    demoTextNextAction: document.getElementById('demoTextNextAction'),
+    btnDemoPrev: document.getElementById('btnDemoPrev'),
+    btnDemoNext: document.getElementById('btnDemoNext'),
+    btnDemoNextText: document.getElementById('btnDemoNextText'),
+    demoResetConfirmModal: document.getElementById('demoResetConfirmModal'),
+    btnCancelDemoReset: document.getElementById('btnCancelDemoReset'),
+    btnCancelDemoResetSecondary: document.getElementById('btnCancelDemoResetSecondary'),
+    btnConfirmDemoReset: document.getElementById('btnConfirmDemoReset'),
+
     // Top Bar & Navigation
     sidebar: document.getElementById('sidebar'),
     sidebarOverlay: document.getElementById('sidebarOverlay'),
@@ -604,6 +740,61 @@
     btnCancelResetDept: document.getElementById('btnCancelResetDept'),
     btnConfirmResetDept: document.getElementById('btnConfirmResetDept'),
 
+    // Step 8: Savings Reports Elements
+    savingsReportsView: document.getElementById('savingsReportsView'),
+    reportsBuildingFilter: document.getElementById('reportsBuildingFilter'),
+    reportsBtnRange7d: document.getElementById('reportsBtnRange7d'),
+    reportsBtnRange30d: document.getElementById('reportsBtnRange30d'),
+    reportsBtnRangeCustom: document.getElementById('reportsBtnRangeCustom'),
+    reportsCustomDateWrap: document.getElementById('reportsCustomDateWrap'),
+    reportsStartDate: document.getElementById('reportsStartDate'),
+    reportsEndDate: document.getElementById('reportsEndDate'),
+    reportsBtnApplyCustom: document.getElementById('reportsBtnApplyCustom'),
+    reportsMetricFilter: document.getElementById('reportsMetricFilter'),
+    btnTriggerExportReport: document.getElementById('btnTriggerExportReport'),
+    btnPrintReport: document.getElementById('btnPrintReport'),
+    reportsKpiTotalEnergy: document.getElementById('reportsKpiTotalEnergy'),
+    reportsKpiTotalEnergySub: document.getElementById('reportsKpiTotalEnergySub'),
+    reportsKpiAvoidableEnergy: document.getElementById('reportsKpiAvoidableEnergy'),
+    reportsKpiAvoidableEnergySub: document.getElementById('reportsKpiAvoidableEnergySub'),
+    reportsKpiSimulatedEnergy: document.getElementById('reportsKpiSimulatedEnergy'),
+    reportsKpiSimulatedEnergySub: document.getElementById('reportsKpiSimulatedEnergySub'),
+    reportsKpiCostSavings: document.getElementById('reportsKpiCostSavings'),
+    reportsKpiCostSavingsSub: document.getElementById('reportsKpiCostSavingsSub'),
+    savingsTrendChartCanvas: document.getElementById('savingsTrendChartCanvas'),
+    savingsChartFallback: document.getElementById('savingsChartFallback'),
+    reportsBldgSortSelect: document.getElementById('reportsBldgSortSelect'),
+    reportsBuildingTableBody: document.getElementById('reportsBuildingTableBody'),
+    reportsClassroomCountBadge: document.getElementById('reportsClassroomCountBadge'),
+    reportsClassroomSearch: document.getElementById('reportsClassroomSearch'),
+    reportsClassroomSortSelect: document.getElementById('reportsClassroomSortSelect'),
+    reportsClassroomTableBody: document.getElementById('reportsClassroomTableBody'),
+    reportsCurrentTariffDisplay: document.getElementById('reportsCurrentTariffDisplay'),
+    btnGoToTariffSettings: document.getElementById('btnGoToTariffSettings'),
+    btnExportBuildingsCsv: document.getElementById('btnExportBuildingsCsv'),
+    btnExportRoomsCsv: document.getElementById('btnExportRoomsCsv'),
+    btnExportAlertsCsv: document.getElementById('btnExportAlertsCsv'),
+    btnExportMaintCsv: document.getElementById('btnExportMaintCsv'),
+    btnExportDeptCsv: document.getElementById('btnExportDeptCsv'),
+    btnExportSummaryCsv: document.getElementById('btnExportSummaryCsv'),
+
+    // Step 8: Settings View Elements
+    settingsView: document.getElementById('settingsView'),
+    settingsForm: document.getElementById('settingsForm'),
+    settingTariffInput: document.getElementById('settingTariffInput'),
+    settingDemandInput: document.getElementById('settingDemandInput'),
+    settingCarbonInput: document.getElementById('settingCarbonInput'),
+    btnSaveSettings: document.getElementById('btnSaveSettings'),
+    btnResetTariffDefault: document.getElementById('btnResetTariffDefault'),
+    btnOpenResetAllModal: document.getElementById('btnOpenResetAllModal'),
+    btnLoadAnomalyScenario: document.getElementById('btnLoadAnomalyScenario'),
+
+    // Master Reset Modal Elements
+    resetAllDemoConfirmModal: document.getElementById('resetAllDemoConfirmModal'),
+    resetAllModalCloseBtn: document.getElementById('resetAllModalCloseBtn'),
+    btnCancelResetAll: document.getElementById('btnCancelResetAll'),
+    btnConfirmResetAll: document.getElementById('btnConfirmResetAll'),
+
     // Toast
     toastContainer: document.getElementById('toastContainer')
   };
@@ -637,6 +828,12 @@
     DEPARTMENTS: 'sceo_dept_data',
     PERIOD: 'sceo_dept_period',
     ACTIVE_DEPT: 'sceo_dept_active_id'
+  };
+
+  const SETTINGS_STORAGE_KEYS = {
+    TARIFF: 'sceo_settings_tariff',
+    DEMAND: 'sceo_settings_demand',
+    CARBON: 'sceo_settings_carbon'
   };
 
   function loadStoredObject(key) {
@@ -785,6 +982,8 @@
     if (elements.smartControlsView) elements.smartControlsView.style.display = 'none';
     if (elements.maintenanceView) elements.maintenanceView.style.display = 'none';
     if (elements.deptChallengeView) elements.deptChallengeView.style.display = 'none';
+    if (elements.savingsReportsView) elements.savingsReportsView.style.display = 'none';
+    if (elements.settingsView) elements.settingsView.style.display = 'none';
     if (elements.placeholderView) elements.placeholderView.style.display = 'none';
 
     if (viewKey === 'overview') {
@@ -934,6 +1133,43 @@
 
       syncDeptPeriodButtons();
       renderDepartmentChallengeView();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (viewKey === 'savings-reports') {
+      elements.overviewView.style.display = 'none';
+      if (elements.heatmapView) elements.heatmapView.style.display = 'none';
+      if (elements.classroomAnalyticsView) elements.classroomAnalyticsView.style.display = 'none';
+      if (elements.timetableOptimizerView) elements.timetableOptimizerView.style.display = 'none';
+      if (elements.alertsActionsView) elements.alertsActionsView.style.display = 'none';
+      if (elements.smartControlsView) elements.smartControlsView.style.display = 'none';
+      if (elements.maintenanceView) elements.maintenanceView.style.display = 'none';
+      if (elements.deptChallengeView) elements.deptChallengeView.style.display = 'none';
+      if (elements.settingsView) elements.settingsView.style.display = 'none';
+      if (elements.savingsReportsView) elements.savingsReportsView.style.display = 'block';
+      if (elements.placeholderView) elements.placeholderView.style.display = 'none';
+      elements.topHeading.textContent = 'Energy Savings & Reports';
+      elements.topBreadcrumb.textContent = 'Campus Management / Energy Savings & Reports';
+
+      if (elements.reportsBuildingFilter) elements.reportsBuildingFilter.value = state.reportsBuildingFilter;
+      if (elements.reportsMetricFilter) elements.reportsMetricFilter.value = state.reportsMetricFilter;
+      syncReportsDateButtons();
+      renderSavingsReportsView();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (viewKey === 'settings') {
+      elements.overviewView.style.display = 'none';
+      if (elements.heatmapView) elements.heatmapView.style.display = 'none';
+      if (elements.classroomAnalyticsView) elements.classroomAnalyticsView.style.display = 'none';
+      if (elements.timetableOptimizerView) elements.timetableOptimizerView.style.display = 'none';
+      if (elements.alertsActionsView) elements.alertsActionsView.style.display = 'none';
+      if (elements.smartControlsView) elements.smartControlsView.style.display = 'none';
+      if (elements.maintenanceView) elements.maintenanceView.style.display = 'none';
+      if (elements.deptChallengeView) elements.deptChallengeView.style.display = 'none';
+      if (elements.savingsReportsView) elements.savingsReportsView.style.display = 'none';
+      if (elements.settingsView) elements.settingsView.style.display = 'block';
+      if (elements.placeholderView) elements.placeholderView.style.display = 'none';
+      elements.topHeading.textContent = 'Settings & Demo Data';
+      elements.topBreadcrumb.textContent = 'Campus Management / Settings & Demo Data';
+
+      renderSettingsView();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       // Show Coming Soon Placeholder
@@ -2898,11 +3134,15 @@
     if (isNaN(days) || days < 1) days = 1;
     if (isNaN(tariff) || tariff < 0) tariff = 0;
 
-    const potentialSavingsKWh = kw * hours * days;
-    const estimatedCostSavings = potentialSavingsKWh * tariff;
-    const co2Reduction = potentialSavingsKWh * 0.42;
+    const potentialSavingsKWh = SCEO_CALCULATIONS.calculatePotentialSavings(kw, hours, days);
+    const estimatedCostSavings = SCEO_CALCULATIONS.calculateCostSavings(potentialSavingsKWh, tariff);
+    const co2Reduction = Math.round(potentialSavingsKWh * 0.42);
 
-    if (elements.estResultKWh) elements.estResultKWh.textContent = Math.round(potentialSavingsKWh).toLocaleString('en-US');
+    if (elements.estResultKWh) {
+      elements.estResultKWh.textContent = Number.isInteger(potentialSavingsKWh)
+        ? potentialSavingsKWh.toLocaleString('en-US')
+        : (potentialSavingsKWh < 10 ? potentialSavingsKWh.toFixed(1) : Math.round(potentialSavingsKWh).toLocaleString('en-US'));
+    }
     if (elements.estResultKWhSub) elements.estResultKWhSub.textContent = `${kw.toFixed(1)} kW × ${hours.toFixed(1)} hrs/day × ${days} days`;
     if (elements.estResultCost) elements.estResultCost.textContent = `$${estimatedCostSavings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     if (elements.estResultCostSub) elements.estResultCostSub.textContent = `at $${tariff.toFixed(2)} per kWh`;
@@ -6002,6 +6242,7 @@
       const nextDate = new Date();
       nextDate.setDate(nextDate.getDate() + 90);
       task.nextDueDate = nextDate.toISOString().slice(0, 10);
+      // Integrity rule: Physical servicing does not assume automated energy reduction
     } else if (newStatus === 'open') {
       task.condition = 'Inspection Recommended';
     }
@@ -6013,7 +6254,11 @@
       openMaintenanceDetailModal(taskId);
     }
 
-    showToast(`Work Order ${taskId} updated to ${getStatusLabel(newStatus)}`, 'success');
+    if (newStatus === 'completed') {
+      showToast(`Work Order ${taskId} marked completed. Note: Verified savings require post-service telemetry.`, 'success');
+    } else {
+      showToast(`Work Order ${taskId} updated to ${getStatusLabel(newStatus)}`, 'success');
+    }
   }
 
   function openAddMaintenanceModal() {
@@ -6533,41 +6778,1086 @@
     showToast('Department Challenge data restored to demo baseline', 'info');
   }
 
+  /* ==========================================================================
+     STEP 8: SAVINGS REPORTS & SETTINGS LOGIC
+     ========================================================================== */
+
+  /**
+   * Load and Initialize Settings Data from LocalStorage
+   */
+  function initSettingsData() {
+    try {
+      const storedTariff = localStorage.getItem(SETTINGS_STORAGE_KEYS.TARIFF);
+      if (storedTariff !== null && !isNaN(parseFloat(storedTariff))) {
+        state.tariffUSD = parseFloat(storedTariff);
+      } else if (SCEO_DATA.metadata && SCEO_DATA.metadata.electricityRateUSD) {
+        state.tariffUSD = SCEO_DATA.metadata.electricityRateUSD;
+      }
+
+      const storedDemand = localStorage.getItem(SETTINGS_STORAGE_KEYS.DEMAND);
+      if (storedDemand !== null && !isNaN(parseFloat(storedDemand))) {
+        state.demandChargeUSD = parseFloat(storedDemand);
+      }
+
+      const storedCarbon = localStorage.getItem(SETTINGS_STORAGE_KEYS.CARBON);
+      if (storedCarbon !== null && !isNaN(parseFloat(storedCarbon))) {
+        state.carbonFactor = parseFloat(storedCarbon);
+      }
+
+      // Synchronize Classroom Analytics estimator tariff with active settings tariff
+      if (elements.estTariff) {
+        elements.estTariff.value = state.tariffUSD.toFixed(2);
+      }
+    } catch (e) {
+      console.warn('Error initializing settings:', e);
+    }
+  }
+
+  /**
+   * Render Settings View Controls
+   */
+  function renderSettingsView() {
+    if (elements.settingTariffInput) {
+      elements.settingTariffInput.value = state.tariffUSD.toFixed(2);
+    }
+    if (elements.settingDemandInput) {
+      elements.settingDemandInput.value = state.demandChargeUSD.toFixed(2);
+    }
+    if (elements.settingCarbonInput) {
+      elements.settingCarbonInput.value = state.carbonFactor.toFixed(2);
+    }
+  }
+
+  /**
+   * Save Financial and Utility Rate Settings
+   */
+  function saveSettings(e) {
+    if (e) e.preventDefault();
+    if (!elements.settingTariffInput) return;
+
+    const newTariff = parseFloat(elements.settingTariffInput.value);
+    const newDemand = parseFloat(elements.settingDemandInput ? elements.settingDemandInput.value : '14.50');
+    const newCarbon = parseFloat(elements.settingCarbonInput ? elements.settingCarbonInput.value : '0.42');
+
+    if (isNaN(newTariff) || newTariff <= 0) {
+      showToast('Please enter a valid positive electricity tariff ($/kWh)', 'warning');
+      return;
+    }
+
+    state.tariffUSD = Math.round(newTariff * 100) / 100;
+    state.demandChargeUSD = Math.round(newDemand * 100) / 100;
+    state.carbonFactor = Math.round(newCarbon * 100) / 100;
+
+    localStorage.setItem(SETTINGS_STORAGE_KEYS.TARIFF, state.tariffUSD.toString());
+    localStorage.setItem(SETTINGS_STORAGE_KEYS.DEMAND, state.demandChargeUSD.toString());
+    localStorage.setItem(SETTINGS_STORAGE_KEYS.CARBON, state.carbonFactor.toString());
+
+    // Update displays across modules
+    if (elements.reportsCurrentTariffDisplay) {
+      elements.reportsCurrentTariffDisplay.textContent = `$${state.tariffUSD.toFixed(2)} / kWh`;
+    }
+    if (elements.estTariff) {
+      elements.estTariff.value = state.tariffUSD.toFixed(2);
+      calculateSavingOpportunity();
+    }
+
+    showToast(`Financial settings saved. Active tariff: $${state.tariffUSD.toFixed(2)}/kWh`, 'success');
+
+    // Re-render overview KPIs & reports if initialized
+    updateKPIs();
+    if (state.currentView === 'savings-reports') {
+      renderSavingsReportsView();
+    }
+  }
+
+  /**
+   * Reset Tariff Rates to Default ($0.18/kWh)
+   */
+  function resetTariffDefaults() {
+    state.tariffUSD = 0.18;
+    state.demandChargeUSD = 14.50;
+    state.carbonFactor = 0.42;
+
+    localStorage.removeItem(SETTINGS_STORAGE_KEYS.TARIFF);
+    localStorage.removeItem(SETTINGS_STORAGE_KEYS.DEMAND);
+    localStorage.removeItem(SETTINGS_STORAGE_KEYS.CARBON);
+
+    renderSettingsView();
+    if (elements.reportsCurrentTariffDisplay) {
+      elements.reportsCurrentTariffDisplay.textContent = `$${state.tariffUSD.toFixed(2)} / kWh`;
+    }
+    if (elements.estTariff) {
+      elements.estTariff.value = state.tariffUSD.toFixed(2);
+      calculateSavingOpportunity();
+    }
+    updateKPIs();
+    showToast('Utility rates reset to default baseline ($0.18/kWh)', 'info');
+  }
+
+  /**
+   * Master Reset Modal Handlers
+   */
+  function openResetAllModal() {
+    if (elements.resetAllDemoConfirmModal) {
+      elements.resetAllDemoConfirmModal.classList.add('active');
+    }
+  }
+
+  function closeResetAllModal() {
+    if (elements.resetAllDemoConfirmModal) {
+      elements.resetAllDemoConfirmModal.classList.remove('active');
+    }
+  }
+
+  /**
+   * Master Reset: Revert All Demo State to Baseline
+   */
+  function confirmResetAllDemoData() {
+    // Clear all SCEO local storage keys
+    const sceoKeys = [
+      TT_STORAGE_KEYS.ACCEPTED,
+      TT_STORAGE_KEYS.DISMISSED,
+      ALERT_STORAGE_KEYS.STATUSES,
+      ALERT_STORAGE_KEYS.DYNAMIC,
+      SC_STORAGE_KEYS.ROOMS,
+      SC_STORAGE_KEYS.LOGS,
+      SC_STORAGE_KEYS.SAVINGS,
+      SC_STORAGE_KEYS.MODE,
+      MAINT_STORAGE_KEYS.TASKS,
+      MAINT_STORAGE_KEYS.VIEW_MODE,
+      DEPT_STORAGE_KEYS.DEPARTMENTS,
+      DEPT_STORAGE_KEYS.PERIOD,
+      DEPT_STORAGE_KEYS.ACTIVE_DEPT,
+      SETTINGS_STORAGE_KEYS.TARIFF,
+      SETTINGS_STORAGE_KEYS.DEMAND,
+      SETTINGS_STORAGE_KEYS.CARBON
+    ];
+
+    sceoKeys.forEach(k => localStorage.removeItem(k));
+
+    // Reset State
+    state.acceptedSuggestions = new Set();
+    state.dismissedSuggestions = new Set();
+    state.alertStatuses = {};
+    state.generatedDynamicAlerts = [];
+    state.tariffUSD = 0.18;
+    state.demandChargeUSD = 14.50;
+    state.carbonFactor = 0.42;
+
+    initSmartControlsData();
+    initMaintenanceData();
+    initDepartmentChallengeData();
+
+    closeResetAllModal();
+
+    // Re-render current active view and overview
+    updateKPIs();
+    if (state.currentView === 'overview') {
+      renderRecentAlerts();
+      renderBuildingsTable();
+      renderPriorityActions();
+    } else if (state.currentView === 'savings-reports') {
+      renderSavingsReportsView();
+    } else if (state.currentView === 'settings') {
+      renderSettingsView();
+    } else if (state.currentView === 'smart-controls') {
+      renderSmartControls();
+    } else if (state.currentView === 'maintenance') {
+      renderMaintenanceView();
+    } else if (state.currentView === 'dept-challenge') {
+      renderDepartmentChallengeView();
+    } else if (state.currentView === 'alerts-actions') {
+      renderAlertsAndActions();
+    } else if (state.currentView === 'timetable-optimizer') {
+      renderTimetableOptimizer();
+    }
+
+    showToast('Master reset completed. All demo data restored to factory baseline.', 'info');
+  }
+
+  /**
+   * Load Sample Anomaly Scenario (for Walkthrough Evaluation)
+   */
+  function loadSampleAnomalyScenario() {
+    // 1. In Smart Controls: set ENG-101 and SCI-201 to high waste condition (empty, AC on, no override)
+    const eng101 = state.scRoomsData.find(r => r.roomId === 'ENG-101');
+    if (eng101) {
+      eng101.occupied = false;
+      eng101.override = false;
+      const ac = eng101.devices.find(d => d.type === 'air_conditioner');
+      if (ac) {
+        ac.state = true;
+        ac.countdown = 4;
+      }
+    }
+    const sci201 = state.scRoomsData.find(r => r.roomId === 'SCI-201');
+    if (sci201) {
+      sci201.occupied = false;
+      sci201.override = false;
+      const ac = sci201.devices.find(d => d.type === 'air_conditioner');
+      if (ac) {
+        ac.state = true;
+        ac.countdown = 4;
+      }
+    }
+    saveSmartControlsState();
+
+    // 2. In Maintenance: set EQ-ENG-101-AC1 to Urgent Review
+    const maint1 = state.maintTasks.find(t => t.id === 'EQ-ENG-101-AC1');
+    if (maint1) {
+      maint1.condition = 'urgent_review';
+      maint1.priority = 'critical';
+      maint1.status = 'open';
+    }
+    saveMaintenanceTasks();
+
+    // 3. Log a scenario event
+    addSimulationLog('ANOMALY_TRIGGER', 'Sample Anomaly Scenario: Unoccupied HVAC running detected in ENG-101 and SCI-201.');
+
+    showToast('Sample anomaly scenario injected into Engineering & Science facilities.', 'warning');
+
+    // Refresh active view
+    if (state.currentView === 'smart-controls') renderSmartControls();
+    if (state.currentView === 'maintenance') renderMaintenanceView();
+    if (state.currentView === 'savings-reports') renderSavingsReportsView();
+  }
+
+  /**
+   * Date Button Synchronization for Savings Reports
+   */
+  function syncReportsDateButtons() {
+    if (elements.reportsBtnRange7d) {
+      elements.reportsBtnRange7d.classList.toggle('active', state.reportsDateRange === '7d');
+    }
+    if (elements.reportsBtnRange30d) {
+      elements.reportsBtnRange30d.classList.toggle('active', state.reportsDateRange === '30d');
+    }
+    if (elements.reportsBtnRangeCustom) {
+      elements.reportsBtnRangeCustom.classList.toggle('active', state.reportsDateRange === 'custom');
+    }
+    if (elements.reportsCustomDateWrap) {
+      elements.reportsCustomDateWrap.style.display = state.reportsDateRange === 'custom' ? 'block' : 'none';
+    }
+  }
+
+  /**
+   * Render Savings Reports Page
+   */
+  function renderSavingsReportsView() {
+    // 1. Calculate Aggregated Consumption & Potential Savings for Selected Scope
+    let totalKWh = 0;
+    let avoidableKWh = 0;
+    const is30d = state.reportsDateRange === '30d' || state.reportsDateRange === 'custom';
+
+    if (state.reportsBuildingFilter === 'all') {
+      SCEO_DATA.buildings.forEach(b => {
+        const kpi = is30d ? b.kpi30Days : b.kpi7Days;
+        totalKWh += kpi.totalKWh;
+        avoidableKWh += kpi.potentialSavingsKWh;
+      });
+    } else {
+      const bldg = SCEO_DATA.buildings.find(b => b.id === state.reportsBuildingFilter);
+      if (bldg) {
+        const kpi = is30d ? bldg.kpi30Days : bldg.kpi7Days;
+        totalKWh = kpi.totalKWh;
+        avoidableKWh = kpi.potentialSavingsKWh;
+      }
+    }
+
+    // 2. Simulated Savings from Smart Controls Engine
+    const simulatedKWh = state.scRealizedSavingsKWh || 0.0;
+    const costSavings = avoidableKWh * state.tariffUSD;
+
+    // 3. Update Summary KPI Cards
+    if (elements.reportsKpiTotalEnergy) {
+      elements.reportsKpiTotalEnergy.textContent = formatNumber(totalKWh);
+    }
+    if (elements.reportsKpiTotalEnergySub) {
+      const scopeLabel = state.reportsBuildingFilter === 'all' ? 'Campus-wide' : `${capitalizeFirst(state.reportsBuildingFilter)} Building`;
+      const periodLabel = is30d ? '30-day period' : '7-day period';
+      elements.reportsKpiTotalEnergySub.textContent = `${scopeLabel} demo sub-meter readings over ${periodLabel}`;
+    }
+
+    if (elements.reportsKpiAvoidableEnergy) {
+      elements.reportsKpiAvoidableEnergy.textContent = formatNumber(avoidableKWh);
+    }
+    if (elements.reportsKpiAvoidableEnergySub) {
+      const pct = totalKWh > 0 ? ((avoidableKWh / totalKWh) * 100).toFixed(1) : '0.0';
+      elements.reportsKpiAvoidableEnergySub.textContent = `${pct}% of consumption • Standby draw during unoccupied hours`;
+    }
+
+    if (elements.reportsKpiSimulatedEnergy) {
+      elements.reportsKpiSimulatedEnergy.textContent = simulatedKWh.toFixed(1);
+    }
+    if (elements.reportsKpiSimulatedEnergySub) {
+      elements.reportsKpiSimulatedEnergySub.textContent = `Realized via Smart Controls simulator actions ($${(simulatedKWh * state.tariffUSD).toFixed(2)} modeled)`;
+    }
+
+    if (elements.reportsKpiCostSavings) {
+      elements.reportsKpiCostSavings.textContent = `$${costSavings.toFixed(2)}`;
+    }
+    if (elements.reportsKpiCostSavingsSub) {
+      elements.reportsKpiCostSavingsSub.textContent = `Calculated at active demo tariff ($${state.tariffUSD.toFixed(2)}/kWh)`;
+    }
+
+    if (elements.reportsCurrentTariffDisplay) {
+      elements.reportsCurrentTariffDisplay.textContent = `$${state.tariffUSD.toFixed(2)} / kWh`;
+    }
+
+    // 4. Render Components
+    renderSavingsTrendChart();
+    renderBuildingPerformanceTable();
+    renderClassroomSavingsTable();
+  }
+
+  /**
+   * Render Energy Consumption & Baseline Trend Chart (Chart.js)
+   */
+  function renderSavingsTrendChart() {
+    if (!elements.savingsTrendChartCanvas) return;
+
+    // Destroy existing chart instance to prevent memory leaks
+    if (state.savingsTrendChart) {
+      try {
+        state.savingsTrendChart.destroy();
+      } catch (e) {
+        console.warn('Error destroying savingsTrendChart:', e);
+      }
+      state.savingsTrendChart = null;
+    }
+
+    if (!state.chartJsAvailable) {
+      if (elements.savingsChartFallback) elements.savingsChartFallback.style.display = 'block';
+      return;
+    }
+    if (elements.savingsChartFallback) elements.savingsChartFallback.style.display = 'none';
+
+    const is30d = state.reportsDateRange === '30d' || state.reportsDateRange === 'custom';
+    let labels = [];
+    let activeData = [];
+    let baselineData = [];
+
+    if (!is30d) {
+      // 7 Days
+      labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      if (state.reportsBuildingFilter === 'engineering') {
+        activeData = [152, 168, 174, 160, 165, 148, 153];
+        baselineData = [142, 148, 150, 146, 148, 125, 128];
+      } else if (state.reportsBuildingFilter === 'science') {
+        activeData = [112, 124, 128, 118, 122, 106, 110];
+        baselineData = [105, 112, 115, 110, 112, 94, 98];
+      } else if (state.reportsBuildingFilter === 'business') {
+        activeData = [74, 81, 82, 78, 79, 72, 74];
+        baselineData = [68, 74, 75, 72, 74, 62, 64];
+      } else {
+        // All Campus
+        activeData = [338, 373, 384, 356, 366, 326, 337];
+        baselineData = [315, 334, 340, 328, 334, 281, 290];
+      }
+    } else {
+      // 30 Days
+      labels = Array.from({ length: 30 }, (_, i) => `Oct ${i + 1}`);
+      if (state.reportsBuildingFilter === 'engineering') {
+        activeData = SCEO_DATA.buildings[0].dailyReadings30Days;
+        baselineData = activeData.map(v => Math.round(v * 0.90));
+      } else if (state.reportsBuildingFilter === 'science') {
+        activeData = SCEO_DATA.buildings[1].dailyReadings30Days;
+        baselineData = activeData.map(v => Math.round(v * 0.92));
+      } else if (state.reportsBuildingFilter === 'business') {
+        activeData = SCEO_DATA.buildings[2].dailyReadings30Days;
+        baselineData = activeData.map(v => Math.round(v * 0.93));
+      } else {
+        activeData = SCEO_DATA.dailyAggregated30Days;
+        baselineData = activeData.map(v => Math.round(v * 0.91));
+      }
+    }
+
+    const ctx = elements.savingsTrendChartCanvas.getContext('2d');
+    state.savingsTrendChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            type: 'line',
+            label: 'ASHRAE Target Baseline (kWh)',
+            data: baselineData,
+            borderColor: '#64748B',
+            borderWidth: 2,
+            borderDash: [5, 5],
+            pointRadius: is30d ? 2 : 4,
+            pointBackgroundColor: '#64748B',
+            fill: false,
+            tension: 0.25,
+            order: 1
+          },
+          {
+            type: 'bar',
+            label: 'Active Energy Consumption (kWh)',
+            data: activeData,
+            backgroundColor: 'rgba(23, 107, 115, 0.82)',
+            hoverBackgroundColor: '#176B73',
+            borderRadius: 4,
+            order: 2
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          mode: 'index',
+          intersect: false
+        },
+        plugins: {
+          legend: {
+            display: false // Displayed in custom HTML legend
+          },
+          tooltip: {
+            backgroundColor: '#0F172A',
+            titleColor: '#F8FAFC',
+            bodyColor: '#E2E8F0',
+            borderColor: '#334155',
+            borderWidth: 1,
+            padding: 10,
+            callbacks: {
+              label: function(context) {
+                const val = context.parsed.y;
+                return `${context.dataset.label}: ${val} kWh`;
+              },
+              afterBody: function(contexts) {
+                if (contexts.length >= 2) {
+                  const baseline = contexts[0].parsed.y;
+                  const active = contexts[1].parsed.y;
+                  const delta = active - baseline;
+                  const sign = delta > 0 ? '+' : '';
+                  return [`Delta vs Baseline: ${sign}${delta} kWh`];
+                }
+                return [];
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              color: '#64748B',
+              font: {
+                size: 11
+              }
+            }
+          },
+          y: {
+            beginAtZero: false,
+            grid: {
+              color: '#EDF2F7'
+            },
+            ticks: {
+              color: '#64748B',
+              font: {
+                size: 11
+              },
+              callback: function(val) {
+                return `${val} kWh`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * Render Building Performance Report Table
+   */
+  function renderBuildingPerformanceTable() {
+    if (!elements.reportsBuildingTableBody) return;
+
+    const is30d = state.reportsDateRange === '30d' || state.reportsDateRange === 'custom';
+
+    // Build building records
+    let records = SCEO_DATA.buildings.map(b => {
+      const kpi = is30d ? b.kpi30Days : b.kpi7Days;
+      // Calculate occupied hours from classroom aggregation
+      const rooms = SCEO_DATA.classrooms.filter(r => r.buildingId === b.id);
+      const totalOccHours = rooms.reduce((acc, r) => {
+        const periodData = is30d ? r.thirtyDays : r.sevenDays;
+        return acc + (periodData ? periodData.occupiedHours : 0);
+      }, 0);
+
+      const intensity = totalOccHours > 0 ? (kpi.totalKWh / totalOccHours) : 0;
+      const avoidable = kpi.potentialSavingsKWh;
+      const cost = avoidable * state.tariffUSD;
+
+      let confidence = 'High (Sub-metered IoT)';
+      let confBadgeClass = 'badge-demo';
+      if (b.id === 'science') {
+        confidence = 'High (Sub-metered + Labs)';
+        confBadgeClass = 'badge-demo';
+      } else if (b.id === 'business') {
+        confidence = 'Medium (Schedule Inferred)';
+        confBadgeClass = 'badge-potential';
+      }
+
+      return {
+        id: b.id,
+        name: b.name,
+        code: b.code,
+        totalRooms: b.totalRooms,
+        totalKWh: kpi.totalKWh,
+        occupiedHours: totalOccHours,
+        intensity: intensity,
+        avoidableKWh: avoidable,
+        wastePercent: kpi.totalKWh > 0 ? ((avoidable / kpi.totalKWh) * 100).toFixed(1) : '0.0',
+        costUSD: cost,
+        confidence: confidence,
+        confBadgeClass: confBadgeClass
+      };
+    });
+
+    // Filter if specific building selected
+    if (state.reportsBuildingFilter !== 'all') {
+      records = records.filter(r => r.id === state.reportsBuildingFilter);
+    }
+
+    // Sort records
+    records.sort((a, b) => {
+      let valA, valB;
+      if (state.reportsBldgSortCol === 'consumption') {
+        valA = a.totalKWh; valB = b.totalKWh;
+      } else if (state.reportsBldgSortCol === 'intensity') {
+        valA = a.intensity; valB = b.intensity;
+      } else if (state.reportsBldgSortCol === 'avoidable') {
+        valA = a.avoidableKWh; valB = b.avoidableKWh;
+      } else if (state.reportsBldgSortCol === 'hours') {
+        valA = a.occupiedHours; valB = b.occupiedHours;
+      } else {
+        valA = a.name; valB = b.name;
+        return state.reportsBldgSortDir === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+      }
+      return state.reportsBldgSortDir === 'asc' ? valA - valB : valB - valA;
+    });
+
+    if (records.length === 0) {
+      elements.reportsBuildingTableBody.innerHTML = `
+        <tr>
+          <td colspan="7" class="empty-table-cell" style="text-align: center; padding: 24px; color: var(--color-text-muted);">
+            No building performance records match the active filter.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    elements.reportsBuildingTableBody.innerHTML = records.map(r => `
+      <tr>
+        <td>
+          <div style="font-weight: 600; color: var(--color-text-main);">${escapeHTML(r.name)}</div>
+          <div style="font-size: 11.5px; color: var(--color-text-muted);">${r.totalRooms} Monitored Rooms • Code: ${r.code}</div>
+        </td>
+        <td style="font-weight: 600;">${formatNumber(r.totalKWh)} kWh</td>
+        <td>${r.occupiedHours} hrs</td>
+        <td>
+          <span style="font-weight: 600; color: var(--color-primary);">${r.intensity.toFixed(2)}</span>
+          <span style="font-size: 11px; color: var(--color-text-muted);"> kWh/hr</span>
+        </td>
+        <td>
+          <span class="text-danger" style="font-weight: 700;">${formatNumber(r.avoidableKWh)} kWh</span>
+          <span style="font-size: 11px; color: var(--color-text-muted);"> (${r.wastePercent}%)</span>
+        </td>
+        <td style="font-weight: 600; color: var(--color-text-main);">$${r.costUSD.toFixed(2)}</td>
+        <td>
+          <span class="stat-source-badge ${r.confBadgeClass}">${escapeHTML(r.confidence)}</span>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  /**
+   * Render Classroom Savings Opportunities Report Table
+   */
+  function renderClassroomSavingsTable() {
+    if (!elements.reportsClassroomTableBody) return;
+
+    const is30d = state.reportsDateRange === '30d' || state.reportsDateRange === 'custom';
+    const query = state.reportsClassroomSearch.toLowerCase().trim();
+
+    let rooms = SCEO_DATA.classrooms.map(r => {
+      const p = is30d ? r.thirtyDays : r.sevenDays;
+      const totalKWh = p ? p.totalKWh : 0;
+      const occupiedHours = p ? p.occupiedHours : 0;
+      const intensity = p ? p.kwhPerOccupiedHour : (occupiedHours > 0 ? totalKWh / occupiedHours : 0);
+      const avoidableKWh = p ? p.estimatedWasteKWh : 0;
+      const wastePct = p ? p.wastePercentage : 0;
+      const costUSD = avoidableKWh * state.tariffUSD;
+      const action = (p && p.recommendedActions && p.recommendedActions.length > 0) 
+        ? p.recommendedActions[0] 
+        : 'Inspect after-hours baseline and calibrate sensors.';
+
+      let confidence = 'High (Sub-meter + PIR)';
+      if (r.roomType.toLowerCase().includes('seminar') || r.roomType.toLowerCase().includes('case')) {
+        confidence = 'Medium (Schedule Inferred)';
+      }
+
+      return {
+        id: r.id,
+        name: r.name,
+        buildingId: r.buildingId,
+        buildingName: r.buildingName,
+        roomType: r.roomType,
+        capacity: r.capacity,
+        totalKWh: totalKWh,
+        occupiedHours: occupiedHours,
+        intensity: intensity,
+        avoidableKWh: avoidableKWh,
+        wastePct: wastePct,
+        costUSD: costUSD,
+        action: action,
+        confidence: confidence
+      };
+    });
+
+    // 1. Filter by Building
+    if (state.reportsBuildingFilter !== 'all') {
+      rooms = rooms.filter(r => r.buildingId === state.reportsBuildingFilter);
+    }
+
+    // 2. Filter by Search Query
+    if (query) {
+      rooms = rooms.filter(r => 
+        r.id.toLowerCase().includes(query) ||
+        r.name.toLowerCase().includes(query) ||
+        r.buildingName.toLowerCase().includes(query) ||
+        r.roomType.toLowerCase().includes(query) ||
+        r.action.toLowerCase().includes(query)
+      );
+    }
+
+    // 3. Sort Rooms
+    rooms.sort((a, b) => {
+      if (state.reportsClassroomSort === 'avoidable_desc') {
+        return b.avoidableKWh - a.avoidableKWh;
+      } else if (state.reportsClassroomSort === 'intensity_desc') {
+        return b.intensity - a.intensity;
+      } else if (state.reportsClassroomSort === 'consumption_desc') {
+        return b.totalKWh - a.totalKWh;
+      } else if (state.reportsClassroomSort === 'hours_desc') {
+        return b.occupiedHours - a.occupiedHours;
+      } else if (state.reportsClassroomSort === 'id_asc') {
+        return a.id.localeCompare(b.id);
+      }
+      return b.avoidableKWh - a.avoidableKWh;
+    });
+
+    // Update count badge
+    if (elements.reportsClassroomCountBadge) {
+      elements.reportsClassroomCountBadge.textContent = `${rooms.length} Rooms`;
+    }
+
+    if (rooms.length === 0) {
+      elements.reportsClassroomTableBody.innerHTML = `
+        <tr>
+          <td colspan="9" class="empty-table-cell" style="text-align: center; padding: 24px; color: var(--color-text-muted);">
+            No classrooms match your search and filter criteria.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    elements.reportsClassroomTableBody.innerHTML = rooms.map(r => `
+      <tr>
+        <td>
+          <span class="room-id-tag font-bold" style="font-size: 12.5px;">${escapeHTML(r.id)}</span>
+          <div style="font-size: 11px; color: var(--color-text-muted); margin-top: 2px;">${escapeHTML(r.roomType)} (${r.capacity} seats)</div>
+        </td>
+        <td>
+          <span style="font-size: 12.5px; font-weight: 500;">${escapeHTML(r.buildingName)}</span>
+        </td>
+        <td style="font-weight: 600;">${formatNumber(r.totalKWh)} kWh</td>
+        <td>${r.occupiedHours} hrs</td>
+        <td>
+          <span style="font-weight: 600; color: var(--color-primary);">${r.intensity.toFixed(1)}</span>
+          <span style="font-size: 11px; color: var(--color-text-muted);"> kWh/hr</span>
+        </td>
+        <td>
+          <span class="text-danger" style="font-weight: 700;">${r.avoidableKWh} kWh</span>
+          <span style="font-size: 11px; color: var(--color-text-muted);"> (${r.wastePct}%)</span>
+        </td>
+        <td style="max-width: 280px;">
+          <div style="font-size: 12px; color: var(--color-text-secondary); line-height: 1.4;" title="${escapeHTML(r.action)}">
+            ${escapeHTML(r.action)}
+          </div>
+        </td>
+        <td>
+          <span class="stat-source-badge ${r.confidence.includes('High') ? 'badge-demo' : 'badge-potential'}">${escapeHTML(r.confidence)}</span>
+        </td>
+        <td style="text-align: right;">
+          <div class="table-action-group">
+            <button type="button" class="deep-link-btn btn-reports-analytics" data-room-id="${escapeHTML(r.id)}" title="Open Classroom Analytics">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path><path d="M6 6h10M6 10h10M6 14h6"></path></svg>
+              <span>Analytics</span>
+            </button>
+            <button type="button" class="deep-link-btn btn-reports-heatmap" data-room-id="${escapeHTML(r.id)}" title="Locate in Energy Heatmap">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+              <span>Heatmap</span>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  /**
+   * Helper: Escape and Format Cell for RFC 4180 CSV Export
+   */
+  function formatCSVCell(val) {
+    if (val === null || val === undefined) return '""';
+    let str = String(val);
+    if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+      str = str.replace(/"/g, '""');
+      return `"${str}"`;
+    }
+    return `"${str}"`;
+  }
+
+  /**
+   * Generic Browser-Based CSV Generator and Downloader (Blob & Object URL)
+   */
+  function generateCSV(headers, rows, filename) {
+    try {
+      if (!rows || rows.length === 0) {
+        showToast(`No records available to export for ${filename}`, 'warning');
+        return;
+      }
+
+      const headerLine = headers.map(formatCSVCell).join(',');
+      const rowLines = rows.map(r => r.map(formatCSVCell).join(','));
+      // Prepend UTF-8 Byte Order Mark (\uFEFF) for Microsoft Excel compatibility
+      const csvContent = '\uFEFF' + [headerLine, ...rowLines].join('\r\n');
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Clean up memory
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+      }, 1000);
+
+      showToast(`Exported ${filename} (${rows.length} records)`, 'success');
+    } catch (e) {
+      console.error('CSV Generation Error:', e);
+      showToast('Error generating CSV file in browser.', 'danger');
+    }
+  }
+
+  /**
+   * 1. Export Building Performance CSV
+   */
+  function exportBuildingsCSV() {
+    const is30d = state.reportsDateRange === '30d' || state.reportsDateRange === 'custom';
+    const periodLabel = is30d ? 'Last 30 Days' : 'Last 7 Days';
+    const headers = [
+      'Building ID', 'Building Name', 'Building Code', 'Reporting Period',
+      'Total Energy (kWh)', 'Occupied Hours (hrs)', 'Energy Intensity (kWh/hr)',
+      'Estimated Avoidable Energy (kWh)', 'Waste Percentage (%)', 'Estimated Cost ($)',
+      'Data Quality Standard'
+    ];
+
+    let bldgs = SCEO_DATA.buildings;
+    if (state.reportsBuildingFilter !== 'all') {
+      bldgs = bldgs.filter(b => b.id === state.reportsBuildingFilter);
+    }
+
+    const rows = bldgs.map(b => {
+      const kpi = is30d ? b.kpi30Days : b.kpi7Days;
+      const rooms = SCEO_DATA.classrooms.filter(r => r.buildingId === b.id);
+      const totalOccHours = rooms.reduce((acc, r) => {
+        const periodData = is30d ? r.thirtyDays : r.sevenDays;
+        return acc + (periodData ? periodData.occupiedHours : 0);
+      }, 0);
+      const intensity = totalOccHours > 0 ? (kpi.totalKWh / totalOccHours).toFixed(2) : '0.00';
+      const avoidable = kpi.potentialSavingsKWh;
+      const cost = (avoidable * state.tariffUSD).toFixed(2);
+      const pct = kpi.totalKWh > 0 ? ((avoidable / kpi.totalKWh) * 100).toFixed(1) : '0.0';
+
+      return [
+        b.id,
+        b.name,
+        b.code,
+        periodLabel,
+        kpi.totalKWh,
+        totalOccHours,
+        intensity,
+        avoidable,
+        pct,
+        cost,
+        b.id === 'business' ? 'Medium (Schedule Inferred)' : 'High (Sub-metered IoT)'
+      ];
+    });
+
+    const dateStamp = new Date().toISOString().slice(0, 10);
+    generateCSV(headers, rows, `sceo-building-performance-${dateStamp}.csv`);
+  }
+
+  /**
+   * 2. Export Classroom Savings Opportunities CSV
+   */
+  function exportClassroomsCSV() {
+    const is30d = state.reportsDateRange === '30d' || state.reportsDateRange === 'custom';
+    const periodLabel = is30d ? 'Last 30 Days' : 'Last 7 Days';
+    const headers = [
+      'Classroom ID', 'Room Name', 'Building ID', 'Building Name',
+      'Room Type', 'Capacity (Seats)', 'Reporting Period', 'Total Consumption (kWh)',
+      'Occupied Hours (hrs)', 'Energy per Occupied Hr (kWh/hr)', 'Avoidable Energy (kWh)',
+      'Waste Percentage (%)', 'Estimated Cost ($)', 'Recommended Remediation', 'Confidence Label'
+    ];
+
+    let rooms = SCEO_DATA.classrooms;
+    if (state.reportsBuildingFilter !== 'all') {
+      rooms = rooms.filter(r => r.buildingId === state.reportsBuildingFilter);
+    }
+
+    const rows = rooms.map(r => {
+      const p = is30d ? r.thirtyDays : r.sevenDays;
+      const totalKWh = p ? p.totalKWh : 0;
+      const occupiedHours = p ? p.occupiedHours : 0;
+      const intensity = p ? p.kwhPerOccupiedHour.toFixed(2) : '0.00';
+      const avoidable = p ? p.estimatedWasteKWh : 0;
+      const pct = p ? p.wastePercentage : 0;
+      const cost = (avoidable * state.tariffUSD).toFixed(2);
+      const action = (p && p.recommendedActions && p.recommendedActions.length > 0) ? p.recommendedActions[0] : 'Audit baseline standby draw';
+      const conf = r.roomType.toLowerCase().includes('seminar') ? 'Medium (Schedule Inferred)' : 'High (Sub-meter + PIR)';
+
+      return [
+        r.id,
+        r.name,
+        r.buildingId,
+        r.buildingName,
+        r.roomType,
+        r.capacity,
+        periodLabel,
+        totalKWh,
+        occupiedHours,
+        intensity,
+        avoidable,
+        pct,
+        cost,
+        action,
+        conf
+      ];
+    });
+
+    const dateStamp = new Date().toISOString().slice(0, 10);
+    generateCSV(headers, rows, `sceo-classroom-savings-${dateStamp}.csv`);
+  }
+
+  /**
+   * 3. Export Alert Records CSV
+   */
+  function exportAlertsCSV() {
+    const alerts = getAllAlerts();
+    const headers = [
+      'Alert ID', 'Classroom ID', 'Building Name', 'Category',
+      'Severity', 'Triage Status', 'Timestamp', 'Measured Power (kW)',
+      'Baseline Standby (kW)', 'Estimated Avoidable Energy (kWh)', 'Estimated Cost ($)',
+      'Rule Triggered', 'Recommended Remediation'
+    ];
+
+    const rows = alerts.map(a => [
+      a.id,
+      a.room,
+      a.building,
+      a.category,
+      a.severity.toUpperCase(),
+      (state.alertStatuses[a.id] || a.status).toUpperCase(),
+      a.timestamp,
+      a.powerKW,
+      a.baselineKW,
+      a.avoidableKWh,
+      `$${a.estimatedCost.toFixed(2)}`,
+      a.ruleTriggered || 'Threshold Exceeded',
+      a.recommendedAction
+    ]);
+
+    const dateStamp = new Date().toISOString().slice(0, 10);
+    generateCSV(headers, rows, `sceo-alert-records-${dateStamp}.csv`);
+  }
+
+  /**
+   * 4. Export Maintenance Records CSV
+   */
+  function exportMaintenanceCSV() {
+    const headers = [
+      'Equipment ID', 'Equipment Name', 'Equipment Type', 'Classroom Location',
+      'Building Name', 'Diagnostic Condition', 'Priority Level', 'Work Order Status',
+      'Diagnostic Issue', 'Telemetry Trigger', 'Recommended Remediation',
+      'Assigned Team', 'Target Date', 'Last Maintained Date'
+    ];
+
+    const rows = state.maintTasks.map(t => [
+      t.id,
+      t.name,
+      t.type,
+      t.room,
+      t.building,
+      t.condition,
+      t.priority,
+      t.status,
+      t.issue,
+      t.reason,
+      t.recommendedAction,
+      t.assignedTeam,
+      t.targetDate,
+      t.lastMaintainedDate
+    ]);
+
+    const dateStamp = new Date().toISOString().slice(0, 10);
+    generateCSV(headers, rows, `sceo-maintenance-records-${dateStamp}.csv`);
+  }
+
+  /**
+   * 5. Export Department Challenge CSV
+   */
+  function exportDepartmentChallengeCSV() {
+    const ranked = getRankedDepartments();
+    const headers = [
+      'Rank', 'Department ID', 'Department Name', 'Building Scope',
+      'Baseline Energy (kWh)', 'Current Energy (kWh)', 'Reduction Delta (kWh)',
+      'Reduction Percentage (%)', 'Occupied Hours (hrs)', 'Normalized Energy (kWh/hr)',
+      'Logged Actions Count', 'Total Challenge Points', 'Standing Rating'
+    ];
+
+    const rows = ranked.map(d => [
+      d.rank,
+      d.id,
+      d.name,
+      d.building,
+      d.baselineKWh !== null ? d.baselineKWh : 'N/A (No Baseline)',
+      d.currentKWh,
+      d.reductionKWh !== null ? d.reductionKWh : 'N/A',
+      d.reductionPercent !== null ? `${d.reductionPercent}%` : 'N/A',
+      d.occupiedHours,
+      d.intensityPerHour.toFixed(2),
+      d.actionsCount,
+      d.points.total,
+      d.rankBadge
+    ]);
+
+    const dateStamp = new Date().toISOString().slice(0, 10);
+    generateCSV(headers, rows, `sceo-department-challenge-${dateStamp}.csv`);
+  }
+
+  /**
+   * 6. Export Overall Savings Summary CSV
+   */
+  function exportSavingsSummaryCSV() {
+    const is30d = state.reportsDateRange === '30d' || state.reportsDateRange === 'custom';
+    const periodLabel = is30d ? 'Last 30 Days' : 'Last 7 Days';
+    const bldgScope = state.reportsBuildingFilter === 'all' ? 'All Campus Facilities' : `${capitalizeFirst(state.reportsBuildingFilter)} Building`;
+
+    let totalKWh = 0;
+    let avoidableKWh = 0;
+    if (state.reportsBuildingFilter === 'all') {
+      SCEO_DATA.buildings.forEach(b => {
+        const kpi = is30d ? b.kpi30Days : b.kpi7Days;
+        totalKWh += kpi.totalKWh;
+        avoidableKWh += kpi.potentialSavingsKWh;
+      });
+    } else {
+      const bldg = SCEO_DATA.buildings.find(b => b.id === state.reportsBuildingFilter);
+      if (bldg) {
+        const kpi = is30d ? bldg.kpi30Days : bldg.kpi7Days;
+        totalKWh = kpi.totalKWh;
+        avoidableKWh = kpi.potentialSavingsKWh;
+      }
+    }
+
+    const headers = ['Executive Parameter', 'Measured Value / Modeling Standard', 'Providence / Category'];
+    const rows = [
+      ['Campus Entity', SCEO_DATA.metadata.campusName || 'Northfield University', 'Institutional Scope'],
+      ['Report Title', 'SCEO Energy Savings & Optimization Audit Summary', 'Audit Deliverable'],
+      ['Report Generation Date', new Date().toLocaleString(), 'System Audit Timestamp'],
+      ['Reporting Scope', bldgScope, 'Spatial Filtering'],
+      ['Reporting Period', periodLabel, 'Temporal Filtering'],
+      ['Active Electricity Tariff', `$${state.tariffUSD.toFixed(2)} / kWh`, 'Financial Rate Assumption'],
+      ['Total Energy Consumption', `${formatNumber(totalKWh)} kWh`, 'Category 1: Demo Sub-meter Readings'],
+      ['Estimated Avoidable Energy', `${formatNumber(avoidableKWh)} kWh (${totalKWh > 0 ? ((avoidableKWh / totalKWh) * 100).toFixed(1) : 0}%)`, 'Category 2: Algorithmic Waste Potential'],
+      ['Simulated Controls Saved', `${state.scRealizedSavingsKWh.toFixed(1)} kWh`, 'Category 3: In-Browser Smart Controls Realized'],
+      ['Estimated Avoidable Cost', `$${(avoidableKWh * state.tariffUSD).toFixed(2)}`, 'Financial Avoidance Estimation'],
+      ['Simulated Cost Avoided', `$${state.scRealizedSavingsCost.toFixed(2)}`, 'Simulation Realized Cost Impact'],
+      ['Verified Real-World Savings', 'UNAVAILABLE (Certified sub-metering required)', 'Category 4: Physical Sensor Verification']
+    ];
+
+    const dateStamp = new Date().toISOString().slice(0, 10);
+    generateCSV(headers, rows, `sceo-savings-summary-${dateStamp}.csv`);
+  }
+
+  /**
+   * Clean Browser Print Report Function
+   */
+  function printReport() {
+    if (state.currentView !== 'savings-reports') {
+      switchView('savings-reports');
+    }
+    window.print();
+  }
+
   /**
    * Setup Event Listeners
    */
   function initEventListeners() {
     // 1. Sidebar Navigation
-    elements.sidebarNavList.addEventListener('click', (e) => {
-      const navItem = e.target.closest('.nav-item');
-      if (!navItem) return;
+    if (elements.sidebarNavList) {
+      elements.sidebarNavList.addEventListener('click', (e) => {
+        const navItem = e.target.closest('.nav-item');
+        if (!navItem) return;
 
-      const view = navItem.dataset.view;
-      if (view) {
-        switchView(view);
-      }
-    });
+        const view = navItem.dataset.view;
+        if (view) {
+          switchView(view);
+        }
+      });
+    }
 
     // Return to overview button from placeholder
-    elements.btnReturnOverview.addEventListener('click', () => {
-      switchView('overview');
-    });
+    if (elements.btnReturnOverview) {
+      elements.btnReturnOverview.addEventListener('click', () => {
+        switchView('overview');
+      });
+    }
 
     // 2. Mobile Drawer Toggle
-    elements.mobileMenuBtn.addEventListener('click', () => {
-      elements.sidebar.classList.toggle('mobile-open');
-      elements.sidebarOverlay.classList.toggle('active');
-    });
+    if (elements.mobileMenuBtn) {
+      elements.mobileMenuBtn.addEventListener('click', () => {
+        if (elements.sidebar) elements.sidebar.classList.toggle('mobile-open');
+        if (elements.sidebarOverlay) elements.sidebarOverlay.classList.toggle('active');
+      });
+    }
 
-    elements.sidebarOverlay.addEventListener('click', () => {
-      elements.sidebar.classList.remove('mobile-open');
-      elements.sidebarOverlay.classList.remove('active');
-    });
+    if (elements.sidebarOverlay) {
+      elements.sidebarOverlay.addEventListener('click', () => {
+        if (elements.sidebar) elements.sidebar.classList.remove('mobile-open');
+        elements.sidebarOverlay.classList.remove('active');
+      });
+    }
 
     // 3. Building Selector Change (Topbar)
-    elements.buildingSelector.addEventListener('change', (e) => {
-      handleBuildingChange(e.target.value);
-    });
+    if (elements.buildingSelector) {
+      elements.buildingSelector.addEventListener('change', (e) => {
+        handleBuildingChange(e.target.value);
+      });
+    }
 
     // Heatmap Building Filter Change
     if (elements.heatmapBuildingFilter) {
@@ -6577,8 +7867,12 @@
     }
 
     // 4. Date Range Buttons (Topbar & Overview)
-    elements.btnRange7d.addEventListener('click', () => handleDateRangeChange('7d'));
-    elements.btnRange30d.addEventListener('click', () => handleDateRangeChange('30d'));
+    if (elements.btnRange7d) {
+      elements.btnRange7d.addEventListener('click', () => handleDateRangeChange('7d'));
+    }
+    if (elements.btnRange30d) {
+      elements.btnRange30d.addEventListener('click', () => handleDateRangeChange('30d'));
+    }
 
     // Heatmap Date Range Buttons
     if (elements.hmBtnRange7d) {
@@ -6617,39 +7911,45 @@
     }
 
     // 6. Notifications Dropdown Toggle
-    elements.notificationsBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isActive = elements.notificationPopover.classList.toggle('active');
-      elements.notificationsBtn.setAttribute('aria-expanded', isActive ? 'true' : 'false');
-    });
+    if (elements.notificationsBtn && elements.notificationPopover) {
+      elements.notificationsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isActive = elements.notificationPopover.classList.toggle('active');
+        elements.notificationsBtn.setAttribute('aria-expanded', isActive ? 'true' : 'false');
+      });
 
-    // Close notifications when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!elements.notificationPopover.contains(e.target) && !elements.notificationsBtn.contains(e.target)) {
-        elements.notificationPopover.classList.remove('active');
-        elements.notificationsBtn.setAttribute('aria-expanded', 'false');
-      }
-    });
+      // Close notifications when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!elements.notificationPopover.contains(e.target) && !elements.notificationsBtn.contains(e.target)) {
+          elements.notificationPopover.classList.remove('active');
+          elements.notificationsBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
 
     // Clear all notifications
-    elements.clearAllNotifsBtn.addEventListener('click', () => {
-      SCEO_DATA.recentAlerts.forEach(a => state.readAlerts.add(a.id));
-      renderNotificationsPopover();
-      updateKPIs();
-      showToast('All notifications marked as read', 'success');
-    });
+    if (elements.clearAllNotifsBtn) {
+      elements.clearAllNotifsBtn.addEventListener('click', () => {
+        SCEO_DATA.recentAlerts.forEach(a => state.readAlerts.add(a.id));
+        renderNotificationsPopover();
+        updateKPIs();
+        showToast('All notifications marked as read', 'success');
+      });
+    }
 
     // 7. Action Detail Modal Controls (Priority Actions)
-    elements.modalCloseBtn.addEventListener('click', closeActionModal);
-    elements.modalDismissBtn.addEventListener('click', closeActionModal);
-    elements.modalResolveBtn.addEventListener('click', resolveCurrentAction);
+    if (elements.modalCloseBtn) elements.modalCloseBtn.addEventListener('click', closeActionModal);
+    if (elements.modalDismissBtn) elements.modalDismissBtn.addEventListener('click', closeActionModal);
+    if (elements.modalResolveBtn) elements.modalResolveBtn.addEventListener('click', resolveCurrentAction);
 
     // Close modal on backdrop click
-    elements.actionModal.addEventListener('click', (e) => {
-      if (e.target === elements.actionModal) {
-        closeActionModal();
-      }
-    });
+    if (elements.actionModal) {
+      elements.actionModal.addEventListener('click', (e) => {
+        if (e.target === elements.actionModal) {
+          closeActionModal();
+        }
+      });
+    }
 
     // 8. Classroom Detail Modal Controls (Step 2)
     if (elements.roomModalCloseBtn) {
@@ -7506,6 +8806,9 @@
         if (elements.resetDeptConfirmModal && elements.resetDeptConfirmModal.classList.contains('active')) {
           elements.resetDeptConfirmModal.classList.remove('active');
         }
+        if (elements.resetAllDemoConfirmModal && elements.resetAllDemoConfirmModal.classList.contains('active')) {
+          closeResetAllModal();
+        }
 
         if (elements.notificationPopover.classList.contains('active')) {
           elements.notificationPopover.classList.remove('active');
@@ -7780,6 +9083,547 @@
         }
       });
     }
+
+    // --------------------------------------------------------------------------
+    // 15. Step 8: Savings Reports & Settings Event Handlers
+    // --------------------------------------------------------------------------
+    if (elements.reportsBuildingFilter) {
+      elements.reportsBuildingFilter.addEventListener('change', (e) => {
+        state.reportsBuildingFilter = e.target.value;
+        renderSavingsReportsView();
+      });
+    }
+
+    if (elements.reportsBtnRange7d) {
+      elements.reportsBtnRange7d.addEventListener('click', () => {
+        state.reportsDateRange = '7d';
+        syncReportsDateButtons();
+        renderSavingsReportsView();
+      });
+    }
+
+    if (elements.reportsBtnRange30d) {
+      elements.reportsBtnRange30d.addEventListener('click', () => {
+        state.reportsDateRange = '30d';
+        syncReportsDateButtons();
+        renderSavingsReportsView();
+      });
+    }
+
+    if (elements.reportsBtnRangeCustom) {
+      elements.reportsBtnRangeCustom.addEventListener('click', () => {
+        state.reportsDateRange = 'custom';
+        syncReportsDateButtons();
+        renderSavingsReportsView();
+      });
+    }
+
+    if (elements.reportsBtnApplyCustom) {
+      elements.reportsBtnApplyCustom.addEventListener('click', () => {
+        if (elements.reportsStartDate) state.reportsCustomStartDate = elements.reportsStartDate.value;
+        if (elements.reportsEndDate) state.reportsCustomEndDate = elements.reportsEndDate.value;
+        renderSavingsReportsView();
+        showToast('Custom date filter slice applied.', 'info');
+      });
+    }
+
+    if (elements.reportsMetricFilter) {
+      elements.reportsMetricFilter.addEventListener('change', (e) => {
+        state.reportsMetricFilter = e.target.value;
+        renderSavingsReportsView();
+      });
+    }
+
+    if (elements.btnTriggerExportReport) {
+      elements.btnTriggerExportReport.addEventListener('click', () => {
+        const target = document.getElementById('exportCenterSection');
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    }
+
+    if (elements.btnPrintReport) {
+      elements.btnPrintReport.addEventListener('click', () => {
+        printReport();
+      });
+    }
+
+    // Building Performance Sorting
+    if (elements.reportsBldgSortSelect) {
+      elements.reportsBldgSortSelect.addEventListener('change', (e) => {
+        const val = e.target.value;
+        const parts = val.split('_');
+        state.reportsBldgSortCol = parts[0];
+        state.reportsBldgSortDir = parts[1] || 'desc';
+        renderBuildingPerformanceTable();
+      });
+    }
+
+    // Building Performance Table Sortable Headers
+    const sortableHeaders = document.querySelectorAll('.reports-table th.sortable-th');
+    sortableHeaders.forEach(th => {
+      th.addEventListener('click', () => {
+        const col = th.dataset.sort;
+        if (!col) return;
+        if (state.reportsBldgSortCol === col) {
+          state.reportsBldgSortDir = state.reportsBldgSortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+          state.reportsBldgSortCol = col;
+          state.reportsBldgSortDir = 'desc';
+        }
+        renderBuildingPerformanceTable();
+      });
+    });
+
+    // Classroom Savings Search & Sort
+    if (elements.reportsClassroomSearch) {
+      elements.reportsClassroomSearch.addEventListener('input', (e) => {
+        state.reportsClassroomSearch = e.target.value;
+        renderClassroomSavingsTable();
+      });
+    }
+
+    if (elements.reportsClassroomSortSelect) {
+      elements.reportsClassroomSortSelect.addEventListener('change', (e) => {
+        state.reportsClassroomSort = e.target.value;
+        renderClassroomSavingsTable();
+      });
+    }
+
+    // Classroom Deep-Link Clicks Delegation
+    if (elements.reportsClassroomTableBody) {
+      elements.reportsClassroomTableBody.addEventListener('click', (e) => {
+        const analyticsBtn = e.target.closest('.btn-reports-analytics');
+        if (analyticsBtn) {
+          const roomId = analyticsBtn.dataset.roomId;
+          if (roomId) navigateToRoomAnalytics(roomId);
+          return;
+        }
+
+        const heatmapBtn = e.target.closest('.btn-reports-heatmap');
+        if (heatmapBtn) {
+          const roomId = heatmapBtn.dataset.roomId;
+          if (roomId) navigateToRoomHeatmap(roomId);
+          return;
+        }
+      });
+    }
+
+    // Tariff Configure Link in Reports
+    if (elements.btnGoToTariffSettings) {
+      elements.btnGoToTariffSettings.addEventListener('click', () => {
+        switchView('settings');
+      });
+    }
+
+    // CSV Export Center Handlers
+    if (elements.btnExportBuildingsCsv) {
+      elements.btnExportBuildingsCsv.addEventListener('click', exportBuildingsCSV);
+    }
+    if (elements.btnExportRoomsCsv) {
+      elements.btnExportRoomsCsv.addEventListener('click', exportClassroomsCSV);
+    }
+    if (elements.btnExportAlertsCsv) {
+      elements.btnExportAlertsCsv.addEventListener('click', exportAlertsCSV);
+    }
+    if (elements.btnExportMaintCsv) {
+      elements.btnExportMaintCsv.addEventListener('click', exportMaintenanceCSV);
+    }
+    if (elements.btnExportDeptCsv) {
+      elements.btnExportDeptCsv.addEventListener('click', exportDepartmentChallengeCSV);
+    }
+    if (elements.btnExportSummaryCsv) {
+      elements.btnExportSummaryCsv.addEventListener('click', exportSavingsSummaryCSV);
+    }
+
+    // Settings View Event Handlers
+    if (elements.settingsForm) {
+      elements.settingsForm.addEventListener('submit', saveSettings);
+    }
+    if (elements.btnResetTariffDefault) {
+      elements.btnResetTariffDefault.addEventListener('click', resetTariffDefaults);
+    }
+
+    // Master Reset Demo State Handlers
+    if (elements.btnOpenResetAllModal) {
+      elements.btnOpenResetAllModal.addEventListener('click', openResetAllModal);
+    }
+    if (elements.btnLoadAnomalyScenario) {
+      elements.btnLoadAnomalyScenario.addEventListener('click', loadSampleAnomalyScenario);
+    }
+    if (elements.resetAllModalCloseBtn) {
+      elements.resetAllModalCloseBtn.addEventListener('click', closeResetAllModal);
+    }
+    if (elements.btnCancelResetAll) {
+      elements.btnCancelResetAll.addEventListener('click', closeResetAllModal);
+    }
+    if (elements.btnConfirmResetAll) {
+      elements.btnConfirmResetAll.addEventListener('click', confirmResetAllDemoData);
+    }
+    if (elements.resetAllDemoConfirmModal) {
+      elements.resetAllDemoConfirmModal.addEventListener('click', (e) => {
+        if (e.target === elements.resetAllDemoConfirmModal) closeResetAllModal();
+      });
+    }
+
+    // ========================================================================
+    // 13. Step 10: Competition Guided Demo Event Listeners
+    // ========================================================================
+    if (elements.btnStartGuidedDemo) {
+      elements.btnStartGuidedDemo.addEventListener('click', () => startGuidedDemo(1));
+    }
+    if (elements.btnTopStartDemo) {
+      elements.btnTopStartDemo.addEventListener('click', () => startGuidedDemo(1));
+    }
+    if (elements.btnDemoNext) {
+      elements.btnDemoNext.addEventListener('click', nextDemoStage);
+    }
+    if (elements.btnDemoPrev) {
+      elements.btnDemoPrev.addEventListener('click', prevDemoStage);
+    }
+    if (elements.btnDemoSkip) {
+      elements.btnDemoSkip.addEventListener('click', skipGuidedDemo);
+    }
+    if (elements.btnDemoSkipText) {
+      elements.btnDemoSkipText.addEventListener('click', skipGuidedDemo);
+    }
+    if (elements.btnDemoResetScenario) {
+      elements.btnDemoResetScenario.addEventListener('click', openResetDemoModal);
+    }
+    if (elements.btnCancelDemoReset) {
+      elements.btnCancelDemoReset.addEventListener('click', closeResetDemoModal);
+    }
+    if (elements.btnCancelDemoResetSecondary) {
+      elements.btnCancelDemoResetSecondary.addEventListener('click', closeResetDemoModal);
+    }
+    if (elements.btnConfirmDemoReset) {
+      elements.btnConfirmDemoReset.addEventListener('click', executeResetDemoScenario);
+    }
+    if (elements.demoResetConfirmModal) {
+      elements.demoResetConfirmModal.addEventListener('click', (e) => {
+        if (e.target === elements.demoResetConfirmModal) closeResetDemoModal();
+      });
+    }
+
+    // Step Progress segments click handler
+    if (elements.demoProgressTrack) {
+      elements.demoProgressTrack.addEventListener('click', (e) => {
+        const seg = e.target.closest('.demo-step-segment');
+        if (seg && seg.dataset.step) {
+          const stepNum = parseInt(seg.dataset.step, 10);
+          if (!isNaN(stepNum)) renderGuidedDemoStage(stepNum);
+        }
+      });
+    }
+
+    // Keyboard navigation (ArrowRight / ArrowLeft / Escape)
+    document.addEventListener('keydown', (e) => {
+      if (!state.guidedDemoActive) return;
+      if (e.key === 'ArrowRight') {
+        nextDemoStage();
+      } else if (e.key === 'ArrowLeft') {
+        prevDemoStage();
+      } else if (e.key === 'Escape') {
+        skipGuidedDemo();
+      }
+    });
+  }
+
+  // ==========================================================================
+  // STEP 10: COMPETITION GUIDED DEMO MODE LOGIC
+  // ==========================================================================
+  const GUIDED_DEMO_STAGES = [
+    {
+      stage: 1,
+      view: 'overview',
+      viewLabel: 'Overview Dashboard',
+      title: 'Stage 1: Monitor Campus Energy Baseline',
+      targetSelector: '.kpi-grid',
+      setup: () => {
+        state.selectedBuilding = 'all';
+        if (elements.buildingSelector) elements.buildingSelector.value = 'all';
+        state.dateRange = '7d';
+        if (elements.btnRange7d && elements.btnRange30d) {
+          elements.btnRange7d.classList.add('active');
+          elements.btnRange30d.classList.remove('active');
+        }
+        updateKPIs();
+        renderBuildingsTable();
+      },
+      whatSeeing: 'Campus-wide electricity consumption (2,480 kWh) and avoidable standby waste (186 kWh, ~7.5% of total) across 24 classrooms in 3 academic buildings over the last 7 days.',
+      whyMatters: 'Macro metrics establish university-wide baselines. Facilities leadership can instantly identify that nearly 200 kWh/week is wasted in unoccupied rooms without manual campus audits.',
+      nextAction: 'Navigate to the Energy Waste Heatmap to localize which specific building and classroom is causing the largest waste outlier.',
+      nextBtnLabel: 'Next: Identify Waste Outlier'
+    },
+    {
+      stage: 2,
+      view: 'energy-heatmap',
+      viewLabel: 'Energy Waste Heatmap',
+      title: 'Stage 2: Identify High-Priority Outlier (ENG-101)',
+      targetSelector: '[data-room-id="ENG-101"]',
+      setup: () => {
+        state.heatmapMetric = 'kwhPerOccupiedHour';
+        state.heatmapSort = 'metricDesc';
+        if (elements.heatmapSortSelect) elements.heatmapSortSelect.value = 'metricDesc';
+        renderHeatmap();
+      },
+      whatSeeing: 'The 24-classroom efficiency heatmap. Room ENG-101 (Lecture Theater Alpha) is flagged in red with an energy intensity of 8.4 kWh/hr and 52 kWh of avoidable waste—over 25% of total campus waste.',
+      whyMatters: 'Aggregated metrics mask localized waste. While the peer lecture hall benchmark is 4.8 kWh/hr, ENG-101 runs at nearly double that rate, indicating severe equipment scheduling or thermostat override issues.',
+      nextAction: 'Open Classroom Analytics to investigate the 24-hour occupancy vs. power profile for ENG-101.',
+      nextBtnLabel: 'Next: Investigate Energy Pattern'
+    },
+    {
+      stage: 3,
+      view: 'classroom-analytics',
+      viewLabel: 'Classroom Analytics',
+      title: 'Stage 3: Investigate 24-Hour Load & Occupancy Curve',
+      targetSelector: '#classroomDailyChartWrap',
+      setup: () => {
+        selectClassroom('ENG-101');
+      },
+      whatSeeing: 'The 24-hour occupancy vs. electrical power load curve for ENG-101. Between 22:00 and 06:00, detected occupancy is 0 people, yet electrical load remains pegged at 6.8 kW throughout the night.',
+      whyMatters: 'Proves the waste is caused by after-hours un-setback operation, not classroom enrollment. Equipment and central HVAC compressors continue drawing peak power when the hall is vacant.',
+      nextAction: 'Review the automated diagnosis and operational recommendation in Alerts & Actions.',
+      nextBtnLabel: 'Next: Review Recommended Action'
+    },
+    {
+      stage: 4,
+      view: 'alerts-actions',
+      viewLabel: 'Alerts & Actions Feed',
+      title: 'Stage 4: Review Operational Recommendation (ALT-101)',
+      targetSelector: '[data-alert-id="ALT-101"]',
+      setup: () => {
+        state.alertBuildingFilter = 'all';
+        state.alertSeverityFilter = 'all';
+        state.alertStatusFilter = 'all';
+        if (elements.alertBuildingFilter) elements.alertBuildingFilter.value = 'all';
+        if (elements.alertSeverityFilter) elements.alertSeverityFilter.value = 'all';
+        if (elements.alertStatusFilter) elements.alertStatusFilter.value = 'all';
+        renderAlertsAndActions();
+      },
+      whatSeeing: 'Critical Alert ALT-101: "Unoccupied After-Hours HVAC Draw in Lecture Hall (ENG-101)". The rule-based engine flags continuous 6.8 kW draw and recommends resetting the manual thermostat override latch.',
+      whyMatters: 'SCEO translates complex telemetry into prioritized operational interventions with quantified potential savings (~28.8 kWh/night, saving ~$5.18/night at $0.18/kWh).',
+      nextAction: 'Open the Smart Controls Simulator to safely test an automated equipment shutdown before physical deployment.',
+      nextBtnLabel: 'Next: Simulate Intervention'
+    },
+    {
+      stage: 5,
+      view: 'smart-controls',
+      viewLabel: 'Smart Controls Simulator',
+      title: 'Stage 5: Simulate Automated Equipment Shutdown',
+      targetSelector: '#scRoomCard-ENG-101',
+      setup: () => {
+        state.scBuildingFilter = 'all';
+        state.scRoomFilter = 'all';
+        if (elements.scBuildingFilter) elements.scBuildingFilter.value = 'all';
+        if (elements.scRoomFilter) elements.scRoomFilter.value = 'all';
+        renderSmartControlsView();
+      },
+      whatSeeing: 'The software simulation controls for ENG-101. The Central HVAC Inverter (4.2 kW) is running while occupancy sensors report "Unoccupied".',
+      whyMatters: 'Simulation allows facilities engineers to validate automated setback rules and safety exclusions safely in software before touching physical BACnet relays or campus power grids.',
+      nextAction: 'Click "Turn Off" on ENG-101 HVAC to simulate the automated intervention, then proceed to the final savings report.',
+      nextBtnLabel: 'Next: Review Estimated Savings'
+    },
+    {
+      stage: 6,
+      view: 'savings-reports',
+      viewLabel: 'Savings & Reports',
+      title: 'Stage 6: Review Estimated Savings & Impact',
+      targetSelector: '#reportsKpiAvoidableEnergy',
+      setup: () => {
+        state.reportsBuildingFilter = 'all';
+        if (elements.reportsBuildingFilter) elements.reportsBuildingFilter.value = 'all';
+        renderSavingsReportsView();
+      },
+      whatSeeing: 'Consolidated campus savings report showing 52 kWh avoidable waste in ENG-101, simulated realized savings, and cost reduction modeled at the university\'s $0.18/kWh utility tariff.',
+      whyMatters: 'Closes the optimization loop: Monitor → Identify → Investigate → Recommend → Simulate → Quantify. Provides audit-ready intelligence for university sustainability goals.',
+      nextAction: 'Export the verified report as CSV or click "Reset Scenario" to repeat the walkthrough from the beginning.',
+      nextBtnLabel: 'Finish Guided Demo ✓'
+    }
+  ];
+
+  function startGuidedDemo(stageNum = 1) {
+    state.guidedDemoActive = true;
+    state.guidedDemoStage = stageNum;
+
+    if (elements.guidedDemoDock) {
+      elements.guidedDemoDock.style.display = 'block';
+    }
+    document.body.classList.add('guided-demo-open');
+
+    renderGuidedDemoStage(state.guidedDemoStage);
+    showToast('Competition Guided Demo launched • Step through the 6 stages', 'info');
+  }
+
+  function renderGuidedDemoStage(stageNum) {
+    const stageIdx = Math.max(0, Math.min(stageNum - 1, GUIDED_DEMO_STAGES.length - 1));
+    const stage = GUIDED_DEMO_STAGES[stageIdx];
+    state.guidedDemoStage = stage.stage;
+
+    // 1. Update text displays
+    if (elements.demoStagePill) elements.demoStagePill.textContent = `STAGE ${stage.stage} OF ${GUIDED_DEMO_STAGES.length}`;
+    if (elements.demoViewPill) elements.demoViewPill.textContent = stage.viewLabel;
+    if (elements.demoStageTitle) elements.demoStageTitle.textContent = stage.title;
+    if (elements.demoTextWhatSeeing) elements.demoTextWhatSeeing.textContent = stage.whatSeeing;
+    if (elements.demoTextWhyMatters) elements.demoTextWhyMatters.textContent = stage.whyMatters;
+    if (elements.demoTextNextAction) elements.demoTextNextAction.textContent = stage.nextAction;
+    if (elements.btnDemoNextText) elements.btnDemoNextText.textContent = stage.nextBtnLabel;
+
+    // 2. Update progress segments
+    if (elements.demoProgressTrack) {
+      elements.demoProgressTrack.setAttribute('aria-valuenow', stage.stage.toString());
+      const segments = elements.demoProgressTrack.querySelectorAll('.demo-step-segment');
+      segments.forEach((seg, idx) => {
+        const segNum = idx + 1;
+        seg.classList.remove('active', 'completed');
+        if (segNum === stage.stage) {
+          seg.classList.add('active');
+        } else if (segNum < stage.stage) {
+          seg.classList.add('completed');
+        }
+      });
+    }
+
+    // 3. Update button states
+    if (elements.btnDemoPrev) {
+      elements.btnDemoPrev.disabled = stage.stage === 1;
+    }
+
+    // 4. Navigate to target view & execute setup
+    switchView(stage.view);
+    if (typeof stage.setup === 'function') {
+      try {
+        stage.setup();
+      } catch (err) {
+        console.warn('Error in demo stage setup:', err);
+      }
+    }
+
+    // 5. Apply spotlight highlighting on relevant control/card
+    setTimeout(() => {
+      clearSpotlightTarget();
+      if (stage.targetSelector) {
+        setSpotlightTarget(stage.targetSelector);
+      }
+    }, 250);
+  }
+
+  function nextDemoStage() {
+    if (state.guidedDemoStage >= GUIDED_DEMO_STAGES.length) {
+      finishGuidedDemo();
+    } else {
+      renderGuidedDemoStage(state.guidedDemoStage + 1);
+    }
+  }
+
+  function prevDemoStage() {
+    if (state.guidedDemoStage > 1) {
+      renderGuidedDemoStage(state.guidedDemoStage - 1);
+    }
+  }
+
+  function skipGuidedDemo() {
+    state.guidedDemoActive = false;
+    clearSpotlightTarget();
+    if (elements.guidedDemoDock) {
+      elements.guidedDemoDock.style.display = 'none';
+    }
+    document.body.classList.remove('guided-demo-open');
+    showToast('Guided Demo exited. You can restart anytime from Overview.', 'info');
+  }
+
+  function finishGuidedDemo() {
+    state.guidedDemoActive = false;
+    clearSpotlightTarget();
+    if (elements.guidedDemoDock) {
+      elements.guidedDemoDock.style.display = 'none';
+    }
+    document.body.classList.remove('guided-demo-open');
+    showToast('🎉 Guided Demo completed! Central energy optimization loop demonstrated.', 'success');
+  }
+
+  function setSpotlightTarget(selector) {
+    try {
+      const target = document.querySelector(selector);
+      if (target) {
+        target.classList.add('demo-spotlight-target');
+        state.activeSpotlightElement = target;
+        target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    } catch (e) {
+      console.warn('Could not find spotlight target:', selector);
+    }
+  }
+
+  function clearSpotlightTarget() {
+    if (state.activeSpotlightElement) {
+      state.activeSpotlightElement.classList.remove('demo-spotlight-target');
+      state.activeSpotlightElement = null;
+    }
+    const all = document.querySelectorAll('.demo-spotlight-target');
+    all.forEach(el => el.classList.remove('demo-spotlight-target'));
+  }
+
+  function openResetDemoModal() {
+    if (elements.demoResetConfirmModal) {
+      elements.demoResetConfirmModal.style.display = 'flex';
+      elements.demoResetConfirmModal.classList.add('active');
+    }
+  }
+
+  function closeResetDemoModal() {
+    if (elements.demoResetConfirmModal) {
+      elements.demoResetConfirmModal.style.display = 'none';
+      elements.demoResetConfirmModal.classList.remove('active');
+    }
+  }
+
+  function executeResetDemoScenario() {
+    // 1. Reset ENG-101 devices in Smart Controls simulator
+    const eng101 = (state.scRoomsData || []).find(r => r.roomId === 'ENG-101');
+    if (eng101 && eng101.devices) {
+      eng101.devices.forEach(d => {
+        if (d.id === 'ENG-101-ac' || d.id === 'ENG-101-lt' || d.id === 'ENG-101-pj') {
+          d.state = 'on';
+          d.manualOverride = false;
+        }
+      });
+      saveSmartControlsRooms();
+    }
+
+    // 2. Reset simulator savings accumulator
+    state.scRealizedSavingsKWh = 0.0;
+    state.scRealizedSavingsCost = 0.0;
+    localStorage.removeItem(SC_STORAGE_KEYS.SAVINGS_KWH);
+    localStorage.removeItem(SC_STORAGE_KEYS.SAVINGS_COST);
+
+    // 3. Reset Alert ALT-101 status
+    if (state.alertStatuses) {
+      state.alertStatuses['ALT-101'] = 'new';
+      saveStoredObject(ALERT_STORAGE_KEYS.STATUSES, state.alertStatuses);
+    }
+
+    // 4. Reset Action ACT-01 in resolved actions
+    if (state.resolvedActions) {
+      state.resolvedActions.delete('ACT-01');
+    }
+
+    // 5. Update views
+    updateKPIs();
+    renderPriorityActions();
+    renderRecentAlerts();
+    if (state.currentView === 'smart-controls') renderSmartControlsView();
+    if (state.currentView === 'alerts-actions') renderAlertsAndActions();
+    if (state.currentView === 'savings-reports') renderSavingsReportsView();
+
+    closeResetDemoModal();
+    showToast('Demo scenario reset: ENG-101 restored to active standby baseline.', 'success');
+
+    // If guided demo is active, restart at Stage 1
+    if (state.guidedDemoActive) {
+      renderGuidedDemoStage(1);
+    }
   }
 
   /**
@@ -7787,6 +9631,7 @@
    */
   function init() {
     // Load persisted prototype state
+    initSettingsData();
     state.acceptedSuggestions = loadStoredSet(TT_STORAGE_KEYS.ACCEPTED);
     state.dismissedSuggestions = loadStoredSet(TT_STORAGE_KEYS.DISMISSED);
     state.alertStatuses = loadStoredObject(ALERT_STORAGE_KEYS.STATUSES);
@@ -7809,7 +9654,7 @@
 
     // Initial welcome toast
     setTimeout(() => {
-      showToast('Welcome to Smart Campus Energy Optimizer (SCEO) • Step 7 Preventive Maintenance & Department Challenge Active', 'info');
+      showToast('Welcome to Smart Campus Energy Optimizer (SCEO) • Step 8 Savings Reports & Prototype Integration Active', 'info');
     }, 400);
   }
 

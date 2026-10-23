@@ -158,7 +158,6 @@
                 <polyline points="10 9 9 9 8 9"></polyline>
               </svg>
               <span>Savings &amp; Reports</span>
-              <span class="nav-badge soon">Next</span>
             </button>
           </li>
 
@@ -170,7 +169,6 @@
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
               </svg>
               <span>Settings</span>
-              <span class="nav-badge soon">Next</span>
             </button>
           </li>
         </ul>
@@ -211,6 +209,14 @@
             <span class="dot"></span>
             <span>Simulated Demo Env</span>
           </div>
+
+          <!-- Quick Guided Demo Launcher (Step 10) -->
+          <button type="button" class="btn-topbar-demo" id="btnTopStartDemo" title="Launch Competition Guided Walkthrough">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px; vertical-align: -1px;">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <span>Guided Demo</span>
+          </button>
 
           <!-- Building Selector -->
           <div class="building-selector-wrapper">
@@ -277,6 +283,14 @@
             </div>
 
             <div class="dashboard-controls">
+              <!-- Start Guided Demo Entry Point (Requirement 1) -->
+              <button type="button" class="btn btn-primary btn-start-guided-demo" id="btnStartGuidedDemo" title="Launch guided 6-stage energy optimization demonstration">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; vertical-align: -2px;">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                <span>Start Guided Demo</span>
+              </button>
+
               <!-- Date Range Selector -->
               <div class="date-range-switcher" role="group" aria-label="Select Date Range">
                 <button type="button" class="date-range-btn active" data-range="7d" id="btnRange7d">Last 7 Days</button>
@@ -1054,7 +1068,7 @@
                     <span class="field-hint">Demo university rate</span>
                   </label>
                   <div class="input-with-unit">
-                    <input type="number" id="estTariff" class="estimator-input" min="0" max="2" step="0.01" value="0.18">
+                    <input type="number" id="estTariff" class="estimator-input" min="0" max="1000" step="0.01" value="0.18">
                     <span class="input-unit">$/kWh</span>
                   </div>
                 </div>
@@ -2478,9 +2492,770 @@
         </section>
 
         <!-- ==================================================================
-             VIEW 9: COMING SOON PLACEHOLDER (For Modules 9 & 10)
+             VIEW 9: SAVINGS & REPORTS (Step 8 Implementation)
              ================================================================== -->
-        <section id="placeholderView" class="placeholder-view" aria-label="Module Coming Soon">
+        <section id="savingsReportsView" class="view-panel" style="display: none;" aria-label="Energy Savings and Reports">
+          <!-- View Header -->
+          <div class="view-header">
+            <div>
+              <div class="view-pretitle">CAMPUS ENERGY AUDIT &amp; FORECASTING</div>
+              <h1 class="view-title">Energy Savings &amp; Reports</h1>
+              <p class="view-subtitle">Review energy consumption, identify opportunities, and evaluate potential savings.</p>
+            </div>
+            <div class="view-header-actions">
+              <span class="report-status-pill">
+                <span class="status-indicator-dot"></span>
+                <span>Model Estimates Active • SCEO v1.0</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Data Integrity & Categorization Notice Banner -->
+          <div class="reports-notice-banner" role="region" aria-label="Data Integrity Disclosure">
+            <div class="reports-notice-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </div>
+            <div class="reports-notice-content">
+              <div class="reports-notice-title">SCEO Telemetry &amp; Savings Distinction Standard</div>
+              <p class="reports-notice-text">
+                To maintain engineering rigor and avoid misleading claims, all figures presented in this report are categorized strictly by source:
+              </p>
+              <div class="reports-category-pills">
+                <span class="rep-cat-pill demo-reading" title="Simulated sub-meter telemetry">
+                  <strong>1. Demo Readings:</strong> Modeled sub-meter IoT consumption
+                </span>
+                <span class="rep-cat-pill potential-saving" title="Algorithmic waste recovery opportunity">
+                  <strong>2. Potential Savings:</strong> Algorithmic estimates from idle/standby waste
+                </span>
+                <span class="rep-cat-pill simulated-control" title="Simulation engine realized actions">
+                  <strong>3. Simulated Saved:</strong> Actions logged in Smart Controls simulator
+                </span>
+                <span class="rep-cat-pill verified-saving" title="Hardware verified measurements">
+                  <strong>4. Verified Savings:</strong> Unavailable (requires physical utility metering)
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Master Filter & Action Toolbar -->
+          <div class="reports-master-toolbar">
+            <div class="reports-toolbar-left">
+              <!-- Building Filter -->
+              <div class="toolbar-control-group">
+                <label for="reportsBuildingFilter" class="toolbar-label">Building Scope:</label>
+                <select id="reportsBuildingFilter" class="select-control">
+                  <option value="all">All Campus Facilities (3 Buildings)</option>
+                  <option value="engineering">Engineering Building (ENG)</option>
+                  <option value="science">Science Building (SCI)</option>
+                  <option value="business">Business Building (BUS)</option>
+                </select>
+              </div>
+
+              <!-- Date Range Buttons -->
+              <div class="toolbar-control-group">
+                <span class="toolbar-label">Reporting Period:</span>
+                <div class="btn-group" role="group" aria-label="Report Date Range">
+                  <button type="button" class="btn-toggle active" id="reportsBtnRange7d">Last 7 Days</button>
+                  <button type="button" class="btn-toggle" id="reportsBtnRange30d">Last 30 Days</button>
+                  <button type="button" class="btn-toggle" id="reportsBtnRangeCustom">Custom Range</button>
+                </div>
+              </div>
+
+              <!-- Metric Filter -->
+              <div class="toolbar-control-group">
+                <label for="reportsMetricFilter" class="toolbar-label">Primary Metric:</label>
+                <select id="reportsMetricFilter" class="select-control">
+                  <option value="all">All Metrics (Balanced View)</option>
+                  <option value="avoidable">Estimated Avoidable Energy (kWh)</option>
+                  <option value="total">Total Energy Consumption (kWh)</option>
+                  <option value="intensity">Energy Intensity (kWh/hr)</option>
+                  <option value="cost">Estimated Cost Savings ($)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="reports-toolbar-right">
+              <button type="button" class="btn-secondary" id="btnTriggerExportReport" title="Jump to Data Export Center">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -2px;">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Export CSV</span>
+              </button>
+              <button type="button" class="btn-primary" id="btnPrintReport" title="Open Clean Printable Report View">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -2px;">
+                  <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                  <rect x="6" y="14" width="12" height="8"></rect>
+                </svg>
+                <span>Print Report</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Custom Date Range Sub-Bar (Conditionally visible) -->
+          <div id="reportsCustomDateWrap" class="reports-custom-date-bar" style="display: none;">
+            <div class="custom-date-inner">
+              <span class="custom-date-label">Select Custom Range:</span>
+              <div class="custom-date-inputs">
+                <label for="reportsStartDate" class="sr-only">Start Date</label>
+                <input type="date" id="reportsStartDate" class="input-control" value="2026-10-01">
+                <span class="date-sep">to</span>
+                <label for="reportsEndDate" class="sr-only">End Date</label>
+                <input type="date" id="reportsEndDate" class="input-control" value="2026-10-21">
+              </div>
+              <button type="button" class="btn-primary btn-sm" id="reportsBtnApplyCustom">Apply Range</button>
+              <span class="custom-date-hint">Filters modeled historical telemetry slice.</span>
+            </div>
+          </div>
+
+          <!-- 4 Executive Summary KPI Cards -->
+          <div class="stats-overview-grid reports-stats-grid">
+            <!-- 1. Total Consumption (Demo Readings) -->
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-card-title">Total Energy Consumption</span>
+                <span class="stat-source-badge badge-demo" title="Data Source: Modeled sub-meter IoT readings">Demo Readings</span>
+              </div>
+              <div class="stat-card-body">
+                <span class="stat-card-value text-main" id="reportsKpiTotalEnergy">2,480</span>
+                <span class="stat-card-unit">kWh</span>
+              </div>
+              <div class="stat-card-footer">
+                <span class="stat-card-sub" id="reportsKpiTotalEnergySub">Campus-wide demo readings over selected 7-day period</span>
+              </div>
+            </div>
+
+            <!-- 2. Estimated Avoidable Energy (Potential Savings) -->
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-card-title">Estimated Avoidable Energy</span>
+                <span class="stat-source-badge badge-potential" title="Data Source: Idle & after-hours waste estimation">Estimated Potential</span>
+              </div>
+              <div class="stat-card-body">
+                <span class="stat-card-value text-danger" id="reportsKpiAvoidableEnergy">186</span>
+                <span class="stat-card-unit">kWh</span>
+              </div>
+              <div class="stat-card-footer">
+                <span class="stat-card-sub" id="reportsKpiAvoidableEnergySub">7.5% of total consumption • Idle during unoccupied hours</span>
+              </div>
+            </div>
+
+            <!-- 3. Simulated Energy Saved (Smart Controls) -->
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-card-title">Simulated Energy Saved</span>
+                <span class="stat-source-badge badge-simulated" title="Data Source: Smart Controls simulator engine">Simulated Controls</span>
+              </div>
+              <div class="stat-card-body">
+                <span class="stat-card-value text-teal" id="reportsKpiSimulatedEnergy">0.0</span>
+                <span class="stat-card-unit">kWh</span>
+              </div>
+              <div class="stat-card-footer">
+                <span class="stat-card-sub" id="reportsKpiSimulatedEnergySub">Logged through browser Smart Controls simulator actions</span>
+              </div>
+            </div>
+
+            <!-- 4. Estimated Cost Savings (Financial Model) -->
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-card-title">Estimated Cost Savings</span>
+                <span class="stat-source-badge badge-cost" title="Data Source: Calculated from demo tariff ($0.18/kWh)">Financial Estimate</span>
+              </div>
+              <div class="stat-card-body">
+                <span class="stat-card-value text-success" id="reportsKpiCostSavings">$33.48</span>
+              </div>
+              <div class="stat-card-footer">
+                <span class="stat-card-sub" id="reportsKpiCostSavingsSub">Calculated at demo electricity tariff ($0.18/kWh)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Energy Consumption & Baseline Comparison Trend Chart -->
+          <div class="reports-chart-card">
+            <div class="reports-chart-header">
+              <div class="reports-chart-title-wrap">
+                <h2 class="section-title">Energy Consumption &amp; Baseline Comparison Trend</h2>
+                <p class="section-subtitle">Daily energy consumption compared against the campus ASHRAE 90.1 target baseline.</p>
+              </div>
+              <div class="reports-chart-legend" aria-hidden="true">
+                <div class="chart-legend-pill">
+                  <span class="legend-color-box active-bar"></span>
+                  <span>Active Consumption (kWh)</span>
+                </div>
+                <div class="chart-legend-pill">
+                  <span class="legend-color-box baseline-line"></span>
+                  <span>ASHRAE Target Baseline (kWh)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="reports-chart-wrapper">
+              <canvas id="savingsTrendChartCanvas" height="95" aria-label="Energy consumption trend line chart" role="img"></canvas>
+              <!-- Graceful Local Fallback if Chart.js is offline -->
+              <div id="savingsChartFallback" class="chart-fallback-container" style="display: none;">
+                <p class="text-muted" style="text-align: center; padding: 30px;">
+                  Chart visualization running in zero-dependency data mode.
+                </p>
+              </div>
+            </div>
+
+            <div class="reports-chart-footer">
+              <div class="chart-source-callout">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span>
+                  <strong>Baseline Comparison Source:</strong> Target baseline is derived from building floor area, standard operating hours, and historical university benchmarks. Weather normalization is not applied in this demo prototype.
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Building Performance Report Section -->
+          <div class="reports-section-card">
+            <div class="reports-section-header">
+              <div>
+                <h2 class="section-title">Building Performance Report</h2>
+                <p class="section-subtitle">Aggregated facility telemetry, utilization intensity, and avoidable energy opportunities.</p>
+              </div>
+              <div class="table-sort-control">
+                <label for="reportsBldgSortSelect" class="sort-label">Sort by:</label>
+                <select id="reportsBldgSortSelect" class="select-control select-sm">
+                  <option value="consumption_desc">Total Consumption (Highest)</option>
+                  <option value="intensity_desc">Energy Intensity (Highest)</option>
+                  <option value="avoidable_desc">Avoidable Energy (Highest)</option>
+                  <option value="name_asc">Building Name (A–Z)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Fair Comparison Structural Notice -->
+            <div class="building-comparison-notice">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="8"></line>
+              </svg>
+              <div>
+                <strong>Fair Comparison Notice &amp; Dataset Limitations:</strong>
+                <p>Campus buildings possess distinct functional profiles: Science Building features wet laboratory fume hoods and cold storage; Engineering houses high-load fabrication machinery and computer labs; Business Building consists primarily of lecture halls. Direct raw consumption comparisons do not imply operational negligence.</p>
+              </div>
+            </div>
+
+            <!-- Building Performance Table -->
+            <div class="table-responsive">
+              <table class="data-table reports-table" aria-label="Building Performance Report Table">
+                <thead>
+                  <tr>
+                    <th scope="col" class="sortable-th" data-sort="name">Building / Facility</th>
+                    <th scope="col" class="sortable-th" data-sort="consumption">Total Energy (kWh)</th>
+                    <th scope="col" class="sortable-th" data-sort="hours">Occupied Hours</th>
+                    <th scope="col" class="sortable-th" data-sort="intensity">Energy Intensity (kWh/hr)</th>
+                    <th scope="col" class="sortable-th" data-sort="avoidable">Avoidable Energy (kWh)</th>
+                    <th scope="col">Estimated Cost ($)</th>
+                    <th scope="col">Data Quality / Confidence</th>
+                  </tr>
+                </thead>
+                <tbody id="reportsBuildingTableBody">
+                  <!-- Dynamically populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Classroom Savings Opportunities Report -->
+          <div class="reports-section-card">
+            <div class="reports-section-header">
+              <div>
+                <div class="section-title-row">
+                  <h2 class="section-title">Classroom Savings Opportunities</h2>
+                  <span class="count-badge" id="reportsClassroomCountBadge">24 Rooms</span>
+                </div>
+                <p class="section-subtitle">Classrooms ranked by potential avoidable energy opportunity, with recommended remediation steps.</p>
+              </div>
+
+              <!-- Search and Sort Controls -->
+              <div class="reports-classroom-toolbar">
+                <div class="search-input-wrapper">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  <label for="reportsClassroomSearch" class="sr-only">Search classrooms</label>
+                  <input type="text" id="reportsClassroomSearch" class="input-control select-sm" placeholder="Filter classroom ID, building, or type...">
+                </div>
+
+                <div class="table-sort-control">
+                  <label for="reportsClassroomSortSelect" class="sort-label">Rank by:</label>
+                  <select id="reportsClassroomSortSelect" class="select-control select-sm">
+                    <option value="avoidable_desc">Avoidable Energy (Highest)</option>
+                    <option value="intensity_desc">Energy Intensity (Highest)</option>
+                    <option value="consumption_desc">Total Consumption (Highest)</option>
+                    <option value="hours_desc">Occupied Hours (Highest)</option>
+                    <option value="id_asc">Classroom ID (A–Z)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Classroom Savings Table -->
+            <div class="table-responsive">
+              <table class="data-table reports-table" aria-label="Classroom Savings Opportunities Table">
+                <thead>
+                  <tr>
+                    <th scope="col">Classroom ID</th>
+                    <th scope="col">Building</th>
+                    <th scope="col">Total Consumption</th>
+                    <th scope="col">Occupied Hours</th>
+                    <th scope="col">Energy / Occupied Hr</th>
+                    <th scope="col">Avoidable Energy</th>
+                    <th scope="col">Recommended Remediation</th>
+                    <th scope="col">Estimate Confidence</th>
+                    <th scope="col" style="text-align: right;">Deep-Link Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="reportsClassroomTableBody">
+                  <!-- Dynamically populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Section: How Savings Are Calculated (Methodology & Formulas) -->
+          <div class="reports-section-card how-savings-card">
+            <div class="reports-section-header">
+              <div>
+                <h2 class="section-title">How Savings Are Calculated</h2>
+                <p class="section-subtitle">Mathematical formulas, assumptions, and engineering guardrails implemented across SCEO.</p>
+              </div>
+              <div class="tariff-quick-pill">
+                <span class="tariff-label">Current Electricity Tariff:</span>
+                <strong class="tariff-value" id="reportsCurrentTariffDisplay">$0.18 / kWh</strong>
+                <button type="button" class="btn-link-sm" id="btnGoToTariffSettings">Configure in Settings</button>
+              </div>
+            </div>
+
+            <div class="calc-formula-grid">
+              <!-- Formula 1 -->
+              <div class="calc-formula-card">
+                <div class="calc-card-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                  </svg>
+                </div>
+                <h3 class="calc-card-title">1. Potential Avoidable Energy (kWh)</h3>
+                <div class="calc-formula-box">
+                  <code>Avoidable Energy (kWh) = Avoidable Power (kW) &times; Avoidable Operating Hours</code>
+                </div>
+                <p class="calc-card-desc">
+                  Calculated from telemetry during unoccupied periods when active draw exceeds allowable standby floor (e.g. HVAC or lighting running in empty rooms). Avoids counting base infrastructure.
+                </p>
+              </div>
+
+              <!-- Formula 2 -->
+              <div class="calc-formula-card">
+                <div class="calc-card-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                  </svg>
+                </div>
+                <h3 class="calc-card-title">2. Estimated Cost Savings ($)</h3>
+                <div class="calc-formula-box">
+                  <code>Cost Savings ($) = Estimated Avoidable Energy (kWh) &times; Electricity Tariff ($/kWh)</code>
+                </div>
+                <p class="calc-card-desc">
+                  Multiplies avoidable kilowatt-hours by the university's contracted utility tariff ($0.18/kWh demo default). Peak demand surcharges are excluded unless specifically triggered.
+                </p>
+              </div>
+
+              <!-- Formula 3 -->
+              <div class="calc-formula-card">
+                <div class="calc-card-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                </div>
+                <h3 class="calc-card-title">3. Energy Intensity per Occupied Hour</h3>
+                <div class="calc-formula-box">
+                  <code>Energy Intensity = Energy Consumption (kWh) &divide; Occupied Hours</code>
+                </div>
+                <p class="calc-card-desc">
+                  <strong>Division-by-zero Guard:</strong> When occupied hours equal zero, the system outputs <code>0.0 kWh/hr</code> rather than an invalid error. Normalizes energy draw by schedule utilization.
+                </p>
+              </div>
+
+              <!-- Formula 4 -->
+              <div class="calc-formula-card">
+                <div class="calc-card-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                    <polyline points="17 6 23 6 23 12"></polyline>
+                  </svg>
+                </div>
+                <h3 class="calc-card-title">4. Percentage Improvement (%)</h3>
+                <div class="calc-formula-box">
+                  <code>Improvement (%) = ((Baseline Energy &minus; Current Energy) &divide; Baseline Energy) &times; 100</code>
+                </div>
+                <p class="calc-card-desc">
+                  <strong>Baseline Absence Guard:</strong> Only calculated when a verified historical baseline exists. If baseline is missing, null, or zero, the system renders <em>"N/A — No Baseline"</em> without false zeros.
+                </p>
+              </div>
+            </div>
+
+            <!-- Double Counting Policy Note -->
+            <div class="double-counting-notice">
+              <strong>De-Duplication Policy (Double-Counting Prevention):</strong>
+              <p>Timetable consolidation recommendations, Smart Controls simulator shutdowns, and Preventive Maintenance repairs operate on overlapping classroom zones. SCEO tracks each remediation independently and does not aggregate savings across differing intervention categories to prevent inflated benefit reports.</p>
+            </div>
+          </div>
+
+          <!-- Section: Browser-Based CSV Data Export Center -->
+          <div class="reports-section-card export-center-card" id="exportCenterSection">
+            <div class="reports-section-header">
+              <div>
+                <h2 class="section-title">Data Export Center (Browser Generated)</h2>
+                <p class="section-subtitle">Generate and download structured CSV records instantly in your browser via object URLs. No external servers or network transmission required.</p>
+              </div>
+              <span class="export-format-badge">RFC 4180 CSV Standard</span>
+            </div>
+
+            <div class="export-cards-grid">
+              <!-- Export 1: Building Performance -->
+              <div class="export-btn-card">
+                <div class="export-card-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                  </svg>
+                </div>
+                <div class="export-card-info">
+                  <h3 class="export-card-title">Building Performance</h3>
+                  <p class="export-card-desc">Facility-level consumption, occupied hours, intensity, avoidable kWh, and estimated cost.</p>
+                </div>
+                <button type="button" class="btn-secondary btn-sm" id="btnExportBuildingsCsv">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  <span>Export Buildings CSV</span>
+                </button>
+              </div>
+
+              <!-- Export 2: Classroom Savings -->
+              <div class="export-btn-card">
+                <div class="export-card-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+                    <path d="M6 6h10M6 10h10M6 14h6"></path>
+                  </svg>
+                </div>
+                <div class="export-card-info">
+                  <h3 class="export-card-title">Classroom Savings Opportunities</h3>
+                  <p class="export-card-desc">All 24 monitored rooms ranked by avoidable kWh, benchmark deltas, and recommended actions.</p>
+                </div>
+                <button type="button" class="btn-secondary btn-sm" id="btnExportRoomsCsv">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  <span>Export Classrooms CSV</span>
+                </button>
+              </div>
+
+              <!-- Export 3: Alert Records -->
+              <div class="export-btn-card">
+                <div class="export-card-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                  </svg>
+                </div>
+                <div class="export-card-info">
+                  <h3 class="export-card-title">Alert &amp; Anomaly Records</h3>
+                  <p class="export-card-desc">All active, acknowledged, and resolved telemetry alerts with severity, power, and triage states.</p>
+                </div>
+                <button type="button" class="btn-secondary btn-sm" id="btnExportAlertsCsv">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  <span>Export Alerts CSV</span>
+                </button>
+              </div>
+
+              <!-- Export 4: Maintenance Records -->
+              <div class="export-btn-card">
+                <div class="export-card-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                  </svg>
+                </div>
+                <div class="export-card-info">
+                  <h3 class="export-card-title">Preventive Maintenance Tasks</h3>
+                  <p class="export-card-desc">Complete equipment inventory, condition ratings, work order status, and team assignments.</p>
+                </div>
+                <button type="button" class="btn-secondary btn-sm" id="btnExportMaintCsv">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  <span>Export Maintenance CSV</span>
+                </button>
+              </div>
+
+              <!-- Export 5: Department Challenge -->
+              <div class="export-btn-card">
+                <div class="export-card-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                    <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                    <path d="M4 22h16"></path>
+                    <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+                  </svg>
+                </div>
+                <div class="export-card-info">
+                  <h3 class="export-card-title">Department Challenge Standings</h3>
+                  <p class="export-card-desc">Academic department rankings, energy reduction percentages, points breakdown, and actions.</p>
+                </div>
+                <button type="button" class="btn-secondary btn-sm" id="btnExportDeptCsv">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  <span>Export Challenge CSV</span>
+                </button>
+              </div>
+
+              <!-- Export 6: Overall Savings Summary -->
+              <div class="export-btn-card">
+                <div class="export-card-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                  </svg>
+                </div>
+                <div class="export-card-info">
+                  <h3 class="export-card-title">Overall Savings Summary</h3>
+                  <p class="export-card-desc">Executive summary matching currently active filters, date ranges, and financial assumptions.</p>
+                </div>
+                <button type="button" class="btn-primary btn-sm" id="btnExportSummaryCsv">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  <span>Export Summary CSV</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             VIEW 10: SETTINGS & DEMO DATA (Step 8 Implementation)
+             ================================================================== -->
+        <section id="settingsView" class="view-panel" style="display: none;" aria-label="System Settings and Demo Data">
+          <!-- View Header -->
+          <div class="view-header">
+            <div>
+              <div class="view-pretitle">SYSTEM CONFIGURATION &amp; DATA MANAGEMENT</div>
+              <h1 class="view-title">Settings &amp; Demo Data</h1>
+              <p class="view-subtitle">Configure simulation tariffs, review demo assumptions, and manage prototype telemetry state.</p>
+            </div>
+            <div class="view-header-actions">
+              <span class="system-status-pill">
+                <span class="status-indicator-dot"></span>
+                <span>Config Engine Active</span>
+              </span>
+            </div>
+          </div>
+
+          <div class="settings-grid">
+            <!-- 1. Financial & Utility Rate Parameters -->
+            <div class="settings-card">
+              <div class="settings-card-header">
+                <div class="settings-header-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h2 class="settings-card-title">Financial &amp; Utility Rate Parameters</h2>
+                  <p class="settings-card-subtitle">These rates dynamically scale all cost estimations across Reports, Analytics, and Smart Controls.</p>
+                </div>
+              </div>
+
+              <form id="settingsForm" class="settings-form">
+                <div class="form-group">
+                  <label for="settingTariffInput" class="form-label">
+                    <span>Active Electricity Tariff ($/kWh)</span>
+                    <span class="required-asterisk">*</span>
+                  </label>
+                  <div class="input-with-addon">
+                    <span class="input-addon">$</span>
+                    <input type="number" id="settingTariffInput" class="form-input" min="0.01" max="1000.00" step="0.01" value="0.18" required>
+                    <span class="input-addon">/ kWh</span>
+                  </div>
+                  <p class="form-hint">University contracted blended utility rate. Default demo rate: $0.18/kWh.</p>
+                </div>
+
+                <div class="form-group">
+                  <label for="settingDemandInput" class="form-label">
+                    <span>Peak Demand Capacity Charge ($/kW)</span>
+                  </label>
+                  <div class="input-with-addon">
+                    <span class="input-addon">$</span>
+                    <input type="number" id="settingDemandInput" class="form-input" min="0" max="100" step="0.50" value="14.50">
+                    <span class="input-addon">/ kW</span>
+                  </div>
+                  <p class="form-hint">Monthly capacity penalty applied to peak 15-minute facility electrical demand.</p>
+                </div>
+
+                <div class="form-group">
+                  <label for="settingCarbonInput" class="form-label">
+                    <span>Regional Grid Carbon Intensity (kg CO2e / kWh)</span>
+                  </label>
+                  <div class="input-with-addon">
+                    <input type="number" id="settingCarbonInput" class="form-input" min="0.01" max="2.00" step="0.01" value="0.42">
+                    <span class="input-addon">kg CO2e/kWh</span>
+                  </div>
+                  <p class="form-hint">Used to model avoided carbon emissions from simulated energy reductions.</p>
+                </div>
+
+                <div class="settings-actions-row">
+                  <button type="submit" class="btn-primary" id="btnSaveSettings">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -2px;">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>Save Financial Settings</span>
+                  </button>
+                  <button type="button" class="btn-secondary" id="btnResetTariffDefault">
+                    <span>Restore Default Rates</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- 2. Demo State & Prototype Reset Controls -->
+            <div class="settings-card danger-zone-card">
+              <div class="settings-card-header">
+                <div class="settings-header-icon danger" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                </div>
+                <div>
+                  <h2 class="settings-card-title">Prototype Demo Data Management</h2>
+                  <p class="settings-card-subtitle">Manage browser storage state and restore demo scenarios for live evaluation.</p>
+                </div>
+              </div>
+
+              <div class="settings-body-text">
+                <p>
+                  All interactions, work orders, simulated shutdowns, and triage states are safely stored in your browser's <code>localStorage</code> under namespaced SCEO keys. Resetting will not affect any browser cache outside this application.
+                </p>
+              </div>
+
+              <div class="danger-zone-actions-grid">
+                <!-- Master Reset -->
+                <div class="danger-action-box">
+                  <div>
+                    <h3 class="danger-box-title">Restore Initial Demo State (Master Reset)</h3>
+                    <p class="danger-box-desc">
+                      Resets all 24 classrooms, alert triages, maintenance records, timetable suggestions, and challenge points to initial factory demo baseline.
+                    </p>
+                  </div>
+                  <button type="button" class="btn-danger-outline" id="btnOpenResetAllModal">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -2px;">
+                      <polyline points="1 4 1 10 7 10"></polyline>
+                      <polyline points="23 20 23 14 17 14"></polyline>
+                      <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+                    </svg>
+                    <span>Reset All Demo Data</span>
+                  </button>
+                </div>
+
+                <!-- Load Sample Anomaly Scenario -->
+                <div class="danger-action-box secondary-action">
+                  <div>
+                    <h3 class="danger-box-title">Load Sample Anomaly Scenario</h3>
+                    <p class="danger-box-desc">
+                      Injects after-hours HVAC anomalies in Engineering Building, an urgent maintenance review on ENG-101 AC, and generates simulated audit events for walkthrough demonstration.
+                    </p>
+                  </div>
+                  <button type="button" class="btn-secondary" id="btnLoadAnomalyScenario">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -2px;">
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                    <span>Load Scenario</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Transparency & Hardware Boundary Disclosure -->
+            <div class="settings-card transparency-card">
+              <div class="settings-card-header">
+                <div class="settings-header-icon info" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                  </svg>
+                </div>
+                <div>
+                  <h2 class="settings-card-title">Simulation Transparency &amp; Boundary Disclosure</h2>
+                  <p class="settings-card-subtitle">Technical explanation of prototype architecture and simulated vs real-world operational bounds.</p>
+                </div>
+              </div>
+
+              <div class="transparency-content">
+                <div class="transparency-point">
+                  <strong>Frontend-Only Application Architecture:</strong>
+                  <p>Smart Campus Energy Optimizer (SCEO) is an interactive, client-side engineering prototype developed using vanilla HTML5, modern CSS, and JavaScript. It does not connect to external servers or remote databases.</p>
+                </div>
+
+                <div class="transparency-point">
+                  <strong>Simulated Telemetry Models:</strong>
+                  <p>Energy figures, sub-meter wattage draws, PIR occupancy signals, and equipment telemetry are generated from empirical university load profiles. No live physical IoT sensors are streaming into this system.</p>
+                </div>
+
+                <div class="transparency-point">
+                  <strong>No Physical Circuit or Hardware Control:</strong>
+                  <p>The Smart Controls simulator operates exclusively within browser memory. Toggling devices, enabling automated shutdowns, or initiating schedule overrides sends zero electrical commands to physical circuit breakers, relays, or campus Building Management Systems (BMS).</p>
+                </div>
+
+                <div class="transparency-point">
+                  <strong>Absence of Verified Real-World Savings:</strong>
+                  <p>All savings figures represent modeled potential estimates or simulated software actions. Real-world savings verification requires long-term post-retrofit sub-metering normalized for degree-days and operational variances.</p>
+                </div>
+
+                <!-- Telemetry Diagnostics Metadata Table -->
+                <div class="telemetry-meta-box">
+                  <div class="meta-row">
+                    <span class="meta-label">Prototype Release:</span>
+                    <span class="meta-val">SCEO v1.0.0-PROTOTYPE (Step 8 Final Integration Pass)</span>
+                  </div>
+                  <div class="meta-row">
+                    <span class="meta-label">Monitored Scope:</span>
+                    <span class="meta-val">24 Monitored Classrooms across 3 Campus Buildings</span>
+                  </div>
+                  <div class="meta-row">
+                    <span class="meta-label">Sampling Resolution:</span>
+                    <span class="meta-val">Modeled 5-minute telemetry intervals aggregated to 7-day / 30-day views</span>
+                  </div>
+                  <div class="meta-row">
+                    <span class="meta-label">Visualization Engine:</span>
+                    <span class="meta-val">Chart.js v4.4.1 (with Zero-Dependency Fallback renderer)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             VIEW COMING SOON PLACEHOLDER (For Any Future Expansions)
+             ================================================================== -->
+        <section id="placeholderView" class="placeholder-view" style="display: none;" aria-label="Module Coming Soon">
           <div class="placeholder-card">
             <div class="placeholder-icon-box" id="placeholderIconBox">
               <!-- Dynamic SVG -->
@@ -3503,6 +4278,197 @@
       <div class="modal-footer">
         <button id="btnCancelResetDept" type="button" class="btn-secondary">Cancel</button>
         <button id="btnConfirmResetDept" type="button" class="btn-primary" style="background-color: var(--color-danger); border-color: var(--color-danger);">Reset Challenge</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Master Reset All Demo State Confirmation Modal (Step 8) -->
+  <div id="resetAllDemoConfirmModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="resetAllModalTitle">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <span class="modal-label">Master Prototype Reset</span>
+          <h3 id="resetAllModalTitle">Reset All Demo Data to Baseline?</h3>
+        </div>
+        <button id="resetAllModalCloseBtn" class="modal-close-btn" type="button" aria-label="Close modal">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-text" style="font-size: 13.5px; line-height: 1.6;">
+          This will restore the entire SCEO prototype to its initial default state:
+        </p>
+        <ul style="padding-left: 18px; margin-top: 8px; font-size: 13px; line-height: 1.7; color: var(--color-text-secondary);">
+          <li>Restores all 24 classrooms and device states in Smart Controls.</li>
+          <li>Reverts alert triage records to initial 8 active alerts.</li>
+          <li>Restores 14 initial equipment records and clears added tasks.</li>
+          <li>Resets Department Energy Challenge rankings and logged actions.</li>
+          <li>Resets Timetable Optimizer accepted and dismissed suggestions.</li>
+          <li>Restores default electricity tariff to <strong>$0.18 / kWh</strong>.</li>
+        </ul>
+        <div class="modal-simulation-disclaimer" style="margin-top: 12px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <span>Clears only SCEO browser storage. No external files or settings are altered.</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btnCancelResetAll" type="button" class="btn-secondary">Cancel</button>
+        <button id="btnConfirmResetAll" type="button" class="btn-primary" style="background-color: var(--color-danger); border-color: var(--color-danger);">Reset All Demo Data</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       STEP 10: COMPETITION GUIDED DEMO DOCK & MODALS
+       ====================================================================== -->
+  <!-- Floating Guided Demo Controller Dock -->
+  <div id="guidedDemoDock" class="guided-demo-dock" style="display: none;" role="region" aria-label="Competition Guided Demo Walkthrough">
+    <div class="demo-dock-inner">
+      <!-- Persistent Limitations Notice (Requirement 4) -->
+      <div class="demo-persistent-notice">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink: 0;">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span><strong>Demonstration prototype &mdash; energy readings are simulated.</strong> Real monitoring and physical device control require approved metering, integration, and safety review.</span>
+      </div>
+
+      <!-- Dock Header: Stage Progress, Scenario Badge & Close -->
+      <div class="demo-dock-header">
+        <div class="demo-stage-badge-group">
+          <span class="demo-badge-pill" id="demoStagePill">STAGE 1 OF 6</span>
+          <span class="demo-view-pill" id="demoViewPill">Overview Dashboard</span>
+          <span class="demo-scenario-tag" id="demoScenarioTag">Scenario: Classroom ENG-101</span>
+        </div>
+        <div class="demo-header-actions">
+          <button type="button" class="btn-demo-dock-action" id="btnDemoResetScenario" title="Reset Demo Scenario to initial state (preserves other data)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -1px;">
+              <polyline points="1 4 1 10 7 10"></polyline>
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+            </svg>
+            <span>Reset Scenario</span>
+          </button>
+          <button type="button" class="btn-demo-dock-close" id="btnDemoSkip" title="Exit Guided Demo" aria-label="Exit Guided Demo">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Visual Step Progress Indicator (6 Segments) -->
+      <div class="demo-progress-track" id="demoProgressTrack" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="6">
+        <div class="demo-step-segment active" data-step="1" title="Stage 1: Monitor Campus Energy"></div>
+        <div class="demo-step-segment" data-step="2" title="Stage 2: Identify Waste Outlier"></div>
+        <div class="demo-step-segment" data-step="3" title="Stage 3: Investigate Energy Pattern"></div>
+        <div class="demo-step-segment" data-step="4" title="Stage 4: Review Recommended Action"></div>
+        <div class="demo-step-segment" data-step="5" title="Stage 5: Simulate Intervention"></div>
+        <div class="demo-step-segment" data-step="6" title="Stage 6: Review Estimated Savings"></div>
+      </div>
+
+      <!-- Stage Title -->
+      <div class="demo-stage-title-wrap">
+        <h3 class="demo-stage-title" id="demoStageTitle">Stage 1: Monitor Campus Energy</h3>
+      </div>
+
+      <!-- 3 Core Explanation Cards: Seeing / Why It Matters / Next Action -->
+      <div class="demo-explanation-grid">
+        <div class="demo-explanation-card">
+          <div class="demo-exp-icon teal">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </div>
+          <div class="demo-exp-body">
+            <span class="demo-exp-label">What You Are Seeing</span>
+            <p class="demo-exp-text" id="demoTextWhatSeeing">Loading stage details...</p>
+          </div>
+        </div>
+
+        <div class="demo-explanation-card">
+          <div class="demo-exp-icon amber">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+          </div>
+          <div class="demo-exp-body">
+            <span class="demo-exp-label">Why It Matters</span>
+            <p class="demo-exp-text" id="demoTextWhyMatters">Loading stage details...</p>
+          </div>
+        </div>
+
+        <div class="demo-explanation-card highlight-card">
+          <div class="demo-exp-icon cyan">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+          <div class="demo-exp-body">
+            <span class="demo-exp-label">Action to Take Next</span>
+            <p class="demo-exp-text" id="demoTextNextAction">Loading stage details...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dock Footer: Navigation Controls -->
+      <div class="demo-dock-footer">
+        <div class="demo-footer-left">
+          <button type="button" class="btn btn-secondary btn-sm" id="btnDemoPrev" disabled>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -1px;">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            Previous
+          </button>
+        </div>
+
+        <div class="demo-footer-right">
+          <button type="button" class="btn btn-ghost btn-sm" id="btnDemoSkipText">Skip Demo</button>
+          <button type="button" class="btn btn-primary btn-sm" id="btnDemoNext">
+            <span id="btnDemoNextText">Next: Identify Waste Outlier</span>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: 4px; vertical-align: -1px;">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Reset Demo Scenario Confirmation (Requirement 5) -->
+  <div id="demoResetConfirmModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="demoResetModalTitle" style="display: none;">
+    <div class="modal-card modal-card-sm" style="max-width: 480px;">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon-badge amber" style="background: rgba(245, 158, 11, 0.12); color: var(--color-warning); padding: 8px; border-radius: var(--radius-sm); margin-right: 12px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="1 4 1 10 7 10"></polyline>
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="modal-title" id="demoResetModalTitle" style="font-size: 1.1rem; margin: 0;">Reset Demo Scenario?</h3>
+            <p class="modal-subtitle" style="font-size: 0.8rem; color: var(--color-text-muted); margin-top: 2px;">Restores Room ENG-101 to its initial baseline</p>
+          </div>
+        </div>
+        <button type="button" class="modal-close-btn" id="btnCancelDemoReset" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 16px 20px;">
+        <p style="font-size: 0.875rem; color: var(--color-text-secondary); line-height: 1.5; margin-bottom: 12px;">
+          This will restore <strong>Room ENG-101</strong>'s equipment (Central HVAC Inverter) to active standby, reopen Alert <strong>ALT-101</strong>, and reset realized simulated energy savings.
+        </p>
+        <div class="card-hint" style="font-size: 0.8rem; background: rgba(56, 189, 248, 0.08); border-left: 3px solid var(--color-primary-cyan); padding: 8px 12px; border-radius: 4px; color: var(--color-text-secondary);">
+          <strong style="color: var(--color-primary-cyan);">Data Safety Guarantee:</strong> Unrelated maintenance work orders, alert triage for other rooms, timetable records, and custom financial rates will NOT be modified.
+        </div>
+      </div>
+      <div class="modal-footer" style="padding: 12px 20px; display: flex; justify-content: flex-end; gap: 8px;">
+        <button type="button" class="btn btn-secondary btn-sm" id="btnCancelDemoResetSecondary">Cancel</button>
+        <button type="button" class="btn btn-primary btn-sm" id="btnConfirmDemoReset" style="background: var(--color-warning); border-color: var(--color-warning); color: #000; font-weight: 600;">Confirm Reset Scenario</button>
       </div>
     </div>
   </div>
