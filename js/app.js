@@ -1938,10 +1938,27 @@
     state.heatmapPriority = 'all';
     state.heatmapSearch = '';
     state.selectedBuilding = 'all';
+    state.heatmapSort = 'metricDesc';
+    state.heatmapMetric = 'kwhPerOccupiedHour';
+    state.dateRange = '7d';
+
     if (elements.heatmapPriorityFilter) elements.heatmapPriorityFilter.value = 'all';
     if (elements.heatmapSearchInput) elements.heatmapSearchInput.value = '';
     if (elements.heatmapBuildingFilter) elements.heatmapBuildingFilter.value = 'all';
     if (elements.buildingSelector) elements.buildingSelector.value = 'all';
+    if (elements.heatmapSortSelect) elements.heatmapSortSelect.value = 'metricDesc';
+
+    // Reset metric buttons
+    elements.btnMetricIntensity?.classList.add('active');
+    elements.btnMetricTotal?.classList.remove('active');
+    elements.btnMetricWaste?.classList.remove('active');
+
+    // Reset date range buttons
+    elements.btnRange7d?.classList.add('active');
+    elements.btnRange30d?.classList.remove('active');
+    elements.hmBtnRange7d?.classList.add('active');
+    elements.hmBtnRange30d?.classList.remove('active');
+
     renderHeatmap();
     showToast('Heatmap filters cleared', 'info');
   }
@@ -2047,6 +2064,16 @@
         return (mB.totalKWh || 0) - (mA.totalKWh || 0);
       } else if (state.heatmapSort === 'idAsc') {
         return a.id.localeCompare(b.id);
+      } else if (state.heatmapSort === 'metricAsc') {
+        if (state.heatmapMetric === 'totalKWh') {
+          return (mA.totalKWh || 0) - (mB.totalKWh || 0);
+        } else if (state.heatmapMetric === 'estimatedWasteKWh') {
+          return (mA.estimatedWasteKWh || 0) - (mB.estimatedWasteKWh || 0);
+        } else {
+          const pA = getRoomPriorityInfo(a, periodKey);
+          const pB = getRoomPriorityInfo(b, periodKey);
+          return (pA.intensityVal || 0) - (pB.intensityVal || 0);
+        }
       } else {
         // Default: metricDesc based on selected heatmapMetric
         if (state.heatmapMetric === 'totalKWh') {
