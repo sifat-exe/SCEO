@@ -1578,6 +1578,2444 @@ const SCEO_DATA = {
         "Simulated sensor noise and stress-test generators"
       ]
     }
+  },
+
+  // ==========================================================================
+  // STEP 4: TIMETABLE OPTIMIZER & ACADEMIC SCHEDULING DATASET
+  // Note: All schedules, room allocations, and energy estimates are simulated.
+  // ==========================================================================
+  timetable: {
+    metadata: {
+      activeTerm: "Fall 2026 Academic Term",
+      activeWeek: "Week 6 (Current Timetable)",
+      electricityTariff: 0.18, // $/kWh demo default
+      totalWeeklyClasses: 33,
+      consolidatableCount: 5,
+      disclaimer: "Fictional academic timetable for prototype demonstration. All schedules, room allocations, and energy estimates are simulated."
+    },
+
+    timeslots: [
+      { id: "slot-1", label: "08:00 - 10:00", start: "08:00", end: "10:00", period: "Morning" },
+      { id: "slot-2", label: "10:00 - 12:00", start: "10:00", end: "12:00", period: "Morning" },
+      { id: "slot-3", label: "12:00 - 14:00", start: "12:00", end: "14:00", period: "Midday" },
+      { id: "slot-4", label: "14:00 - 16:00", start: "14:00", end: "16:00", period: "Afternoon" },
+      { id: "slot-5", label: "16:00 - 18:00", start: "16:00", end: "18:00", period: "Late Afternoon" },
+      { id: "slot-6", label: "18:00 - 20:00", start: "18:00", end: "20:00", period: "Evening" }
+    ],
+
+    days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+
+    dayLabels: {
+      "Mon": "Monday",
+      "Tue": "Tuesday",
+      "Wed": "Wednesday",
+      "Thu": "Thursday",
+      "Fri": "Friday",
+      "Sat": "Saturday"
+    },
+
+    classes: [
+      // -------------------------------------------------------------
+      // MONDAY CLASSES (11 Classes)
+      // -------------------------------------------------------------
+      {
+        id: "CLS-101",
+        courseCode: "ENGR-301",
+        courseName: "Fluid Mechanics & Thermodynamics",
+        department: "Mechanical Engineering",
+        instructor: "Dr. Marcus Vance",
+        roomId: "ENG-101",
+        buildingId: "engineering",
+        day: "Mon",
+        slotId: "slot-1",
+        startTime: "08:00",
+        endTime: "10:00",
+        durationHours: 2.0,
+        enrolled: 42,
+        roomTypeNeeded: "Lecture Theater",
+        equipmentNeeded: ["Tiered Seating", "AV Presentation"],
+        powerKW: 6.8,
+        sessionKWh: 13.6,
+        isConsolidatable: false
+      },
+      {
+        id: "CLS-102",
+        courseCode: "ENGR-204",
+        courseName: "Robotics Control Systems",
+        department: "Mechatronics",
+        instructor: "Prof. H. Tanaka",
+        roomId: "ENG-101",
+        buildingId: "engineering",
+        day: "Mon",
+        slotId: "slot-4",
+        startTime: "14:00",
+        endTime: "16:00",
+        durationHours: 2.0,
+        enrolled: 26,
+        roomTypeNeeded: "Seminar Room",
+        equipmentNeeded: ["Standard Projector"],
+        powerKW: 6.8,
+        sessionKWh: 13.6,
+        isConsolidatable: true,
+        consolidationId: "SUG-01"
+      },
+      {
+        id: "CLS-103",
+        courseCode: "ENGR-110",
+        courseName: "Intro to Materials Science",
+        department: "Civil & Materials Eng.",
+        instructor: "Dr. Sarah Lin",
+        roomId: "ENG-102",
+        buildingId: "engineering",
+        day: "Mon",
+        slotId: "slot-2",
+        startTime: "10:00",
+        endTime: "12:00",
+        durationHours: 2.0,
+        enrolled: 78,
+        roomTypeNeeded: "Lecture Theater",
+        equipmentNeeded: ["AV Dual Display"],
+        powerKW: 4.6,
+        sessionKWh: 9.2,
+        isConsolidatable: false
+      },
+      {
+        id: "CLS-104",
+        courseCode: "CS-101",
+        courseName: "Foundations of Computer Science",
+        department: "Computer Science",
+        instructor: "Prof. Liam O'Connor",
+        roomId: "ENG-104",
+        buildingId: "engineering",
+        day: "Mon",
+        slotId: "slot-1",
+        startTime: "08:00",
+        endTime: "10:00",
+        durationHours: 2.0,
+        enrolled: 38,
+        roomTypeNeeded: "Computer Lab",
+        equipmentNeeded: ["Workstations", "IDE Setup"],
+        powerKW: 2.2,
+        sessionKWh: 4.4,
+        isConsolidatable: false
+      },
+      {
+        id: "CLS-105",
+        courseCode: "CS-205",
+        courseName: "Data Structures & Algorithms",
+        department: "Computer Science",
+        instructor: "Dr. A. Davis",
+        roomId: "ENG-104",
+        buildingId: "engineering",
+        day: "Mon",
+        slotId: "slot-2",
+        startTime: "10:00",
+        endTime: "12:00",
+        durationHours: 2.0,
+        enrolled: 40,
+        roomTypeNeeded: "Computer Lab",
+        equipmentNeeded: ["Workstations"],
+        powerKW: 2.2,
+        sessionKWh: 4.4,
+        isConsolidatable: false
+      },
+      {
+        id: "CLS-106",
+        courseCode: "ENGR-215",
+        courseName: "Mechanics of Solids Lab",
+        department: "Mechanical Engineering",
+        instructor: "Dr. Marcus Vance",
+        roomId: "ENG-201",
+        buildingId: "engineering",
+        day: "Mon",
+        slotId: "slot-3",
+        startTime: "12:00",
+        endTime: "14:00",
+        durationHours: 2.0,
+        enrolled: 22,
+        roomTypeNeeded: "Laboratory",
+        equipmentNeeded: ["Hydraulic Test Rig"],
+        powerKW: 1.2,
+        sessionKWh: 2.4,
+        isConsolidatable: false
+      },
+      {
+        id: "CLS-107",
+        courseCode: "BIO-101",
+        courseName: "Cellular & Molecular Biology",
+        department: "Biological Sciences",
+        instructor: "Prof. Elena Rostova",
+        roomId: "SCI-101",
+        buildingId: "science",
+        day: "Mon",
+        slotId: "slot-2",
+        startTime: "10:00",
+        endTime: "12:00",
+        durationHours: 2.0,
+        enrolled: 84,
+        roomTypeNeeded: "Lecture Theater",
+        equipmentNeeded: ["Microscope Camera AV"],
+        powerKW: 5.2,
+        sessionKWh: 10.4,
+        isConsolidatable: false
+      },
+      {
+        id: "CLS-108",
+        courseCode: "CHEM-201",
+        courseName: "Organic Synthesis Lab",
+        department: "Chemistry",
+        instructor: "Dr. Victor Kim",
+        roomId: "SCI-201",
+        buildingId: "science",
+        day: "Mon",
+        slotId: "slot-4",
+        startTime: "14:00",
+        endTime: "16:00",
+        durationHours: 2.0,
+        enrolled: 26,
+        roomTypeNeeded: "Laboratory",
+        equipmentNeeded: ["Fume Hoods", "Chemical Sashes"],
+        powerKW: 6.5,
+        sessionKWh: 13.0,
+        isConsolidatable: false
+      },
+      {
+        id: "CLS-109",
+        courseCode: "PHYS-202",
+        courseName: "Optics & Laser Experiments",
+        department: "Physics",
+        instructor: "Dr. N. Thorne",
+        roomId: "SCI-204",
+        buildingId: "science",
+        day: "Mon",
+        slotId: "slot-3",
+        startTime: "12:00",
+        endTime: "14:00",
+        durationHours: 2.0,
+        enrolled: 24,
+        roomTypeNeeded: "Laboratory",
+        equipmentNeeded: ["Darkroom Baffles"],
+        powerKW: 3.6,
+        sessionKWh: 7.2,
+        isConsolidatable: false
+      },
+      {
+        id: "CLS-110",
+        courseCode: "BUS-101",
+        courseName: "Principles of Modern Marketing",
+        department: "Business Administration",
+        instructor: "K. Al-Mansoor",
+        roomId: "BUS-101",
+        buildingId: "business",
+        day: "Mon",
+        slotId: "slot-2",
+        startTime: "10:00",
+        endTime: "12:00",
+        durationHours: 2.0,
+        enrolled: 95,
+        roomTypeNeeded: "Auditorium",
+        equipmentNeeded: ["Auditorium Sound System"],
+        powerKW: 7.5,
+        sessionKWh: 15.0,
+        isConsolidatable: false
+      },
+      {
+        id: "CLS-111",
+        courseCode: "FIN-305",
+        courseName: "Global Financial Markets",
+        department: "Finance & Economics",
+        instructor: "Prof. Diane Sterling",
+        roomId: "BUS-201",
+        buildingId: "business",
+        day: "Mon",
+        slotId: "slot-4",
+        startTime: "14:00",
+        endTime: "16:00",
+        durationHours: 2.0,
+        enrolled: 38,
+        roomTypeNeeded: "Case Study Room",
+        equipmentNeeded: ["Tiered U-Shape Table"],
+        powerKW: 2.4,
+        sessionKWh: 4.8,
+        isConsolidatable: false
+      },
+
+      // -------------------------------------------------------------
+      // TUESDAY CLASSES (7 Classes)
+      // -------------------------------------------------------------
+      {
+        id: "CLS-201",
+        courseCode: "ENGR-102",
+        courseName: "Engineering Mathematics I",
+        department: "Mathematics & Engineering",
+        instructor: "Dr. Sarah Lin",
+        roomId: "ENG-102",
+        buildingId: "engineering",
+        day: "Tue",
+        slotId: "slot-1",
+        startTime: "08:00",
+        endTime: "10:00",
+        durationHours: 2.0,
+        enrolled: 80,
+        roomTypeNeeded: "Lecture Theater",
+        equipmentNeeded: ["Dual Projector"],
+        powerKW: 4.6,
+        sessionKWh: 9.2,
+        isConsolidatable: false
+      },
+      {
+        id: "CLS-202",
+        courseCode: "ENGR-220",
+        courseName: "Electrical Circuits & Signals",
+        department: "Electrical Engineering",
+        instructor: "Prof. H. Tanaka",
+        roomId: "ENG-102",
+        buildingId: "engineering",
+        day: "Tue",
+        slotId: "slot-3",
+        startTime: "12:00",
+        endTime: "14:00",
+        durationHours: 2.0,
+        enrolled: 65,
+        roomTypeNeeded: "Lecture Theater",
+        equipmentNeeded: ["Circuit Simulator AV"],
+        powerKW: 4.6,
+        sessionKWh: 9.2,
+        isConsolidatable: false
+      },
+      {
+        id: "CLS-203",
+        courseCode: "CS-108",
+        courseName: "Applied Python Laboratory",
+        department: "Computer Science",
+        instructor: "Prof. Liam O'Connor",
+        roomId: "ENG-104",
+        buildingId: "engineering",
+        day: "Tue",
+        slotId: "slot-5",
+        startTime: "16:00",
+        endTime: "18:00",
+        durationHours: 2.0,
+        enrolled: 30,
+        roomTypeNeeded: "Computer Lab",
+        equipmentNeeded: ["Workstations"],
+        powerKW: 2.2,
+        sessionKWh: 4.4,
+        isConsolidatable: true,
+        consolidationId: "SUG-04"
+      },
+      {
+        id: "CLS-204",
+        courseCode: "CS-302",
+        courseName: "CAD & Structural Modeling Studio",
+        department: "Civil Engineering",
+        instructor: "Dr. Marcus Vance",
+        roomId: "ENG-301",
+        buildingId: "engineering",
+        day: "Tue",
+        slotId: "slot-2",
+        startTime: "10:00",
+        endTime: "12:00",
+        durationHours: 2.0,
+        enrolled: 34,
+        roomTypeNeeded: "Computer Lab",
+        equipmentNeeded: ["CAD GPU Terminals"],
+        powerKW: 3.8,
+        sessionKWh: 7.6,
+        isConsolidatable: false
+      },
+      {
+        id: "CLS-205",
+        courseCode: "CHEM-102",
+        courseName: "General Chemistry Principles",
+        department: "Chemistry",
+        instructor: "Dr. Victor Kim",
+        roomId: "SCI-102",
+        buildingId: "science",
+        day: "Tue",
+        slotId: "slot-1",
+        startTime: "08:00",
+        endTime: "10:00",
+        durationHours: 2.0,
+        enrolled: 72,
+        roomTypeNeeded: "Lecture Theater",
+        equipmentNeeded: ["Periodic Table Display"],
+        powerKW: 4.4,
+        sessionKWh: 8.8,
+        isConsolidatable: false
+      },
+      {
+        id: "CLS-206",
+        courseCode: "BIO-210",
+        courseName: "Genetics & Genomics",
+        department: "Biological Sciences",
+        instructor: "Prof. Elena Rostova",
+        roomId: "SCI-102",
+        buildingId: "science",
+        day: "Tue",
+        slotId: "slot-3",
+        startTime: "12:00",
+        endTime: "14:00",
+        durationHours: 2.0,
+        enrolled: 55,
+        roomTypeNeeded: "Lecture Theater",
+        equipmentNeeded: ["Standard AV"],
+        powerKW: 4.4,
+        sessionKWh: 8.8,
+        isConsolidatable: false
+      },
+      {
+        id: "CLS-207",
+        courseCode: "MGMT-201",
+        courseName: "Organizational Behavior Seminar",
+        department: "Management",
+        instructor: "K. Al-Mansoor",
+        roomId: "BUS-102",
+        buildingId: "business",
+        day: "Tue",
+        slotId: "slot-2",
+        startTime: "10:00",
+        endTime: "12:00",
+        durationHours: 2.0,
+        enrolled: 40,
+        roomTypeNeeded: "Seminar Room",
+        equipmentNeeded: ["Discussion Whiteboards"],
+        powerKW: 2.0,
+        sessionKWh: 4.0,
+        isConsolidatable: false
+      },
+
+      // -------------------------------------------------------------
+      // WEDNESDAY CLASSES (6 Classes)
+      // -------------------------------------------------------------
+      {
+        id: "CLS-301",
+        courseCode: "ENGR-401",
+        courseName: "Senior Engineering Design Hub",
+        department: "Mechanical Engineering",
+        instructor: "Dr. Marcus Vance",
+        roomId: "ENG-310",
+        buildingId: "engineering",
+        day: "Wed",
+        slotId: "slot-2",
+        startTime: "10:00",
+        endTime: "12:00",
+        durationHours: 2.0,
+        enrolled: 45,
+        roomTypeNeeded: "Seminar Room",
+        equipmentNeeded: ["Collaborative Benches"],
+        powerKW: 2.5,
+        sessionKWh: 5.0,
+        isConsolidatable: false
+      },
+      {
+        id: "CLS-302",
+        courseCode: "CS-220",
+        courseName: "Database Systems & Architecture",
+        department: "Computer Science",
+        instructor: "Dr. A. Davis",
+        roomId: "ENG-304",
+        buildingId: "engineering",
+        day: "Wed",
+        slotId: "slot-4",
+        startTime: "14:00",
+        endTime: "16:00",
+        durationHours: 2.0,
+        enrolled: 30,
+        roomTypeNeeded: "Computer Lab",
+        equipmentNeeded: ["SQL Database Server"],
+        powerKW: 2.0,
+        sessionKWh: 4.0,
+        isConsolidatable: false
+      },
+      {
+        id: "CLS-303",
+        courseCode: "BIO-305",
+        courseName: "Microbiology & Immunology",
+        department: "Biological Sciences",
+        instructor: "Prof. Elena Rostova",
+        roomId: "SCI-101",
+        buildingId: "science",
+        day: "Wed",
+        slotId: "slot-1",
+        startTime: "08:00",
+        endTime: "10:00",
+        durationHours: 2.0,
+        enrolled: 60,
+        roomTypeNeeded: "Lecture Theater",
+        equipmentNeeded: ["AV Setup"],
+        powerKW: 5.2,
+        sessionKWh: 10.4,
+        isConsolidatable: false
+      },
+      {
+        id: "CLS-304",
+        courseCode: "CHEM-105",
+        courseName: "General Chemistry Tutorial",
+        department: "Chemistry",
+        instructor: "Dr. Victor Kim",
+        roomId: "SCI-305",
+        buildingId: "science",
+        day: "Wed",
+        slotId: "slot-4",
+        startTime: "14:00",
+        endTime: "16:00",
+        durationHours: 2.0,
+        enrolled: 22,
+        roomTypeNeeded: "Seminar Room",
+        equipmentNeeded: ["Standard AV"],
+        powerKW: 1.6,
+        sessionKWh: 3.2,
+        isConsolidatable: true,
+        consolidationId: "SUG-02"
+      },
+      {
+        id: "CLS-305",
+        courseCode: "ENV-201",
+        courseName: "Environmental System Dynamics",
+        department: "Environmental Sciences",
+        instructor: "Dr. N. Thorne",
+        roomId: "SCI-301",
+        buildingId: "science",
+        day: "Wed",
+        slotId: "slot-2",
+        startTime: "10:00",
+        endTime: "12:00",
+        durationHours: 2.0,
+        enrolled: 20,
+        roomTypeNeeded: "Laboratory",
+        equipmentNeeded: ["GIS Terminals"],
+        powerKW: 2.8,
+        sessionKWh: 5.6,
+        isConsolidatable: false
+      },
+      {
+        id: "CLS-306",
+        courseCode: "MKTG-402",
+        courseName: "Consumer Behavior Research",
+        department: "Business Administration",
+        instructor: "Prof. Diane Sterling",
+        roomId: "BUS-201",
+        buildingId: "business",
+        day: "Wed",
+        slotId: "slot-3",
+        startTime: "12:00",
+        endTime: "14:00",
+        durationHours: 2.0,
+        enrolled: 42,
+        roomTypeNeeded: "Case Study Room",
+        equipmentNeeded: ["Discussion Mic System"],
+        powerKW: 2.4,
+        sessionKWh: 4.8,
+        isConsolidatable: false
+      },
+
+      // -------------------------------------------------------------
+      // THURSDAY CLASSES (5 Classes)
+      // -------------------------------------------------------------
+      {
+        id: "CLS-401",
+        courseCode: "ENGR-315",
+        courseName: "Control Systems Lab",
+        department: "Mechatronics",
+        instructor: "Prof. H. Tanaka",
+        roomId: "ENG-204",
+        buildingId: "engineering",
+        day: "Thu",
+        slotId: "slot-2",
+        startTime: "10:00",
+        endTime: "12:00",
+        durationHours: 2.0,
+        enrolled: 30,
+        roomTypeNeeded: "Laboratory",
+        equipmentNeeded: ["Robotics Arms"],
+        powerKW: 4.2,
+        sessionKWh: 8.4,
+        isConsolidatable: false
+      },
+      {
+        id: "CLS-402",
+        courseCode: "ENGR-105",
+        courseName: "Engineering Graphic Communication",
+        department: "Civil Engineering",
+        instructor: "Dr. Sarah Lin",
+        roomId: "ENG-301",
+        buildingId: "engineering",
+        day: "Thu",
+        slotId: "slot-4",
+        startTime: "14:00",
+        endTime: "16:00",
+        durationHours: 2.0,
+        enrolled: 35,
+        roomTypeNeeded: "Computer Lab",
+        equipmentNeeded: ["Drafting Screens"],
+        powerKW: 3.8,
+        sessionKWh: 7.6,
+        isConsolidatable: false
+      },
+      {
+        id: "CLS-403",
+        courseCode: "PHYS-101",
+        courseName: "Physics for Engineering Majors",
+        department: "Physics",
+        instructor: "Dr. N. Thorne",
+        roomId: "SCI-101",
+        buildingId: "science",
+        day: "Thu",
+        slotId: "slot-3",
+        startTime: "12:00",
+        endTime: "14:00",
+        durationHours: 2.0,
+        enrolled: 90,
+        roomTypeNeeded: "Lecture Theater",
+        equipmentNeeded: ["Large Hall Audio"],
+        powerKW: 5.2,
+        sessionKWh: 10.4,
+        isConsolidatable: false
+      },
+      {
+        id: "CLS-404",
+        courseCode: "BUS-301",
+        courseName: "Corporate Governance Seminar",
+        department: "Business Administration",
+        instructor: "K. Al-Mansoor",
+        roomId: "BUS-101",
+        buildingId: "business",
+        day: "Thu",
+        slotId: "slot-5",
+        startTime: "16:00",
+        endTime: "18:00",
+        durationHours: 2.0,
+        enrolled: 28,
+        roomTypeNeeded: "Case Study Room",
+        equipmentNeeded: ["AV System"],
+        powerKW: 7.5,
+        sessionKWh: 15.0,
+        isConsolidatable: true,
+        consolidationId: "SUG-03"
+      },
+      {
+        id: "CLS-405",
+        courseCode: "FIN-410",
+        courseName: "Applied Algorithmic Trading",
+        department: "Finance & Economics",
+        instructor: "Prof. Diane Sterling",
+        roomId: "BUS-202",
+        buildingId: "business",
+        day: "Thu",
+        slotId: "slot-2",
+        startTime: "10:00",
+        endTime: "12:00",
+        durationHours: 2.0,
+        enrolled: 28,
+        roomTypeNeeded: "Computer Lab",
+        equipmentNeeded: ["Trading Terminals"],
+        powerKW: 3.2,
+        sessionKWh: 6.4,
+        isConsolidatable: false
+      },
+
+      // -------------------------------------------------------------
+      // FRIDAY CLASSES (4 Classes)
+      // -------------------------------------------------------------
+      {
+        id: "CLS-501",
+        courseCode: "ENGR-201",
+        courseName: "Thermodynamics Tutorial",
+        department: "Mechanical Engineering",
+        instructor: "Dr. Marcus Vance",
+        roomId: "ENG-208",
+        buildingId: "engineering",
+        day: "Fri",
+        slotId: "slot-1",
+        startTime: "08:00",
+        endTime: "10:00",
+        durationHours: 2.0,
+        enrolled: 35,
+        roomTypeNeeded: "Seminar Room",
+        equipmentNeeded: ["Whiteboards"],
+        powerKW: 2.1,
+        sessionKWh: 4.2,
+        isConsolidatable: false
+      },
+      {
+        id: "CLS-502",
+        courseCode: "CS-310",
+        courseName: "Cloud Systems & Web Architecture",
+        department: "Computer Science",
+        instructor: "Dr. A. Davis",
+        roomId: "ENG-104",
+        buildingId: "engineering",
+        day: "Fri",
+        slotId: "slot-3",
+        startTime: "12:00",
+        endTime: "14:00",
+        durationHours: 2.0,
+        enrolled: 42,
+        roomTypeNeeded: "Computer Lab",
+        equipmentNeeded: ["Cloud Workstations"],
+        powerKW: 2.2,
+        sessionKWh: 4.4,
+        isConsolidatable: false
+      },
+      {
+        id: "CLS-503",
+        courseCode: "CHEM-301",
+        courseName: "Advanced Inorganic Chemistry",
+        department: "Chemistry",
+        instructor: "Dr. Victor Kim",
+        roomId: "SCI-102",
+        buildingId: "science",
+        day: "Fri",
+        slotId: "slot-2",
+        startTime: "10:00",
+        endTime: "12:00",
+        durationHours: 2.0,
+        enrolled: 50,
+        roomTypeNeeded: "Lecture Theater",
+        equipmentNeeded: ["Dual Projector"],
+        powerKW: 4.4,
+        sessionKWh: 8.8,
+        isConsolidatable: false
+      },
+      {
+        id: "CLS-504",
+        courseCode: "BUS-105",
+        courseName: "Business Law & Ethical Practice",
+        department: "Management",
+        instructor: "K. Al-Mansoor",
+        roomId: "BUS-102",
+        buildingId: "business",
+        day: "Fri",
+        slotId: "slot-3",
+        startTime: "12:00",
+        endTime: "14:00",
+        durationHours: 2.0,
+        enrolled: 40,
+        roomTypeNeeded: "Seminar Room",
+        equipmentNeeded: ["Standard AV"],
+        powerKW: 2.0,
+        sessionKWh: 4.0,
+        isConsolidatable: false
+      },
+
+      // -------------------------------------------------------------
+      // SATURDAY CLASSES (2 Classes - Executive Seminars)
+      // -------------------------------------------------------------
+      {
+        id: "CLS-601",
+        courseCode: "BUS-601",
+        courseName: "Executive Leadership & Strategy",
+        department: "Graduate Business School",
+        instructor: "K. Al-Mansoor",
+        roomId: "BUS-101",
+        buildingId: "business",
+        day: "Sat",
+        slotId: "slot-2",
+        startTime: "10:00",
+        endTime: "12:00",
+        durationHours: 2.0,
+        enrolled: 32,
+        roomTypeNeeded: "Auditorium",
+        equipmentNeeded: ["AV Audio Suite"],
+        powerKW: 7.5,
+        sessionKWh: 15.0,
+        isConsolidatable: true,
+        consolidationId: "SUG-05"
+      },
+      {
+        id: "CLS-602",
+        courseCode: "ENGR-501",
+        courseName: "Professional Engineering Licensure",
+        department: "Continuing Education",
+        instructor: "Dr. Sarah Lin",
+        roomId: "ENG-102",
+        buildingId: "engineering",
+        day: "Sat",
+        slotId: "slot-2",
+        startTime: "10:00",
+        endTime: "12:00",
+        durationHours: 2.0,
+        enrolled: 25,
+        roomTypeNeeded: "Seminar Room",
+        equipmentNeeded: ["Standard Projector"],
+        powerKW: 4.6,
+        sessionKWh: 9.2,
+        isConsolidatable: true,
+        consolidationId: "SUG-05"
+      }
+    ],
+
+    suggestions: [
+      {
+        id: "SUG-01",
+        type: "Oversized Room Consolidation",
+        title: "Relocate ENGR-204 to Seminar Room ENG-208",
+        day: "Mon",
+        buildingId: "engineering",
+        classId: "CLS-102",
+        courseCode: "ENGR-204",
+        currentRoomId: "ENG-101",
+        proposedRoomId: "ENG-208",
+        slotId: "slot-4",
+        timeRange: "14:00 - 16:00",
+        enrolled: 26,
+        currentRoomType: "Lecture Theater",
+        currentCapacity: 120,
+        currentPowerKW: 6.8,
+        proposedRoomType: "Seminar Room",
+        proposedCapacity: 40,
+        proposedPowerKW: 2.1,
+        avoidableHours: 2.0,
+        potentialEnergyKWh: 9.4, // (6.8 kW - 2.1 kW) * 2.0h
+        estimatedCostSavings: 1.69, // 9.4 kWh * $0.18
+        confidence: "High",
+        confidenceReason: "Capacity margin is 14 seats (+53%); both rooms in Engineering Building with standard AV equipment.",
+        reason: "ENG-101 (120 seats, 6.8 kW) is kept running in the afternoon solely for 26 attendees. Vacant seminar room ENG-208 (40 seats, 2.1 kW) easily accommodates this cohort, allowing ENG-101 HVAC to power down 2 hours earlier after morning sessions.",
+        calculationFormula: "(Current Room Draw: 6.8 kW - Proposed Room Draw: 2.1 kW) × 2.0 Operating Hours = 9.4 kWh avoided",
+        adminConstraints: [
+          "Confirm instructor approval for whiteboard-centric teaching layout.",
+          "Verify standard presentation AV equipment in ENG-208 meets course needs.",
+          "Check student elevator transit between Level 1 and Level 2."
+        ]
+      },
+      {
+        id: "SUG-02",
+        type: "Thermal Wing Early Setback",
+        title: "Consolidate Level 3 Tutorial into Level 1 Seminar Room",
+        day: "Wed",
+        buildingId: "science",
+        classId: "CLS-304",
+        courseCode: "CHEM-105",
+        currentRoomId: "SCI-305",
+        proposedRoomId: "SCI-105",
+        slotId: "slot-4",
+        timeRange: "14:00 - 16:00",
+        enrolled: 22,
+        currentRoomType: "Seminar Room",
+        currentCapacity: 35,
+        currentPowerKW: 1.6,
+        proposedRoomType: "Seminar Room",
+        proposedCapacity: 35,
+        proposedPowerKW: 1.8,
+        avoidableHours: 2.5,
+        potentialEnergyKWh: 13.5, // Level 3 AHU zone shutdown credit: 5.4 kW * 2.5h
+        estimatedCostSavings: 2.43,
+        confidence: "High",
+        confidenceReason: "Identical room type (Seminar, 35 seats); both equipped with identical projector displays.",
+        reason: "CHEM-105 is the sole afternoon class on Level 3 of Science Building. Moving it to vacant Level 1 room SCI-105 allows the entire Level 3 Air Handling Unit (AHU) and corridor lighting zone to enter night setback 2.5 hours early.",
+        calculationFormula: "Level 3 AHU Zone Setback: 5.4 kW × 2.5 Hours Early Shutdown = 13.5 kWh avoided",
+        adminConstraints: [
+          "Confirm elevator and stairwell accessibility between Level 1 and Level 3.",
+          "Notify teaching assistants of room change to SCI-105."
+        ]
+      },
+      {
+        id: "SUG-03",
+        type: "Auditorium Load Shedding",
+        title: "Move Corporate Governance from Auditorium to Case Study Room",
+        day: "Thu",
+        buildingId: "business",
+        classId: "CLS-404",
+        courseCode: "BUS-301",
+        currentRoomId: "BUS-101",
+        proposedRoomId: "BUS-201",
+        slotId: "slot-5",
+        timeRange: "16:00 - 18:00",
+        enrolled: 28,
+        currentRoomType: "Auditorium",
+        currentCapacity: 150,
+        currentPowerKW: 7.5,
+        proposedRoomType: "Case Study Room",
+        proposedCapacity: 50,
+        proposedPowerKW: 2.4,
+        avoidableHours: 2.0,
+        potentialEnergyKWh: 10.2, // (7.5 kW - 2.4 kW) * 2.0h
+        estimatedCostSavings: 1.84,
+        confidence: "High",
+        confidenceReason: "Class size 28 is under 50-seat capacity; Case Study Room provides superior interactive acoustics.",
+        reason: "BUS-301 attendance of 28 occupies less than 20% of the 150-seat Executive Auditorium (7.5 kW). Relocating to BUS-201 (50 seats, 2.4 kW) eliminates massive chiller airflow and permits the ground-floor auditorium to shut down.",
+        calculationFormula: "(Auditorium Draw: 7.5 kW - Case Study Room Draw: 2.4 kW) × 2.0 Hours = 10.2 kWh avoided",
+        adminConstraints: [
+          "Verify instructor agrees with horseshoe case-study layout vs auditorium podium.",
+          "Check registration list for any last-minute student additions over 50."
+        ]
+      },
+      {
+        id: "SUG-04",
+        type: "Idle Gap Elimination",
+        title: "Reschedule Applied Python Lab into Contiguous Midday Block",
+        day: "Tue",
+        buildingId: "engineering",
+        classId: "CLS-203",
+        courseCode: "CS-108",
+        currentRoomId: "ENG-104",
+        proposedRoomId: "ENG-104",
+        slotId: "slot-3", // moved from slot-5 (16:00-18:00) to slot-3 (12:00-14:00)
+        timeRange: "12:00 - 14:00",
+        enrolled: 30,
+        currentRoomType: "Computer Lab",
+        currentCapacity: 45,
+        currentPowerKW: 2.2,
+        proposedRoomType: "Computer Lab",
+        proposedCapacity: 45,
+        proposedPowerKW: 2.2,
+        avoidableHours: 4.0,
+        potentialEnergyKWh: 8.8, // 2.2 kW idle * 4.0h
+        estimatedCostSavings: 1.58,
+        confidence: "Medium",
+        confidenceReason: "Same room and equipment; requires checking student cohort timetable compatibility.",
+        reason: "ENG-104 sits empty for 4 hours between 12:00 and 16:00 with workstations idling. Moving CS-108 to 12:00 creates contiguous lab teaching, allowing full PC shutdown at 14:00 instead of 18:00.",
+        calculationFormula: "Computer Lab Standby Power: 2.2 kW × 4.0 Vacant Idle Hours Avoided = 8.8 kWh avoided",
+        adminConstraints: [
+          "Requires student cohort schedule conflict check with registrar.",
+          "Confirm teaching assistant availability during the 12:00 - 14:00 slot."
+        ]
+      },
+      {
+        id: "SUG-05",
+        type: "Weekend Building Clustering",
+        title: "Consolidate Saturday Seminars into Single Building Zone",
+        day: "Sat",
+        buildingId: "all",
+        classId: "CLS-602",
+        courseCode: "ENGR-501",
+        currentRoomId: "ENG-102",
+        proposedRoomId: "BUS-201",
+        slotId: "slot-2",
+        timeRange: "10:00 - 12:00",
+        enrolled: 25,
+        currentRoomType: "Seminar Room",
+        currentCapacity: 100,
+        currentPowerKW: 4.6,
+        proposedRoomType: "Case Study Room",
+        proposedCapacity: 50,
+        proposedPowerKW: 2.4,
+        avoidableHours: 4.0,
+        potentialEnergyKWh: 18.4, // Engineering Building chiller startup avoided
+        estimatedCostSavings: 3.31,
+        confidence: "Medium",
+        confidenceReason: "Enables Engineering Building chiller plant to stay off all Saturday; inter-building move.",
+        reason: "Only one class runs in Engineering on Saturday. Moving ENGR-501 into Business Building (where executive programs already operate) allows Engineering Building chiller and air handlers to stay in weekend setback all day.",
+        calculationFormula: "Engineering Building Chiller Plant Setback: 4.6 kW × 4.0 Hours Avoided = 18.4 kWh avoided",
+        adminConstraints: [
+          "Requires inter-faculty agreement between Engineering and Business faculties.",
+          "Issue temporary Saturday electronic keycard access for engineering students."
+        ]
+      }
+    ]
+  },
+
+  // ==========================================================================
+  // STEP 5: ALERTS & ACTIONS DATASET
+  // Note: All readings, anomalies, and estimates are simulated demo data.
+  // ==========================================================================
+  alertsModule: {
+    metadata: {
+      title: "Alerts & Actions Center",
+      disclaimer: "Simulated prototype data. Missing readings are classified as data-quality issues, not proof of energy waste.",
+      lastScanTime: "Just now (Automated Rule Scan)",
+      rulesCount: 6
+    },
+
+    thresholds: {
+      afterHoursThresholdKW: 1.5,
+      intensityExcessPercent: 40,
+      baselineSurgePercent: 25,
+      unoccupiedHoursThreshold: 2.0,
+      packetLossHoursThreshold: 3.0
+    },
+
+    alerts: [
+      {
+        id: "ALT-101",
+        title: "Unoccupied After-Hours HVAC Draw in Lecture Hall",
+        buildingId: "engineering",
+        buildingName: "Engineering Building",
+        roomId: "ENG-101",
+        category: "After-Hours Consumption",
+        severity: "critical",
+        severityLabel: "Critical",
+        timestamp: "Today, 02:45 AM",
+        dateCategory: "today",
+        currentDraw: "6.8 kW",
+        baselineStandby: "0.4 kW",
+        reason: "Heating and high-velocity ventilation operating continuously 4.5 hours after scheduled classes ended. Thermostat override active with zero detected occupants.",
+        ruleTriggered: "After-Hours Anomaly: Active draw (6.8 kW) exceeded 1.5 kW threshold during scheduled off-hours (22:00 - 05:00).",
+        recommendedAction: "Reset physical BACnet manual override latch in ENG-101 and enforce automated night setback to 16°C.",
+        status: "new",
+        isDataQuality: false,
+        potentialWasteKWh: 28.8,
+        potentialSavingsCost: 5.18,
+        readingsAvailable: true
+      },
+      {
+        id: "ALT-102",
+        title: "Excessive Laboratory Ventilation Draw in Organic Lab",
+        buildingId: "science",
+        buildingName: "Science Building",
+        roomId: "SCI-201",
+        category: "High Energy Intensity",
+        severity: "high",
+        severityLabel: "High",
+        timestamp: "Today, 09:15 AM",
+        dateCategory: "today",
+        currentDraw: "7.9 kW",
+        baselineStandby: "3.5 kW",
+        reason: "Fume hood exhaust sash left propped open past designated lab operating hours, forcing high-velocity exhaust fans to operate at 100% capacity.",
+        ruleTriggered: "High Intensity Anomaly: Measured intensity (11.2 kWh/occ-hr) exceeded laboratory benchmark of 4.2 kWh/occ-hr by +166% (>40% threshold).",
+        recommendedAction: "Notify Chemistry Department laboratory technician to inspect sash latches and confirm VAV damper modulates to eco-idle.",
+        status: "acknowledged",
+        isDataQuality: false,
+        potentialWasteKWh: 17.6,
+        potentialSavingsCost: 3.17,
+        readingsAvailable: true
+      },
+      {
+        id: "ALT-103",
+        title: "Unoccupied Conditioning for Cancelled Academic Class",
+        buildingId: "science",
+        buildingName: "Science Building",
+        roomId: "SCI-102",
+        category: "Unoccupied Load Anomaly",
+        severity: "medium",
+        severityLabel: "Medium",
+        timestamp: "Yesterday, 04:30 PM",
+        dateCategory: "yesterday",
+        currentDraw: "3.2 kW",
+        baselineStandby: "0.5 kW",
+        reason: "Pre-cooling cycle triggered for a tutorial session that was cancelled in the academic schedule. Space remained empty for 3.0 consecutive hours.",
+        ruleTriggered: "Unoccupied Conditioning Rule: Active draw sustained for > 2.0 hours with 0 recorded attendees.",
+        recommendedAction: "Integrate timetable optimizer cancellation feeds into central air handler controller to dynamically cancel pre-cooling.",
+        status: "new",
+        isDataQuality: false,
+        potentialWasteKWh: 8.1,
+        potentialSavingsCost: 1.46,
+        readingsAvailable: true
+      },
+      {
+        id: "ALT-104",
+        title: "CAD Studio Workstations High Standby Phantom Draw",
+        buildingId: "engineering",
+        buildingName: "Engineering Building",
+        roomId: "ENG-305",
+        category: "Baseline Surge",
+        severity: "medium",
+        severityLabel: "Medium",
+        timestamp: "Yesterday, 11:20 PM",
+        dateCategory: "yesterday",
+        currentDraw: "2.1 kW",
+        baselineStandby: "0.85 kW",
+        reason: "32 high-performance GPU drafting terminals remained energized in sleep-disabled mode overnight following evening lab session.",
+        ruleTriggered: "Baseline Surge Rule: Standby power increased by +147% over the established 30-day baseline (>25% surge threshold).",
+        recommendedAction: "Push automated operating system power management sleep policy at 21:00 and enable wake-on-LAN for remote updates.",
+        status: "new",
+        isDataQuality: false,
+        potentialWasteKWh: 10.0,
+        potentialSavingsCost: 1.80,
+        readingsAvailable: true
+      },
+      {
+        id: "ALT-105",
+        title: "Auditorium Chiller Running 2.5 Hours Post-Session",
+        buildingId: "business",
+        buildingName: "Business Building",
+        roomId: "BUS-101",
+        category: "HVAC Setback / Shutdown",
+        severity: "high",
+        severityLabel: "High",
+        timestamp: "Today, 01:10 PM",
+        dateCategory: "today",
+        currentDraw: "7.5 kW",
+        baselineStandby: "1.2 kW",
+        reason: "150-seat executive auditorium air handling unit left running at full cooling capacity after morning marketing seminar concluded at 12:00.",
+        ruleTriggered: "Shutdown Delay Rule: HVAC cooling load active > 1 hour after timetable scheduled end-time with vacancy confirmed.",
+        recommendedAction: "Verify automated shutdown handshake between timetable optimizer and central building automation supervisory system.",
+        status: "new",
+        isDataQuality: false,
+        potentialWasteKWh: 15.75,
+        potentialSavingsCost: 2.84,
+        readingsAvailable: true
+      },
+      {
+        id: "ALT-106",
+        title: "Telemetry Interruption: Sub-Meter Heartbeat Lost",
+        buildingId: "business",
+        buildingName: "Business Building",
+        roomId: "BUS-301",
+        category: "Data Quality / Sensor Gap",
+        severity: "low",
+        severityLabel: "Low",
+        timestamp: "Today, 06:00 AM",
+        dateCategory: "today",
+        currentDraw: "Telemetry Offline",
+        baselineStandby: "Unknown",
+        reason: "Sub-meter Modbus gateway stopped transmitting telemetry 4.2 hours ago. 18 consecutive polling intervals dropped.",
+        ruleTriggered: "Data Quality Rule: Expected sensor packets missing for > 3.0 hours. Telemetry unavailable.",
+        recommendedAction: "Inspect network switch port 14 in Business Building IDF closet and power-cycle sub-meter gateway.",
+        status: "new",
+        isDataQuality: true,
+        dataQualityNotice: "Data Quality Notice: Missing sensor readings indicate a telemetry communication gap. This is not proof of energy waste.",
+        potentialWasteKWh: 0.0,
+        potentialSavingsCost: 0.00,
+        readingsAvailable: false
+      },
+      {
+        id: "ALT-107",
+        title: "Perimeter Lighting Active in High Daylight Zone",
+        buildingId: "business",
+        buildingName: "Business Building",
+        roomId: "BUS-102",
+        category: "Lighting Anomaly",
+        severity: "low",
+        severityLabel: "Low",
+        timestamp: "2 days ago",
+        dateCategory: "older",
+        currentDraw: "1.2 kW",
+        baselineStandby: "0.2 kW",
+        reason: "South-facing perimeter luminaires drawing 1.2 kW during peak solar noon conditions despite natural illuminance exceeding 650 lux.",
+        ruleTriggered: "Daylight Harvesting Anomaly: Perimeter lighting active during high natural daylight window.",
+        recommendedAction: "Recalibrate window photocell threshold and re-enable automated daylight dimming curve.",
+        status: "resolved",
+        isDataQuality: false,
+        potentialWasteKWh: 4.8,
+        potentialSavingsCost: 0.86,
+        readingsAvailable: true
+      },
+      {
+        id: "ALT-108",
+        title: "Hydraulic Test Bench Auxiliary Pump Left Energized",
+        buildingId: "engineering",
+        buildingName: "Engineering Building",
+        roomId: "ENG-201",
+        category: "Equipment Standby",
+        severity: "medium",
+        severityLabel: "Medium",
+        timestamp: "2 days ago",
+        dateCategory: "older",
+        currentDraw: "1.8 kW",
+        baselineStandby: "0.1 kW",
+        reason: "Fluid dynamics test bench auxiliary recirculation pump ran dry for 6 hours overnight outside lab operational schedule.",
+        ruleTriggered: "Standby Equipment Anomaly: Specialized test load active overnight outside academic booking hours.",
+        recommendedAction: "Fit secondary interlock relay to cut test bench auxiliary supply when master lab lighting relay drops.",
+        status: "acknowledged",
+        isDataQuality: false,
+        potentialWasteKWh: 10.2,
+        potentialSavingsCost: 1.84,
+        readingsAvailable: true
+      }
+    ],
+
+    recommendedActions: [
+      {
+        id: "ACT-01",
+        title: "Inspect after-hours HVAC override in Engineering Building",
+        buildingId: "engineering",
+        buildingName: "Engineering Building",
+        roomId: "ENG-101",
+        priority: "critical",
+        priorityLabel: "Critical Priority",
+        category: "HVAC & Night Setback",
+        reason: "Persistent 6.8 kW continuous draw past 22:00 in unoccupied lecture theater.",
+        expectedBenefit: "Estimated ~28.8 kWh/night (~$5.18/night) avoidable conditioning waste.",
+        relatedAlertId: "ALT-101",
+        status: "pending"
+      },
+      {
+        id: "ACT-02",
+        title: "Enforce fume hood sash closure protocol in Science Building",
+        buildingId: "science",
+        buildingName: "Science Building",
+        roomId: "SCI-201",
+        priority: "high",
+        priorityLabel: "High Priority",
+        category: "Laboratory Ventilation",
+        reason: "Exhaust fans idling at 100% capacity due to propped chemical sash during inactive hours.",
+        expectedBenefit: "Estimated ~17.6 kWh/day (~$3.17/day) avoidable fan power.",
+        relatedAlertId: "ALT-102",
+        status: "in-progress"
+      },
+      {
+        id: "ACT-03",
+        title: "Synchronize auditorium chiller shutdown with timetable departures",
+        buildingId: "business",
+        buildingName: "Business Building",
+        roomId: "BUS-101",
+        priority: "high",
+        priorityLabel: "High Priority",
+        category: "Air Conditioning",
+        reason: "Auditorium AHU left running for 2.5 hours after midday lecture sessions.",
+        expectedBenefit: "Estimated ~15.8 kWh/session (~$2.84/session) avoidable chiller draw.",
+        relatedAlertId: "ALT-105",
+        status: "pending"
+      },
+      {
+        id: "ACT-04",
+        title: "Deploy automated sleep policy for CAD computer lab workstations",
+        buildingId: "engineering",
+        buildingName: "Engineering Building",
+        roomId: "ENG-305",
+        priority: "medium",
+        priorityLabel: "Medium Priority",
+        category: "Workstation Standby",
+        reason: "32 workstations drawing phantom standby load of 2.1 kW overnight.",
+        expectedBenefit: "Estimated ~10.0 kWh/night (~$1.80/night) avoidable standby electricity.",
+        relatedAlertId: "ALT-104",
+        status: "pending"
+      },
+      {
+        id: "ACT-05",
+        title: "Investigate telemetry packet loss at Business Building IoT gateway",
+        buildingId: "business",
+        buildingName: "Business Building",
+        roomId: "BUS-301",
+        priority: "low",
+        priorityLabel: "Low Priority",
+        category: "Data Quality & Metering",
+        reason: "Missing telemetry packets prevent automated anomaly detection. Sub-meter offline.",
+        expectedBenefit: "Restores telemetry observability and reporting accuracy (Data quality recovery; no direct kWh savings claimed).",
+        relatedAlertId: "ALT-106",
+        status: "pending"
+      }
+    ]
+  },
+
+  // ==========================================================================
+  // STEP 6: SMART CONTROLS SIMULATOR DATASET
+  // Note: All devices, power ratings, and control states are simulated demo models.
+  // No physical hardware, relays, or IoT devices are connected.
+  // ==========================================================================
+  smartControlsModule: {
+    metadata: {
+      title: "Smart Controls Simulator",
+      subtitle: "Simulate energy-saving actions for unoccupied classrooms.",
+      disclaimer: "Simulation only — no physical devices are connected.",
+      tariffRate: 0.18,              // USD per kWh
+      co2KgPerKWh: 0.42,             // kg CO2e per kWh
+      defaultAutoShutdownDelay: 4,   // Seconds countdown for interactive demo
+      demoOperatingModes: ["manual", "automatic"]
+    },
+
+    deviceTypes: {
+      air_conditioner: { label: "Air Conditioner / HVAC", defaultPowerKW: 3.5, category: "HVAC" },
+      lighting: { label: "Ceiling Lighting Grid", defaultPowerKW: 0.8, category: "Lighting" },
+      fans: { label: "Circulation Fans", defaultPowerKW: 0.35, category: "Ventilation" },
+      projector: { label: "Digital Projector & AV", defaultPowerKW: 0.45, category: "AV Equipment" },
+      workstations: { label: "Lab Workstations Bank", defaultPowerKW: 2.1, category: "IT Equipment" },
+      specialized_equipment: { label: "Specialized Lab Unit", defaultPowerKW: 2.4, category: "Lab Equipment" },
+      safety_exhaust: { label: "Safety Baseline Exhaust", defaultPowerKW: 2.2, category: "Safety System" }
+    },
+
+    initialRooms: [
+      // -------------------------------------------------------------
+      // ENGINEERING BUILDING (10 Classrooms)
+      // -------------------------------------------------------------
+      {
+        roomId: "ENG-101",
+        buildingId: "engineering",
+        buildingName: "Engineering Building",
+        roomName: "Lecture Theater Alpha",
+        roomType: "Lecture Theater",
+        capacity: 120,
+        floor: "Level 1",
+        occupancyStatus: "unoccupied",
+        scheduleStatus: "unscheduled",
+        scheduledClassName: null,
+        devices: [
+          { id: "ENG-101-ac", name: "Central HVAC Inverter", type: "air_conditioner", powerKW: 4.2, state: "on", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "ENG-101-lt", name: "Tiered Stage & Room Lights", type: "lighting", powerKW: 1.0, state: "on", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "ENG-101-fn", name: "Auxiliary Circulation Fans", type: "fans", powerKW: 0.35, state: "off", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "ENG-101-pj", name: "Dual Laser Projector Rig", type: "projector", powerKW: 0.45, state: "on", manualOverride: false, isEssential: false, scheduled: false }
+        ]
+      },
+      {
+        roomId: "ENG-102",
+        buildingId: "engineering",
+        buildingName: "Engineering Building",
+        roomName: "Standard Classroom 102",
+        roomType: "Classroom",
+        capacity: 45,
+        floor: "Level 1",
+        occupancyStatus: "occupied",
+        scheduleStatus: "scheduled",
+        scheduledClassName: "MECH 102 - Statics & Dynamics",
+        devices: [
+          { id: "ENG-102-ac", name: "Split Air Conditioner", type: "air_conditioner", powerKW: 2.8, state: "on", manualOverride: false, isEssential: false, scheduled: true },
+          { id: "ENG-102-lt", name: "LED Panel Grid", type: "lighting", powerKW: 0.6, state: "on", manualOverride: false, isEssential: false, scheduled: true },
+          { id: "ENG-102-fn", name: "Ceiling Fans", type: "fans", powerKW: 0.3, state: "on", manualOverride: false, isEssential: false, scheduled: true },
+          { id: "ENG-102-pj", name: "Smart Display Podium", type: "projector", powerKW: 0.35, state: "on", manualOverride: false, isEssential: false, scheduled: true }
+        ]
+      },
+      {
+        roomId: "ENG-103",
+        buildingId: "engineering",
+        buildingName: "Engineering Building",
+        roomName: "Standard Classroom 103",
+        roomType: "Classroom",
+        capacity: 40,
+        floor: "Level 1",
+        occupancyStatus: "unoccupied",
+        scheduleStatus: "unscheduled",
+        scheduledClassName: null,
+        devices: [
+          { id: "ENG-103-ac", name: "Split Air Conditioner", type: "air_conditioner", powerKW: 2.8, state: "off", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "ENG-103-lt", name: "LED Panel Grid", type: "lighting", powerKW: 0.6, state: "off", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "ENG-103-fn", name: "Ceiling Fans", type: "fans", powerKW: 0.3, state: "off", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "ENG-103-pj", name: "Smart Display", type: "projector", powerKW: 0.35, state: "off", manualOverride: false, isEssential: false, scheduled: false }
+        ]
+      },
+      {
+        roomId: "ENG-201",
+        buildingId: "engineering",
+        buildingName: "Engineering Building",
+        roomName: "Mechanical Lab 201",
+        roomType: "Laboratory",
+        capacity: 30,
+        floor: "Level 2",
+        occupancyStatus: "unoccupied",
+        scheduleStatus: "unscheduled",
+        scheduledClassName: null,
+        devices: [
+          { id: "ENG-201-ac", name: "HVAC Zone Modulator", type: "air_conditioner", powerKW: 3.5, state: "on", manualOverride: true, isEssential: false, scheduled: false },
+          { id: "ENG-201-lt", name: "High-Bay Fluorescent Troffers", type: "lighting", powerKW: 0.9, state: "off", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "ENG-201-eq", name: "Hydraulic Pump Safety Return", type: "specialized_equipment", powerKW: 2.2, state: "on", manualOverride: false, isEssential: true, scheduled: false }
+        ]
+      },
+      {
+        roomId: "ENG-202",
+        buildingId: "engineering",
+        buildingName: "Engineering Building",
+        roomName: "Seminar Room 202",
+        roomType: "Seminar Room",
+        capacity: 35,
+        floor: "Level 2",
+        occupancyStatus: "occupied",
+        scheduleStatus: "scheduled",
+        scheduledClassName: "ELEC 205 - Circuits Theory",
+        devices: [
+          { id: "ENG-202-ac", name: "Split Air Conditioner", type: "air_conditioner", powerKW: 2.6, state: "on", manualOverride: false, isEssential: false, scheduled: true },
+          { id: "ENG-202-lt", name: "Dimmable Downlights", type: "lighting", powerKW: 0.55, state: "on", manualOverride: false, isEssential: false, scheduled: true },
+          { id: "ENG-202-pj", name: "Interactive Smartboard", type: "projector", powerKW: 0.35, state: "on", manualOverride: false, isEssential: false, scheduled: true }
+        ]
+      },
+      {
+        roomId: "ENG-203",
+        buildingId: "engineering",
+        buildingName: "Engineering Building",
+        roomName: "Classroom 203",
+        roomType: "Classroom",
+        capacity: 50,
+        floor: "Level 2",
+        occupancyStatus: "unoccupied",
+        scheduleStatus: "unscheduled",
+        scheduledClassName: null,
+        devices: [
+          { id: "ENG-203-ac", name: "Split Air Conditioner", type: "air_conditioner", powerKW: 3.2, state: "on", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "ENG-203-lt", name: "Fluorescent Troffers", type: "lighting", powerKW: 0.7, state: "on", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "ENG-203-fn", name: "Ceiling Fans", type: "fans", powerKW: 0.35, state: "off", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "ENG-203-pj", name: "Digital Projector", type: "projector", powerKW: 0.4, state: "off", manualOverride: false, isEssential: false, scheduled: false }
+        ]
+      },
+      {
+        roomId: "ENG-204",
+        buildingId: "engineering",
+        buildingName: "Engineering Building",
+        roomName: "Workshop 204",
+        roomType: "Workshop",
+        capacity: 25,
+        floor: "Level 2",
+        occupancyStatus: "unoccupied",
+        scheduleStatus: "unscheduled",
+        scheduledClassName: null,
+        devices: [
+          { id: "ENG-204-ac", name: "Industrial Split AC", type: "air_conditioner", powerKW: 3.0, state: "off", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "ENG-204-lt", name: "LED High-Bays", type: "lighting", powerKW: 0.8, state: "off", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "ENG-204-fn", name: "Exhaust Wall Fan", type: "fans", powerKW: 0.4, state: "off", manualOverride: false, isEssential: false, scheduled: false }
+        ]
+      },
+      {
+        roomId: "ENG-301",
+        buildingId: "engineering",
+        buildingName: "Engineering Building",
+        roomName: "Computer Lab 301",
+        roomType: "Computer Lab",
+        capacity: 60,
+        floor: "Level 3",
+        occupancyStatus: "occupied",
+        scheduleStatus: "scheduled",
+        scheduledClassName: "CS 301 - Embedded Systems",
+        devices: [
+          { id: "ENG-301-ac", name: "Dual Inverter AC Unit", type: "air_conditioner", powerKW: 3.8, state: "on", manualOverride: false, isEssential: false, scheduled: true },
+          { id: "ENG-301-lt", name: "Recessed Troffers", type: "lighting", powerKW: 1.1, state: "on", manualOverride: false, isEssential: false, scheduled: true },
+          { id: "ENG-301-ws", name: "Terminal Workstation Pods (40 units)", type: "workstations", powerKW: 2.4, state: "on", manualOverride: false, isEssential: false, scheduled: true },
+          { id: "ENG-301-pj", name: "Ceiling Projector", type: "projector", powerKW: 0.4, state: "on", manualOverride: false, isEssential: false, scheduled: true }
+        ]
+      },
+      {
+        roomId: "ENG-302",
+        buildingId: "engineering",
+        buildingName: "Engineering Building",
+        roomName: "Tutorial Room 302",
+        roomType: "Tutorial Room",
+        capacity: 20,
+        floor: "Level 3",
+        occupancyStatus: "unoccupied",
+        scheduleStatus: "unscheduled",
+        scheduledClassName: null,
+        devices: [
+          { id: "ENG-302-ac", name: "Split Air Conditioner", type: "air_conditioner", powerKW: 2.0, state: "off", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "ENG-302-lt", name: "LED Downlights", type: "lighting", powerKW: 0.35, state: "off", manualOverride: false, isEssential: false, scheduled: false }
+        ]
+      },
+      {
+        roomId: "ENG-305",
+        buildingId: "engineering",
+        buildingName: "Engineering Building",
+        roomName: "CAD Design Studio 305",
+        roomType: "Computer Lab",
+        capacity: 40,
+        floor: "Level 3",
+        occupancyStatus: "unoccupied",
+        scheduleStatus: "unscheduled",
+        scheduledClassName: null,
+        devices: [
+          { id: "ENG-305-ac", name: "Dual Inverter HVAC", type: "air_conditioner", powerKW: 3.6, state: "on", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "ENG-305-lt", name: "Design Studio Lighting Grid", type: "lighting", powerKW: 1.0, state: "on", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "ENG-305-ws", name: "32 GPU Rendering Terminals (Standby)", type: "workstations", powerKW: 2.1, state: "on", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "ENG-305-pj", name: "Dual Ultra-HD Projectors", type: "projector", powerKW: 0.5, state: "off", manualOverride: false, isEssential: false, scheduled: false }
+        ]
+      },
+
+      // -------------------------------------------------------------
+      // SCIENCE BUILDING (7 Classrooms)
+      // -------------------------------------------------------------
+      {
+        roomId: "SCI-101",
+        buildingId: "science",
+        buildingName: "Science Building",
+        roomName: "Physics Lecture Hall 101",
+        roomType: "Lecture Theater",
+        capacity: 100,
+        floor: "Level 1",
+        occupancyStatus: "occupied",
+        scheduleStatus: "scheduled",
+        scheduledClassName: "PHYS 101 - Classical Mechanics",
+        devices: [
+          { id: "SCI-101-ac", name: "Chilled Water Fan Coil Unit", type: "air_conditioner", powerKW: 3.4, state: "on", manualOverride: false, isEssential: false, scheduled: true },
+          { id: "SCI-101-lt", name: "Amphitheater Dimmable Halogens", type: "lighting", powerKW: 0.9, state: "on", manualOverride: false, isEssential: false, scheduled: true },
+          { id: "SCI-101-pj", name: "High-Lumen Presentation Projector", type: "projector", powerKW: 0.45, state: "on", manualOverride: false, isEssential: false, scheduled: true }
+        ]
+      },
+      {
+        roomId: "SCI-102",
+        buildingId: "science",
+        buildingName: "Science Building",
+        roomName: "Classroom 102 (Cancelled Tutorial)",
+        roomType: "Classroom",
+        capacity: 40,
+        floor: "Level 1",
+        occupancyStatus: "unoccupied",
+        scheduleStatus: "unscheduled",
+        scheduledClassName: null,
+        devices: [
+          { id: "SCI-102-ac", name: "Pre-Cooling Packaged AC Unit", type: "air_conditioner", powerKW: 3.2, state: "on", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "SCI-102-lt", name: "Classroom Troffers", type: "lighting", powerKW: 0.8, state: "on", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "SCI-102-fn", name: "Ceiling Fans", type: "fans", powerKW: 0.35, state: "off", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "SCI-102-pj", name: "Digital Projector", type: "projector", powerKW: 0.4, state: "off", manualOverride: false, isEssential: false, scheduled: false }
+        ]
+      },
+      {
+        roomId: "SCI-103",
+        buildingId: "science",
+        buildingName: "Science Building",
+        roomName: "Biology Prep Room 103",
+        roomType: "Laboratory",
+        capacity: 25,
+        floor: "Level 1",
+        occupancyStatus: "unoccupied",
+        scheduleStatus: "unscheduled",
+        scheduledClassName: null,
+        devices: [
+          { id: "SCI-103-ac", name: "Climate Control AC", type: "air_conditioner", powerKW: 2.2, state: "off", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "SCI-103-lt", name: "Cleanroom LED Strips", type: "lighting", powerKW: 0.5, state: "off", manualOverride: false, isEssential: false, scheduled: false }
+        ]
+      },
+      {
+        roomId: "SCI-201",
+        buildingId: "science",
+        buildingName: "Science Building",
+        roomName: "Organic Chemistry Lab 201",
+        roomType: "Laboratory",
+        capacity: 35,
+        floor: "Level 2",
+        occupancyStatus: "unoccupied",
+        scheduleStatus: "unscheduled",
+        scheduledClassName: null,
+        devices: [
+          { id: "SCI-201-ac", name: "Lab HVAC Zone Controller", type: "air_conditioner", powerKW: 3.8, state: "on", manualOverride: true, isEssential: false, scheduled: false },
+          { id: "SCI-201-lt", name: "Chemical Bench Task Lights", type: "lighting", powerKW: 0.8, state: "on", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "SCI-201-sf", name: "Fume Hood Safety Exhaust Blower", type: "safety_exhaust", powerKW: 2.5, state: "on", manualOverride: false, isEssential: true, scheduled: false }
+        ]
+      },
+      {
+        roomId: "SCI-202",
+        buildingId: "science",
+        buildingName: "Science Building",
+        roomName: "Cellular Biology Lab 202",
+        roomType: "Laboratory",
+        capacity: 35,
+        floor: "Level 2",
+        occupancyStatus: "occupied",
+        scheduleStatus: "scheduled",
+        scheduledClassName: "BIO 202 - Molecular Genetics",
+        devices: [
+          { id: "SCI-202-ac", name: "VAV Terminal Fan Coil", type: "air_conditioner", powerKW: 3.5, state: "on", manualOverride: false, isEssential: false, scheduled: true },
+          { id: "SCI-202-lt", name: "Microscopy Anti-Glare Lighting", type: "lighting", powerKW: 0.9, state: "on", manualOverride: false, isEssential: false, scheduled: true },
+          { id: "SCI-202-pj", name: "High-Res Pathology Projector", type: "projector", powerKW: 0.45, state: "on", manualOverride: false, isEssential: false, scheduled: true }
+        ]
+      },
+      {
+        roomId: "SCI-301",
+        buildingId: "science",
+        buildingName: "Science Building",
+        roomName: "Advanced Chemistry Lab 301",
+        roomType: "Laboratory",
+        capacity: 30,
+        floor: "Level 3",
+        occupancyStatus: "unoccupied",
+        scheduleStatus: "unscheduled",
+        scheduledClassName: null,
+        devices: [
+          { id: "SCI-301-ac", name: "VAV Climate Modulator", type: "air_conditioner", powerKW: 3.4, state: "off", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "SCI-301-lt", name: "Lab Perimeter Lights", type: "lighting", powerKW: 0.9, state: "on", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "SCI-301-eq", name: "Autoclave Sterilizer Pre-Heat Coil", type: "specialized_equipment", powerKW: 2.4, state: "on", manualOverride: false, isEssential: false, scheduled: false }
+        ]
+      },
+      {
+        roomId: "SCI-302",
+        buildingId: "science",
+        buildingName: "Science Building",
+        roomName: "Genetics Research Suite 302",
+        roomType: "Laboratory",
+        capacity: 20,
+        floor: "Level 3",
+        occupancyStatus: "unoccupied",
+        scheduleStatus: "unscheduled",
+        scheduledClassName: null,
+        devices: [
+          { id: "SCI-302-ac", name: "Inverter Cooling Unit", type: "air_conditioner", powerKW: 2.2, state: "off", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "SCI-302-lt", name: "Sealed Cleanroom Panels", type: "lighting", powerKW: 0.5, state: "off", manualOverride: false, isEssential: false, scheduled: false }
+        ]
+      },
+
+      // -------------------------------------------------------------
+      // BUSINESS BUILDING (7 Classrooms)
+      // -------------------------------------------------------------
+      {
+        roomId: "BUS-101",
+        buildingId: "business",
+        buildingName: "Business Building",
+        roomName: "Executive Leadership Auditorium",
+        roomType: "Auditorium",
+        capacity: 150,
+        floor: "Level 1",
+        occupancyStatus: "unoccupied",
+        scheduleStatus: "unscheduled",
+        scheduledClassName: null,
+        devices: [
+          { id: "BUS-101-ac", name: "Heavy Chiller AHU Subsystem", type: "air_conditioner", powerKW: 5.2, state: "on", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "BUS-101-lt", name: "Stage & Perimeter Chandeliers", type: "lighting", powerKW: 1.2, state: "on", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "BUS-101-pj", name: "Dual Auditoria Projection Wall", type: "projector", powerKW: 0.5, state: "on", manualOverride: false, isEssential: false, scheduled: false }
+        ]
+      },
+      {
+        roomId: "BUS-102",
+        buildingId: "business",
+        buildingName: "Business Building",
+        roomName: "Executive Classroom 102",
+        roomType: "Classroom",
+        capacity: 50,
+        floor: "Level 1",
+        occupancyStatus: "occupied",
+        scheduleStatus: "scheduled",
+        scheduledClassName: "MKTG 201 - Global Brand Strategy",
+        devices: [
+          { id: "BUS-102-ac", name: "Split Inverter AC", type: "air_conditioner", powerKW: 2.8, state: "on", manualOverride: false, isEssential: false, scheduled: true },
+          { id: "BUS-102-lt", name: "Daylight Balanced Panels", type: "lighting", powerKW: 0.7, state: "on", manualOverride: false, isEssential: false, scheduled: true },
+          { id: "BUS-102-pj", name: "Interactive Smartboard", type: "projector", powerKW: 0.4, state: "on", manualOverride: false, isEssential: false, scheduled: true }
+        ]
+      },
+      {
+        roomId: "BUS-103",
+        buildingId: "business",
+        buildingName: "Business Building",
+        roomName: "Case Study Room 103",
+        roomType: "Classroom",
+        capacity: 35,
+        floor: "Level 1",
+        occupancyStatus: "unoccupied",
+        scheduleStatus: "unscheduled",
+        scheduledClassName: null,
+        devices: [
+          { id: "BUS-103-ac", name: "Split Inverter AC", type: "air_conditioner", powerKW: 2.4, state: "off", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "BUS-103-lt", name: "LED Panel Grid", type: "lighting", powerKW: 0.5, state: "off", manualOverride: false, isEssential: false, scheduled: false }
+        ]
+      },
+      {
+        roomId: "BUS-201",
+        buildingId: "business",
+        buildingName: "Business Building",
+        roomName: "Lecture Theater Beta 201",
+        roomType: "Lecture Theater",
+        capacity: 80,
+        floor: "Level 2",
+        occupancyStatus: "unoccupied",
+        scheduleStatus: "unscheduled",
+        scheduledClassName: null,
+        devices: [
+          { id: "BUS-201-ac", name: "Chilled Water Air Handler", type: "air_conditioner", powerKW: 3.8, state: "on", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "BUS-201-lt", name: "Tiered Fluorescent Lighting", type: "lighting", powerKW: 0.9, state: "on", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "BUS-201-fn", name: "Ceiling Circulation Fans", type: "fans", powerKW: 0.35, state: "on", manualOverride: false, isEssential: false, scheduled: false }
+        ]
+      },
+      {
+        roomId: "BUS-202",
+        buildingId: "business",
+        buildingName: "Business Building",
+        roomName: "Financial Analytics Lab 202",
+        roomType: "Computer Lab",
+        capacity: 45,
+        floor: "Level 2",
+        occupancyStatus: "occupied",
+        scheduleStatus: "scheduled",
+        scheduledClassName: "FIN 301 - Quantitative Corporate Finance",
+        devices: [
+          { id: "BUS-202-ac", name: "Precision Inverter AC", type: "air_conditioner", powerKW: 3.2, state: "on", manualOverride: false, isEssential: false, scheduled: true },
+          { id: "BUS-202-lt", name: "Glare-Free Grid Lights", type: "lighting", powerKW: 0.8, state: "on", manualOverride: false, isEssential: false, scheduled: true },
+          { id: "BUS-202-ws", name: "Financial Terminals Pod (30 units)", type: "workstations", powerKW: 1.8, state: "on", manualOverride: false, isEssential: false, scheduled: true }
+        ]
+      },
+      {
+        roomId: "BUS-301",
+        buildingId: "business",
+        buildingName: "Business Building",
+        roomName: "Network IDF Suite 301",
+        roomType: "Seminar Room",
+        capacity: 25,
+        floor: "Level 3",
+        occupancyStatus: "unoccupied",
+        scheduleStatus: "unscheduled",
+        scheduledClassName: null,
+        devices: [
+          { id: "BUS-301-ac", name: "Modular Split AC", type: "air_conditioner", powerKW: 2.2, state: "off", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "BUS-301-lt", name: "Overhead Fluorescent", type: "lighting", powerKW: 0.45, state: "off", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "BUS-301-eq", name: "Telecom IDF Rack Auxiliary Cooler", type: "specialized_equipment", powerKW: 1.2, state: "on", manualOverride: false, isEssential: true, scheduled: false }
+        ]
+      },
+      {
+        roomId: "BUS-302",
+        buildingId: "business",
+        buildingName: "Business Building",
+        roomName: "Boardroom 302",
+        roomType: "Seminar Room",
+        capacity: 20,
+        floor: "Level 3",
+        occupancyStatus: "unoccupied",
+        scheduleStatus: "unscheduled",
+        scheduledClassName: null,
+        devices: [
+          { id: "BUS-302-ac", name: "Whisper-Quiet Split AC", type: "air_conditioner", powerKW: 2.0, state: "off", manualOverride: false, isEssential: false, scheduled: false },
+          { id: "BUS-302-lt", name: "Architectural Cove LEDs", type: "lighting", powerKW: 0.4, state: "off", manualOverride: false, isEssential: false, scheduled: false }
+        ]
+      }
+    ],
+
+    initialEventLogs: [
+      {
+        id: "EVT-1001",
+        timestamp: "09:15:22",
+        type: "system_init",
+        tag: "SYSTEM INITIALIZED",
+        tagClass: "pill-teal",
+        roomId: "ALL",
+        message: "Smart Controls Simulator initialized in Manual Mode. 24 classrooms loaded with telemetry profiles."
+      },
+      {
+        id: "EVT-1002",
+        timestamp: "09:16:04",
+        type: "anomaly_detected",
+        tag: "SHUTDOWN RECOMMENDED",
+        tagClass: "pill-amber",
+        roomId: "ENG-101",
+        message: "ENG-101 marked unoccupied with 3 devices active (5.65 kW load). Unnecessary equipment shutdown recommended."
+      },
+      {
+        id: "EVT-1003",
+        timestamp: "09:17:15",
+        type: "override_engaged",
+        tag: "OVERRIDE ENGAGED",
+        tagClass: "pill-blue",
+        roomId: "SCI-201",
+        message: "Manual override locked on HVAC Zone Controller in SCI-201. Protected from automated shutdown."
+      },
+      {
+        id: "EVT-1004",
+        timestamp: "09:18:30",
+        type: "essential_protected",
+        tag: "ESSENTIAL PROTECTED",
+        tagClass: "pill-purple",
+        roomId: "SCI-201",
+        message: "Fume Hood Safety Exhaust Blower in SCI-201 verified as Essential Equipment. Protected from load shedding."
+      }
+    ]
+  },
+
+  // ==========================================================================
+  // STEP 7A: PREVENTIVE MAINTENANCE DATASET
+  // Note: All equipment records, maintenance dates, and diagnostic alerts
+  // are simulated models. No physical equipment is inspected.
+  // ==========================================================================
+  maintenanceModule: {
+    metadata: {
+      title: "Preventive Maintenance",
+      subtitle: "Track equipment issues before they lead to energy waste.",
+      disclaimer: "Simulation only — fictional equipment records & demo diagnostic telemetry.",
+      technicianTeams: [
+        "HVAC Rapid Response Unit",
+        "Campus Facilities Mechanical Team",
+        "Electrical & Lighting Group",
+        "AV & Instructional Tech Team",
+        "Lab Safety & Ventilation Services"
+      ]
+    },
+
+    equipmentTypes: {
+      air_conditioner: { label: "Air Conditioner / HVAC", icon: "air_conditioner" },
+      fans: { label: "Circulation & Exhaust Fans", icon: "fans" },
+      lighting: { label: "Ceiling Lighting Grid", icon: "lighting" },
+      projector: { label: "Digital Projector & AV", icon: "projector" },
+      specialized: { label: "Specialized Lab Unit", icon: "specialized" }
+    },
+
+    initialEquipment: [
+      {
+        id: "EQ-ENG-101-AC1",
+        name: "Lecture Hall Chilled Beam Unit Alpha",
+        buildingId: "engineering",
+        buildingName: "Engineering Building",
+        roomId: "ENG-101",
+        roomName: "Lecture Theater Alpha",
+        roomType: "Lecture Theater",
+        type: "air_conditioner",
+        typeLabel: "Air Conditioner / HVAC",
+        condition: "Urgent Review",
+        conditionSeverity: "critical",
+        lastMaintenanceDate: "2026-05-12",
+        nextDueDate: "2026-09-15",
+        priority: "Critical",
+        status: "open",
+        assignedTeam: "HVAC Rapid Response Unit",
+        targetCompletionDate: "2026-10-25",
+        reportedIssue: "AC filter inspection 40 days overdue. Airflow resistance causing 28% compressor power penalty.",
+        reasonForInspection: "Classroom Analytics flagged recurring 7.4 kW draw vs expected 5.5 kW baseline. High energy draw indicates airflow restriction, but physical inspection is required to verify condition.",
+        recommendedAction: "Replace clogged MERV-13 air filters, clean evaporator fins, and verify supply duct static pressure.",
+        history: [
+          { date: "2026-05-12", action: "Refrigerant pressure calibration and condenser flush", technician: "M. Torres" },
+          { date: "2025-11-20", action: "Belt tension adjustment and seasonal filter swap", technician: "D. Chen" }
+        ]
+      },
+      {
+        id: "EQ-ENG-102-LT",
+        name: "Dimmable Architectural LED Troffer Bank",
+        buildingId: "engineering",
+        buildingName: "Engineering Building",
+        roomId: "ENG-102",
+        roomName: "Classroom 102",
+        roomType: "Classroom",
+        type: "lighting",
+        typeLabel: "Ceiling Lighting Grid",
+        condition: "Inspection Recommended",
+        conditionSeverity: "warning",
+        lastMaintenanceDate: "2026-04-18",
+        nextDueDate: "2026-10-18",
+        priority: "Medium",
+        status: "scheduled",
+        assignedTeam: "Electrical & Lighting Group",
+        targetCompletionDate: "2026-10-28",
+        reportedIssue: "Reported lighting fault: Occupancy sensor override switch mechanically stuck in ON position.",
+        reasonForInspection: "Lights recorded active during 14 unoccupied overnight intervals over the past 30 days.",
+        recommendedAction: "Replace faulty wall relay bypass module and recalibrate dual-technology ceiling PIR sensor.",
+        history: [
+          { date: "2026-04-18", action: "Emergency driver replacement on Row 2 fixtures", technician: "K. Patel" }
+        ]
+      },
+      {
+        id: "EQ-ENG-201-FN",
+        name: "Mechanical Workshop Exhaust Blower",
+        buildingId: "engineering",
+        buildingName: "Engineering Building",
+        roomId: "ENG-201",
+        roomName: "Mechanical Lab 201",
+        roomType: "Laboratory",
+        type: "fans",
+        typeLabel: "Circulation & Exhaust Fans",
+        condition: "Maintenance Due",
+        conditionSeverity: "danger",
+        lastMaintenanceDate: "2026-03-10",
+        nextDueDate: "2026-09-10",
+        priority: "High",
+        status: "in_progress",
+        assignedTeam: "Campus Facilities Mechanical Team",
+        targetCompletionDate: "2026-10-24",
+        reportedIssue: "Fan maintenance due: High acoustic vibration and belt deflection observed during full-load testing.",
+        reasonForInspection: "Telemetry indicates constant 2.2 kW draw with 12% reduced volumetric CFM air velocity.",
+        recommendedAction: "Align drive pulleys, replace worn V-belts, and lubricate pillow block shaft bearings.",
+        history: [
+          { date: "2026-03-10", action: "Semi-annual motor grease service and safety check", technician: "A. Kowalski" }
+        ]
+      },
+      {
+        id: "EQ-ENG-203-AC",
+        name: "Split Inverter Heat Pump Modulator",
+        buildingId: "engineering",
+        buildingName: "Engineering Building",
+        roomId: "ENG-203",
+        roomName: "Classroom 203",
+        roomType: "Classroom",
+        type: "air_conditioner",
+        typeLabel: "Air Conditioner / HVAC",
+        condition: "Urgent Review",
+        conditionSeverity: "critical",
+        lastMaintenanceDate: "2026-02-15",
+        nextDueDate: "2026-08-15",
+        priority: "High",
+        status: "open",
+        assignedTeam: "HVAC Rapid Response Unit",
+        targetCompletionDate: "2026-10-26",
+        reportedIssue: "Repeated high energy consumption requiring investigation: Short cycling at 3.2 kW regardless of ambient setpoint.",
+        reasonForInspection: "Thermostat temperature differential delta-T collapsed to 1.8°C indicating expansion valve sticking.",
+        recommendedAction: "Inspect electronic expansion valve (EEV) step motor and recharge R-410A refrigerant circuit.",
+        history: [
+          { date: "2026-02-15", action: "Condenser circuit board replacement", technician: "M. Torres" }
+        ]
+      },
+      {
+        id: "EQ-ENG-301-PJ",
+        name: "Short-Throw High-Lumen Laser Projector",
+        buildingId: "engineering",
+        buildingName: "Engineering Building",
+        roomId: "ENG-301",
+        roomName: "Computer Lab 301",
+        roomType: "Computer Lab",
+        type: "projector",
+        typeLabel: "Digital Projector & AV",
+        condition: "Good",
+        conditionSeverity: "good",
+        lastMaintenanceDate: "2026-08-20",
+        nextDueDate: "2027-02-20",
+        priority: "Low",
+        status: "completed",
+        assignedTeam: "AV & Instructional Tech Team",
+        targetCompletionDate: "2026-08-20",
+        reportedIssue: "Routine laser engine dust filter vacuum and lens optics alignment.",
+        reasonForInspection: "Standard preventive schedule. Zero energy anomalies detected.",
+        recommendedAction: "Clean optical dust filter mesh; clear internal intake vent passage.",
+        history: [
+          { date: "2026-08-20", action: "Filter mesh cleaned and firmware updated", technician: "J. Simmons" }
+        ]
+      },
+      {
+        id: "EQ-SCI-101-LT",
+        name: "High-Bay Fluorescent Lighting System",
+        buildingId: "science",
+        buildingName: "Science Building",
+        roomId: "SCI-101",
+        roomName: "Auditorium 101",
+        roomType: "Lecture Theater",
+        type: "lighting",
+        typeLabel: "Ceiling Lighting Grid",
+        condition: "Maintenance Due",
+        conditionSeverity: "danger",
+        lastMaintenanceDate: "2026-01-10",
+        nextDueDate: "2026-07-10",
+        priority: "Medium",
+        status: "open",
+        assignedTeam: "Electrical & Lighting Group",
+        targetCompletionDate: "2026-10-30",
+        reportedIssue: "Reported lighting fault: 4 magnetic ballasts buzzing audibly with noticeable lumen flicker.",
+        reasonForInspection: "Ballast power factor degraded from 0.95 to 0.72, generating unmetered reactive line losses.",
+        recommendedAction: "Retrofit fixture with electronic ballast-bypass LED tubes to eliminate 240W ballast losses.",
+        history: [
+          { date: "2026-01-10", action: "Replaced 6 burned-out T8 tubes", technician: "K. Patel" }
+        ]
+      },
+      {
+        id: "EQ-SCI-102-AC",
+        name: "Multi-Zone Variable Flow AC",
+        buildingId: "science",
+        buildingName: "Science Building",
+        roomId: "SCI-102",
+        roomName: "Lecture Hall 102",
+        roomType: "Lecture Theater",
+        type: "air_conditioner",
+        typeLabel: "Air Conditioner / HVAC",
+        condition: "Urgent Review",
+        conditionSeverity: "critical",
+        lastMaintenanceDate: "2026-05-30",
+        nextDueDate: "2026-09-30",
+        priority: "High",
+        status: "scheduled",
+        assignedTeam: "HVAC Rapid Response Unit",
+        targetCompletionDate: "2026-10-27",
+        reportedIssue: "Repeated high energy consumption requiring investigation: Chilled water valve locked at 100% open.",
+        reasonForInspection: "Unit continuously drew 4.1 kW during weekend periods with zero class occupancy.",
+        recommendedAction: "Replace actuator motor on 2-way chilled water control valve and cycle test DDC controller.",
+        history: [
+          { date: "2026-05-30", action: "Chilled water strainer cleanout", technician: "M. Torres" }
+        ]
+      },
+      {
+        id: "EQ-SCI-201-EX",
+        name: "Chemical Fume Hood Exhaust Scrubber Blower",
+        buildingId: "science",
+        buildingName: "Science Building",
+        roomId: "SCI-201",
+        roomName: "Chemistry Lab 201",
+        roomType: "Laboratory",
+        type: "specialized",
+        typeLabel: "Specialized Lab Unit",
+        condition: "Inspection Recommended",
+        conditionSeverity: "warning",
+        lastMaintenanceDate: "2026-07-15",
+        nextDueDate: "2026-10-15",
+        priority: "Critical",
+        status: "in_progress",
+        assignedTeam: "Lab Safety & Ventilation Services",
+        targetCompletionDate: "2026-10-24",
+        reportedIssue: "Fan maintenance due: Velocity sensor calibration drift; damper hunting between 40% and 90% CFM.",
+        reasonForInspection: "Essential equipment drawing 2.2 kW continuously. Airflow velocity hunting wastes fan kinetic energy.",
+        recommendedAction: "Calibrate thermal anemometer face velocity sensor and service pneumatic damper actuator.",
+        history: [
+          { date: "2026-07-15", action: "HEPA exhaust filter certification", technician: "Dr. S. Thorne" },
+          { date: "2026-01-18", action: "Annual EH&S safety containment audit", technician: "Dr. S. Thorne" }
+        ]
+      },
+      {
+        id: "EQ-SCI-202-FN",
+        name: "Ceiling Destratification Fans Bank",
+        buildingId: "science",
+        buildingName: "Science Building",
+        roomId: "SCI-202",
+        roomName: "Biology Lab 202",
+        roomType: "Laboratory",
+        type: "fans",
+        typeLabel: "Circulation & Exhaust Fans",
+        condition: "Good",
+        conditionSeverity: "good",
+        lastMaintenanceDate: "2026-08-01",
+        nextDueDate: "2027-02-01",
+        priority: "Low",
+        status: "completed",
+        assignedTeam: "Campus Facilities Mechanical Team",
+        targetCompletionDate: "2026-08-01",
+        reportedIssue: "Routine capacitor test and blade balance calibration.",
+        reasonForInspection: "Standard semi-annual servicing completed. All fan motors operating at nominal 0.35 kW draw.",
+        recommendedAction: "No action required. Next inspection scheduled for February 2027.",
+        history: [
+          { date: "2026-08-01", action: "Run capacitors verified at 4.5uF nominal", technician: "A. Kowalski" }
+        ]
+      },
+      {
+        id: "EQ-BUS-101-AC1",
+        name: "Auditorium Variable Refrigerant Flow (VRF) Condenser",
+        buildingId: "business",
+        buildingName: "Business Building",
+        roomId: "BUS-101",
+        roomName: "Auditorium 101",
+        roomType: "Lecture Theater",
+        type: "air_conditioner",
+        typeLabel: "Air Conditioner / HVAC",
+        condition: "Urgent Review",
+        conditionSeverity: "critical",
+        lastMaintenanceDate: "2026-04-05",
+        nextDueDate: "2026-08-05",
+        priority: "Critical",
+        status: "open",
+        assignedTeam: "HVAC Rapid Response Unit",
+        targetCompletionDate: "2026-10-25",
+        reportedIssue: "AC filter inspection overdue: Pre-filters heavily coated with particulate matter after campus renovation.",
+        reasonForInspection: "Compressor head pressure alarm triggered twice this week; active load surged from 3.8 kW to 5.2 kW.",
+        recommendedAction: "Perform chemical wash on outdoor condenser coils and swap all 8 primary air handler filter cartridges.",
+        history: [
+          { date: "2026-04-05", action: "Compressor oil acid test and filter change", technician: "D. Chen" }
+        ]
+      },
+      {
+        id: "EQ-BUS-102-LT",
+        name: "LED Recessed Architectural Downlights",
+        buildingId: "business",
+        buildingName: "Business Building",
+        roomId: "BUS-102",
+        roomName: "Case Study Room 102",
+        roomType: "Case Study Room",
+        type: "lighting",
+        typeLabel: "Ceiling Lighting Grid",
+        condition: "Good",
+        conditionSeverity: "good",
+        lastMaintenanceDate: "2026-09-10",
+        nextDueDate: "2027-03-10",
+        priority: "Low",
+        status: "completed",
+        assignedTeam: "Electrical & Lighting Group",
+        targetCompletionDate: "2026-09-10",
+        reportedIssue: "DALI dimmer programming update and lux sensor calibration.",
+        reasonForInspection: "Daylighting sensor calibrated to maintain 450 lux standard. Zero power anomalies.",
+        recommendedAction: "Normal operation maintained.",
+        history: [
+          { date: "2026-09-10", action: "DALI lighting gateway firmware flash", technician: "K. Patel" }
+        ]
+      },
+      {
+        id: "EQ-BUS-201-PJ",
+        name: "Dual Ultra-HD Laser Presentation Suite",
+        buildingId: "business",
+        buildingName: "Business Building",
+        roomId: "BUS-201",
+        roomName: "Case Study Room 201",
+        roomType: "Case Study Room",
+        type: "projector",
+        typeLabel: "Digital Projector & AV",
+        condition: "Inspection Recommended",
+        conditionSeverity: "warning",
+        lastMaintenanceDate: "2026-03-22",
+        nextDueDate: "2026-09-22",
+        priority: "Medium",
+        status: "scheduled",
+        assignedTeam: "AV & Instructional Tech Team",
+        targetCompletionDate: "2026-10-29",
+        reportedIssue: "Projector internal exhaust fan failure warning on unit #2.",
+        reasonForInspection: "Laser engine thermal throttles power back to 60% luminosity when internal ambient hits 52°C.",
+        recommendedAction: "Replace internal 80mm cooling fan and verify HDMI CEC auto-standby signaling.",
+        history: [
+          { date: "2026-03-22", action: "Color calibration and optic lens cleaning", technician: "J. Simmons" }
+        ]
+      },
+      {
+        id: "EQ-BUS-202-PJ",
+        name: "Conference Room Projector & Audio Rack",
+        buildingId: "business",
+        buildingName: "Business Building",
+        roomId: "BUS-202",
+        roomName: "Seminar Room 202",
+        roomType: "Seminar Room",
+        type: "projector",
+        typeLabel: "Digital Projector & AV",
+        condition: "Inspection Recommended",
+        conditionSeverity: "warning",
+        lastMaintenanceDate: "2025-09-14",
+        nextDueDate: "2026-03-14",
+        priority: "Medium",
+        status: "open",
+        assignedTeam: "AV & Instructional Tech Team",
+        targetCompletionDate: "2026-11-02",
+        reportedIssue: "Missing maintenance history: No logged service records in the system for over 13 months.",
+        reasonForInspection: "Flagged during annual asset audit due to missing physical maintenance log validation.",
+        recommendedAction: "Conduct full baseline electrical safety test, clean optical train, and log initial digital service baseline.",
+        history: []
+      },
+      {
+        id: "EQ-BUS-301-EQ",
+        name: "Telecom IDF Auxiliary Spot Cooler",
+        buildingId: "business",
+        buildingName: "Business Building",
+        roomId: "BUS-301",
+        roomName: "Network IDF Suite 301",
+        roomType: "Seminar Room",
+        type: "specialized",
+        typeLabel: "Specialized Lab Unit",
+        condition: "Maintenance Due",
+        conditionSeverity: "danger",
+        lastMaintenanceDate: "2026-02-28",
+        nextDueDate: "2026-08-28",
+        priority: "High",
+        status: "open",
+        assignedTeam: "Campus Facilities Mechanical Team",
+        targetCompletionDate: "2026-10-27",
+        reportedIssue: "Condensate drain pump float switch sticking; unit continuously running condensate heater.",
+        reasonForInspection: "Draw sustained at 1.2 kW even during winter setback. Essential cooling equipment requires immediate drain flush.",
+        recommendedAction: "Flush condensate line with microbial inhibitor, replace float microswitch, and clean intake grille.",
+        history: [
+          { date: "2026-02-28", action: "Drain pump servicing and evaporator sanitization", technician: "A. Kowalski" }
+        ]
+      }
+    ]
+  },
+
+  // ==========================================================================
+  // STEP 7B: DEPARTMENT ENERGY CHALLENGE DATASET
+  // Note: All competition rankings, baseline comparisons, and participation points
+  // are illustrative demo models.
+  // ==========================================================================
+  departmentChallengeModule: {
+    metadata: {
+      title: "Department Energy Challenge",
+      subtitle: "Encourage fair, measurable energy-saving improvements across campus.",
+      disclaimer: "Simulation only — department rankings and energy scoring are illustrative demo models.",
+      activeCycle: "Fall 2026 Semester Competition",
+      tariffUSD: 0.18
+    },
+
+    evaluationPeriods: [
+      { id: "month", label: "Month to Date (October 2026)", days: 22, desc: "Active monthly sprint evaluation" },
+      { id: "semester", label: "Fall Semester 2026", days: 75, desc: "Mid-term cumulative performance" },
+      { id: "academic_year", label: "Academic Year 2025-2026", days: 240, desc: "Full year verified historical benchmark" }
+    ],
+
+    scoringRules: {
+      reductionPointsPerPercent: 25,     // 25 pts per 1.0% normalized energy reduction
+      actionCompletedPoints: 50,         // 50 pts per completed energy-saving action
+      participationMultiplier: 2.0,      // Points from participation rate (e.g. 85% = 170 pts)
+      achievementsConfig: [
+        {
+          id: "energy_saver",
+          label: "Energy Saver",
+          icon: "zap",
+          badgeColor: "amber",
+          desc: "Achieved >= 7.0% verified energy reduction against normalized baseline"
+        },
+        {
+          id: "consistent_improver",
+          label: "Consistent Improver",
+          icon: "trending-up",
+          badgeColor: "teal",
+          desc: "Maintained energy reductions across 2 or more evaluation periods"
+        },
+        {
+          id: "action_champion",
+          label: "Action Champion",
+          icon: "award",
+          badgeColor: "purple",
+          desc: "Successfully completed 3 or more verified energy-saving challenge actions"
+        }
+      ]
+    },
+
+    departments: [
+      {
+        id: "dept_science",
+        name: "Faculty of Science",
+        code: "SCI",
+        buildingId: "science",
+        buildingName: "Science Building",
+        facultyHead: "Prof. Elena Rostova",
+        enrolledStudents: 1420,
+        monitoredRoomsCount: 8,
+        description: "Heavy laboratory wet-benches, chemical fume hoods, and cold storage units across 8 monitored classrooms.",
+        periods: {
+          month: {
+            baselineKWh: 3100,
+            currentKWh: 2790,
+            occupiedHours: 260,
+            baselinePerHour: 11.92,
+            currentPerHour: 10.73,
+            participationPct: 92
+          },
+          semester: {
+            baselineKWh: 13600,
+            currentKWh: 12150,
+            occupiedHours: 1150,
+            baselinePerHour: 11.83,
+            currentPerHour: 10.57,
+            participationPct: 90
+          },
+          academic_year: {
+            baselineKWh: 40500,
+            currentKWh: 36800,
+            occupiedHours: 3400,
+            baselinePerHour: 11.91,
+            currentPerHour: 10.82,
+            participationPct: 88
+          }
+        },
+        actions: [
+          {
+            id: "ACT-SCI-01",
+            title: "Chemical Fume Hood 'Shut the Sash' Campaign",
+            category: "Safety & Lab Protocols",
+            status: "completed",
+            dateCompleted: "2026-10-05",
+            points: 50,
+            note: "Nightly sash closure protocol verified by lab safety marshals in Rooms 201 & 204."
+          },
+          {
+            id: "ACT-SCI-02",
+            title: "Cold Storage Setpoint Optimization",
+            category: "Lab Equipment",
+            status: "completed",
+            dateCompleted: "2026-10-12",
+            points: 50,
+            note: "Optimized ultra-low research freezers from -85°C to -80°C saving estimated 3.2 kWh/day."
+          },
+          {
+            id: "ACT-SCI-03",
+            title: "Organic Chemistry Lab Lighting Relamp",
+            category: "Lighting Efficiency",
+            status: "completed",
+            dateCompleted: "2026-10-18",
+            points: 50,
+            note: "Replaced buzzing T8 ballasts with high-efficiency 4000K LED troffer panels in Room 101."
+          }
+        ],
+        recommendations: [
+          "Install digital sash position telemetry sensors in SCI-201 to automate minimum exhaust CFM setpoint.",
+          "Coordinate late evening biology lectures to share rooms with Business Building to consolidate chiller loads."
+        ]
+      },
+      {
+        id: "dept_engineering",
+        name: "Faculty of Engineering",
+        code: "ENG",
+        buildingId: "engineering",
+        buildingName: "Engineering Building",
+        facultyHead: "Dr. Marcus Vance",
+        enrolledStudents: 1850,
+        monitoredRoomsCount: 10,
+        description: "High-intensity CAD computer labs, mechanical fabrication workshops, and large lecture theaters across 10 monitored classrooms.",
+        periods: {
+          month: {
+            baselineKWh: 4200,
+            currentKWh: 3850,
+            occupiedHours: 320,
+            baselinePerHour: 13.12,
+            currentPerHour: 12.03,
+            participationPct: 84
+          },
+          semester: {
+            baselineKWh: 18500,
+            currentKWh: 17100,
+            occupiedHours: 1420,
+            baselinePerHour: 13.03,
+            currentPerHour: 12.04,
+            participationPct: 85
+          },
+          academic_year: {
+            baselineKWh: 54000,
+            currentKWh: 50400,
+            occupiedHours: 4100,
+            baselinePerHour: 13.17,
+            currentPerHour: 12.29,
+            participationPct: 82
+          }
+        },
+        actions: [
+          {
+            id: "ACT-ENG-01",
+            title: "CAD Workstation Auto-Sleep Group Policy",
+            category: "IT Infrastructure",
+            status: "completed",
+            dateCompleted: "2026-10-08",
+            points: 50,
+            note: "Pushed 15-minute idle standby profile to 45 high-spec engineering workstations in Lab 301."
+          },
+          {
+            id: "ACT-ENG-02",
+            title: "Weekend Central Chiller Setback Protocol",
+            category: "HVAC Scheduling",
+            status: "completed",
+            dateCompleted: "2026-10-14",
+            points: 50,
+            note: "Rescheduled isolated Saturday session to allow primary engineering chiller plant to remain in setback."
+          },
+          {
+            id: "ACT-ENG-03",
+            title: "Student Sensor & Switch Awareness Drive",
+            category: "Behavioral Campaign",
+            status: "in_progress",
+            dateCompleted: null,
+            points: 25,
+            note: "Student council posters and digital QR code audit surveys deployed across Level 1 lecture wings."
+          }
+        ],
+        recommendations: [
+          "Automate idle shutdown for mechanical labs 201 & 202 on Friday afternoons.",
+          "Prioritize MERV-13 air filter replacement in Lecture Theater Alpha to reduce 28% compressor penalty."
+        ]
+      },
+      {
+        id: "dept_business",
+        name: "School of Business",
+        code: "BUS",
+        buildingId: "business",
+        buildingName: "Business Building",
+        facultyHead: "Dean Arthur Pendelton",
+        enrolledStudents: 1980,
+        monitoredRoomsCount: 6,
+        description: "Executive presentation rooms, lecture halls, and case study seminar rooms across 6 monitored classrooms.",
+        periods: {
+          month: {
+            baselineKWh: 2450,
+            currentKWh: 2280,
+            occupiedHours: 290,
+            baselinePerHour: 8.45,
+            currentPerHour: 7.86,
+            participationPct: 78
+          },
+          semester: {
+            baselineKWh: 10800,
+            currentKWh: 10100,
+            occupiedHours: 1280,
+            baselinePerHour: 8.44,
+            currentPerHour: 7.89,
+            participationPct: 80
+          },
+          academic_year: {
+            baselineKWh: 32000,
+            currentKWh: 30200,
+            occupiedHours: 3800,
+            baselinePerHour: 8.42,
+            currentPerHour: 7.95,
+            participationPct: 76
+          }
+        },
+        actions: [
+          {
+            id: "ACT-BUS-01",
+            title: "Auditorium Chiller Coordinated Power-Down",
+            category: "HVAC Scheduling",
+            status: "completed",
+            dateCompleted: "2026-10-09",
+            points: 50,
+            note: "Coordinated Auditorium 101 AHU shutdown within 15 minutes of lecture dismissal."
+          },
+          {
+            id: "ACT-BUS-02",
+            title: "Executive Boardroom Presence Sensor Audit",
+            category: "Lighting Efficiency",
+            status: "in_progress",
+            dateCompleted: null,
+            points: 25,
+            note: "Evaluating PIR occupancy sensitivity in Level 3 executive suites."
+          }
+        ],
+        recommendations: [
+          "Turn off architectural cove lights in boardroom 302 when empty.",
+          "Consolidate small executive cohort classes into single-zone Level 1 wings."
+        ]
+      },
+      {
+        id: "dept_admin",
+        name: "Campus Administration & Operations",
+        code: "ADM",
+        buildingId: "all",
+        buildingName: "Central Admin Complex",
+        facultyHead: "Director Sarah Jenkins",
+        enrolledStudents: 0, // Staff only: 220 FTE
+        monitoredRoomsCount: 4,
+        description: "Staff offices, central IT administration hubs, meeting suites, and facility operational depots.",
+        periods: {
+          month: {
+            baselineKWh: 1680,
+            currentKWh: 1590,
+            occupiedHours: 210,
+            baselinePerHour: 8.00,
+            currentPerHour: 7.57,
+            participationPct: 88
+          },
+          semester: {
+            baselineKWh: 7400,
+            currentKWh: 7050,
+            occupiedHours: 920,
+            baselinePerHour: 8.04,
+            currentPerHour: 7.66,
+            participationPct: 86
+          },
+          academic_year: {
+            baselineKWh: 22000,
+            currentKWh: 21100,
+            occupiedHours: 2750,
+            baselinePerHour: 8.00,
+            currentPerHour: 7.67,
+            participationPct: 85
+          }
+        },
+        actions: [
+          {
+            id: "ACT-ADM-01",
+            title: "Nightly Security Energy Verification Sweep",
+            category: "Operational Patrols",
+            status: "completed",
+            dateCompleted: "2026-10-02",
+            points: 50,
+            note: "Integrated building equipment inspection into campus security evening rounds."
+          },
+          {
+            id: "ACT-ADM-02",
+            title: "Server Room Cold Aisle Containment",
+            category: "IT Infrastructure",
+            status: "completed",
+            dateCompleted: "2026-10-15",
+            points: 50,
+            note: "Sealed floor cable penetrations and installed blanking panels in IDF racks."
+          }
+        ],
+        recommendations: [
+          "Deploy campus-wide energy dashboard displays in faculty common rooms.",
+          "Establish monthly department energy coordinator reviews."
+        ]
+      },
+      {
+        id: "dept_humanities",
+        name: "Faculty of Humanities (New Sensor Pilot)",
+        code: "HUM",
+        buildingId: "humanities",
+        buildingName: "Humanities Hall (Pilot Wing)",
+        facultyHead: "Prof. Clare Beaumont",
+        enrolledStudents: 1100,
+        monitoredRoomsCount: 2,
+        description: "Newly instrumented seminar rooms currently accumulating baseline calibration data. Demonstrates safe zero-baseline handling.",
+        periods: {
+          month: {
+            baselineKWh: null, // Deliberate null to test requirement 8 & 9
+            currentKWh: 820,
+            occupiedHours: 120,
+            baselinePerHour: null,
+            currentPerHour: 6.83,
+            participationPct: 95
+          },
+          semester: {
+            baselineKWh: null,
+            currentKWh: 3600,
+            occupiedHours: 510,
+            baselinePerHour: null,
+            currentPerHour: 7.05,
+            participationPct: 92
+          },
+          academic_year: {
+            baselineKWh: null,
+            currentKWh: null,
+            occupiedHours: 0,
+            baselinePerHour: null,
+            currentPerHour: null,
+            participationPct: 90
+          }
+        },
+        actions: [
+          {
+            id: "ACT-HUM-01",
+            title: "Pilot Classroom Daylighting Protocol",
+            category: "Behavioral Campaign",
+            status: "completed",
+            dateCompleted: "2026-10-11",
+            points: 50,
+            note: "Instructors instructed to open south-facing louvers and keep primary lights off on clear days."
+          }
+        ],
+        recommendations: [
+          "Accumulate 30 days of telemetry data to calibrate a fair baseline before calculating reduction %.",
+          "Department is evaluated on Participation and Action completion during baseline calibration phase."
+        ]
+      }
+    ]
   }
 };
 

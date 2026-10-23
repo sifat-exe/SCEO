@@ -90,7 +90,6 @@
                 <line x1="3" y1="10" x2="21" y2="10"></line>
               </svg>
               <span>Timetable Optimizer</span>
-              <span class="nav-badge soon">Next</span>
             </button>
           </li>
 
@@ -102,7 +101,6 @@
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
               </svg>
               <span>Alerts &amp; Actions</span>
-              <span class="nav-badge soon">Next</span>
             </button>
           </li>
 
@@ -121,22 +119,20 @@
                 <line x1="17" y1="16" x2="23" y2="16"></line>
               </svg>
               <span>Smart Controls</span>
-              <span class="nav-badge soon">Next</span>
             </button>
           </li>
 
-          <!-- 7. Maintenance -->
+          <!-- 7. Maintenance (Active Step 7A) -->
           <li class="nav-item" data-view="maintenance">
             <button class="nav-link" type="button">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
               </svg>
               <span>Maintenance</span>
-              <span class="nav-badge soon">Next</span>
             </button>
           </li>
 
-          <!-- 8. Department Challenge -->
+          <!-- 8. Department Challenge (Active Step 7B) -->
           <li class="nav-item" data-view="dept-challenge">
             <button class="nav-link" type="button">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -148,7 +144,6 @@
                 <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
               </svg>
               <span>Department Challenge</span>
-              <span class="nav-badge soon">Next</span>
             </button>
           </li>
 
@@ -1160,7 +1155,1330 @@
         </section>
 
         <!-- ==================================================================
-             VIEW 4: COMING SOON PLACEHOLDER (For Modules 4 through 10)
+             VIEW 4: TIMETABLE OPTIMIZER (STEP 4)
+             ================================================================== -->
+        <section id="timetableOptimizerView" class="dashboard-content-section" style="display: none;" aria-label="Timetable Optimizer">
+
+          <!-- Section Header -->
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">Timetable Optimizer</h2>
+              <p class="section-subtitle">Reduce avoidable energy use through smarter classroom scheduling.</p>
+            </div>
+            <div class="header-badge-group">
+              <span class="badge-fictional-demo">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                Demo Mode &bull; Simulated Timetable
+              </span>
+            </div>
+          </div>
+
+          <!-- Prototype Notice & Reset Bar -->
+          <div class="tt-disclaimer-banner">
+            <div class="tt-disclaimer-content">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="tt-disclaimer-icon">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              <div>
+                <strong>Simulated Prototype Notice:</strong>
+                <span>All academic schedules, room allocations, and energy calculations are fictional demo data. Accepting suggestions updates the prototype state only — no real university timetable has been changed.</span>
+              </div>
+            </div>
+            <button type="button" id="btnTtResetDemo" class="btn-tt-reset" title="Reset accepted and dismissed demo changes to baseline">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+              <span>Reset Demo State</span>
+            </button>
+          </div>
+
+          <!-- Timetable Optimizer Toolbar -->
+          <div class="timetable-toolbar">
+            <!-- Building Filter -->
+            <div class="toolbar-group">
+              <label for="ttBuildingFilter" class="filter-label">Building Scope:</label>
+              <select id="ttBuildingFilter" class="form-select tt-building-select" aria-label="Filter timetable by building">
+                <option value="all">All Monitored Buildings (24 Rooms)</option>
+                <option value="engineering">Engineering Building (8 Rooms)</option>
+                <option value="science">Science Building (8 Rooms)</option>
+                <option value="business">Business Building (8 Rooms)</option>
+              </select>
+            </div>
+
+            <!-- Day Selector (Segmented buttons Mon-Sat, All) -->
+            <div class="toolbar-group">
+              <span class="filter-label">Day:</span>
+              <div class="segmented-control tt-day-selector" id="ttDaySelector" role="group" aria-label="Select schedule day">
+                <button type="button" class="btn-segmented active" data-day="Mon">Mon</button>
+                <button type="button" class="btn-segmented" data-day="Tue">Tue</button>
+                <button type="button" class="btn-segmented" data-day="Wed">Wed</button>
+                <button type="button" class="btn-segmented" data-day="Thu">Thu</button>
+                <button type="button" class="btn-segmented" data-day="Fri">Fri</button>
+                <button type="button" class="btn-segmented" data-day="Sat">Sat</button>
+                <button type="button" class="btn-segmented" data-day="all">All Days</button>
+              </div>
+            </div>
+
+            <!-- Week Selector / Demo Date Range -->
+            <div class="toolbar-group">
+              <label for="ttWeekSelect" class="filter-label">Term Week:</label>
+              <select id="ttWeekSelect" class="form-select tt-week-select" aria-label="Select academic term week">
+                <option value="week-6" selected>Week 6 (Current Timetable)</option>
+                <option value="week-7">Week 7 (Exam Revision Period)</option>
+                <option value="week-8">Week 8 (Inter-Term Block)</option>
+              </select>
+            </div>
+
+            <!-- View Switcher (Day Grid vs Weekly Matrix) -->
+            <div class="toolbar-group">
+              <span class="filter-label">View:</span>
+              <div class="segmented-control tt-view-switcher" id="ttViewSwitcher" role="group" aria-label="Timetable display mode">
+                <button type="button" class="btn-segmented active" id="btnTtViewDay" title="Room-by-Room Timetable Grid for Selected Day">Day Grid</button>
+                <button type="button" class="btn-segmented" id="btnTtViewWeek" title="Weekly Matrix Overview across Days">Weekly View</button>
+              </div>
+            </div>
+
+            <!-- Conflict Checker Simulation Action -->
+            <div class="toolbar-group">
+              <button type="button" class="btn-conflict-toggle" id="btnTtToggleConflict" title="Toggle sample conflict to test conflict checker engine">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                <span id="btnTtToggleConflictText">Simulate Sample Conflict</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Summary KPI Cards (4 Cards) -->
+          <div class="timetable-summary-grid">
+            <!-- 1. Scheduled Classes -->
+            <div class="card summary-metric-card">
+              <div class="metric-card-header">
+                <span class="metric-label">Scheduled Classes</span>
+                <span class="metric-icon-pill icon-blue">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                </span>
+              </div>
+              <div class="metric-value-row">
+                <span class="metric-value" id="ttKpiScheduledClasses">11</span>
+                <span class="metric-unit">classes</span>
+              </div>
+              <p class="metric-subtext" id="ttKpiScheduledClassesSub">On Monday (33 total weekly)</p>
+            </div>
+
+            <!-- 2. Rooms in Use -->
+            <div class="card summary-metric-card">
+              <div class="metric-card-header">
+                <span class="metric-label">Rooms in Use</span>
+                <span class="metric-icon-pill icon-teal">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                </span>
+              </div>
+              <div class="metric-value-row">
+                <span class="metric-value" id="ttKpiRoomsInUse">8</span>
+                <span class="metric-unit">/ 24</span>
+              </div>
+              <p class="metric-subtext" id="ttKpiRoomsInUseSub">33% room utilization in scope</p>
+            </div>
+
+            <!-- 3. Potentially Consolidatable Classes -->
+            <div class="card summary-metric-card">
+              <div class="metric-card-header">
+                <span class="metric-label">Consolidatable Opportunities</span>
+                <span class="metric-icon-pill icon-amber">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                </span>
+              </div>
+              <div class="metric-value-row">
+                <span class="metric-value" id="ttKpiConsolidatable">1</span>
+                <span class="metric-unit">classes</span>
+              </div>
+              <p class="metric-subtext" id="ttKpiConsolidatableSub">5 consolidation candidates campus-wide</p>
+            </div>
+
+            <!-- 4. Estimated Potential Energy Savings -->
+            <div class="card summary-metric-card highlight-card">
+              <div class="metric-card-header">
+                <span class="metric-label">Estimated Potential Savings</span>
+                <span class="metric-icon-pill icon-green">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+                </span>
+              </div>
+              <div class="metric-value-row">
+                <span class="metric-value text-success" id="ttKpiSavings">9.4</span>
+                <span class="metric-unit text-success">kWh</span>
+              </div>
+              <p class="metric-subtext" id="ttKpiSavingsSub">$1.69 / day avoidable operating cost</p>
+            </div>
+          </div>
+
+          <!-- Schedule Conflict Validation Alert Panel (Requirement 7) -->
+          <div id="ttConflictPanel" class="tt-conflict-panel" style="display: none;">
+            <!-- Dynamically populated via JS -->
+          </div>
+
+          <!-- Main Layout: Timetable View + Suggestions Panel -->
+          <div class="timetable-split-layout">
+            
+            <!-- Left Main Column: Interactive Timetable Matrix -->
+            <div class="timetable-main-panel card">
+              <!-- Matrix Toolbar -->
+              <div class="matrix-header-bar">
+                <div class="matrix-title-group">
+                  <h3 class="matrix-heading" id="ttMatrixHeading">Classroom Schedule Matrix</h3>
+                  <span class="matrix-scope-badge" id="ttMatrixScopeBadge">Monday &bull; All Buildings</span>
+                </div>
+                <div class="matrix-actions-group">
+                  <div class="table-search-box">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="search" id="ttSearchInput" class="table-search-input" placeholder="Search course, code, or room..." aria-label="Search schedule">
+                  </div>
+                  <label class="tt-checkbox-label">
+                    <input type="checkbox" id="ttFilterOccupiedOnly">
+                    <span>Active rooms only</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Timetable Grid Scrollable Container -->
+              <div class="timetable-grid-wrapper" id="ttGridWrapper">
+                <div id="ttTimetableMatrix" class="timetable-matrix-container">
+                  <!-- Dynamically populated via JS: Day Grid or Weekly Matrix -->
+                </div>
+              </div>
+
+              <!-- Empty State for Filter/Search -->
+              <div id="ttMatrixEmptyState" class="table-empty-state" style="display: none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                <h4>No classes scheduled matching this filter</h4>
+                <p>Try switching day, selecting "All Buildings", or clearing search terms.</p>
+              </div>
+
+              <!-- Timetable Legend & Footnote -->
+              <div class="timetable-legend-bar">
+                <div class="legend-items-list">
+                  <span class="legend-item"><span class="legend-dot dot-occupied"></span> Scheduled Class</span>
+                  <span class="legend-item"><span class="legend-dot dot-consolidatable"></span> Consolidatable Opportunity</span>
+                  <span class="legend-item"><span class="legend-dot dot-accepted"></span> Relocated (Demo Accepted)</span>
+                  <span class="legend-item"><span class="legend-dot dot-idle"></span> Vacant / Idle Slot</span>
+                </div>
+                <span class="legend-note">Click any class or room ID to inspect telemetry and energy benchmarks</span>
+              </div>
+            </div>
+
+            <!-- Right Column: Optimization Suggestions Panel (Requirements 3, 4, 5 & 6) -->
+            <div class="timetable-suggestions-panel card">
+              <div class="suggestions-panel-header">
+                <div class="suggestions-header-title">
+                  <div class="suggestions-icon-bubble">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                  </div>
+                  <div>
+                    <h3 class="suggestions-title">Energy-Saving Suggestions</h3>
+                    <p class="suggestions-subtitle">Coordinating room usage to avoid unnecessary conditioning</p>
+                  </div>
+                </div>
+                <span class="badge-suggestions-count" id="ttSuggestionsCountBadge">5 Active</span>
+              </div>
+
+              <!-- Transparent Formula & Administrator Caveat Callout -->
+              <div class="tt-formula-callout">
+                <div class="formula-badge">Transparent Formula</div>
+                <code class="formula-code">Potential Energy (kWh) = Avoidable Room Power (kW) &times; Avoidable Operating Hours</code>
+                <p class="formula-disclaimer">
+                  Avoidable cost = Energy avoided &times; $0.18/kWh demo tariff. Preliminary simulated estimate. 
+                  Does not assume rooms are accessible or nearby without administrator review.
+                </p>
+              </div>
+
+              <!-- Suggestions Card List -->
+              <div class="suggestions-cards-list" id="ttSuggestionsList">
+                <!-- Dynamically populated via JS -->
+              </div>
+
+              <!-- Empty State when all suggestions are accepted/dismissed -->
+              <div id="ttSuggestionsEmptyState" class="suggestions-empty-state" style="display: none;">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                <h4>No active suggestions in this scope</h4>
+                <p>All suggestions for the selected scope have been accepted or dismissed, or no opportunities were detected for this day.</p>
+                <button type="button" class="btn-secondary btn-sm" id="btnTtRestoreSuggestions">Restore All Suggestions</button>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- ==================================================================
+             VIEW 5: ALERTS & ACTIONS (STEP 5)
+             ================================================================== -->
+        <section id="alertsActionsView" class="dashboard-content-section" style="display: none;" aria-label="Alerts and Actions Center">
+
+          <!-- Section Header -->
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">Alerts &amp; Actions</h2>
+              <p class="section-subtitle">Detect potential energy waste and turn insights into practical action.</p>
+            </div>
+            <div class="header-badge-group">
+              <span class="badge-fictional-demo">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                Demo Mode &bull; Simulated Anomaly Detection
+              </span>
+            </div>
+          </div>
+
+          <!-- Prototype Notice & Analysis Control Banner -->
+          <div class="alerts-disclaimer-banner">
+            <div class="alerts-disclaimer-content">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="alerts-disclaimer-icon">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              <div>
+                <strong>Simulated Telemetry Notice:</strong>
+                <span>All anomalies and alert states are generated from simulated demo models. Missing or inconsistent readings are identified as data-quality issues and must not be interpreted as proof of energy waste.</span>
+              </div>
+            </div>
+            <div class="alerts-banner-actions">
+              <button type="button" id="btnRunAlertAnalysis" class="btn-run-analysis" title="Re-evaluate rules against classroom dataset">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <span>Run Demo Alert Analysis</span>
+              </button>
+              <button type="button" id="btnResetAlertStates" class="btn-alerts-reset" title="Reset all alert statuses to default demo state">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                <span>Reset Demo States</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Alerts Controls Toolbar -->
+          <div class="alerts-toolbar">
+            <!-- Building Filter -->
+            <div class="toolbar-group">
+              <label for="alertBuildingFilter" class="filter-label">Building Scope:</label>
+              <select id="alertBuildingFilter" class="form-select alert-select-control" aria-label="Filter alerts by building">
+                <option value="all">All Monitored Buildings</option>
+                <option value="engineering">Engineering Building</option>
+                <option value="science">Science Building</option>
+                <option value="business">Business Building</option>
+              </select>
+            </div>
+
+            <!-- Severity Filter -->
+            <div class="toolbar-group">
+              <label for="alertSeverityFilter" class="filter-label">Severity:</label>
+              <select id="alertSeverityFilter" class="form-select alert-select-control" aria-label="Filter alerts by severity">
+                <option value="all">All Severities</option>
+                <option value="critical">Critical Priority</option>
+                <option value="high">High Priority</option>
+                <option value="medium">Medium Priority</option>
+                <option value="low">Low Priority / Info</option>
+              </select>
+            </div>
+
+            <!-- Status Filter -->
+            <div class="toolbar-group">
+              <label for="alertStatusFilter" class="filter-label">Status:</label>
+              <select id="alertStatusFilter" class="form-select alert-select-control" aria-label="Filter alerts by status">
+                <option value="all">All Statuses</option>
+                <option value="new">New (Awaiting Review)</option>
+                <option value="acknowledged">Acknowledged</option>
+                <option value="resolved">Resolved</option>
+              </select>
+            </div>
+
+            <!-- Date Filter -->
+            <div class="toolbar-group">
+              <label for="alertDateFilter" class="filter-label">Recency:</label>
+              <select id="alertDateFilter" class="form-select alert-select-control" aria-label="Filter alerts by date recency">
+                <option value="all">All Simulated Records</option>
+                <option value="today">Today</option>
+                <option value="yesterday">Yesterday</option>
+                <option value="older">Older Records</option>
+              </select>
+            </div>
+
+            <!-- Search Filter Input -->
+            <div class="toolbar-group" style="flex: 1; min-width: 200px;">
+              <div class="table-search-box" style="width: 100%;">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="search" id="alertSearchInput" class="table-search-input" placeholder="Search by alert, room ID, or rule..." aria-label="Search alerts">
+              </div>
+            </div>
+          </div>
+
+          <!-- Summary KPI Cards (4 Cards - Calculated dynamically from dataset & filters) -->
+          <div class="alerts-summary-grid">
+            <!-- 1. Total Active Alerts -->
+            <div class="card summary-metric-card">
+              <div class="metric-card-header">
+                <span class="metric-label">Total Active Alerts</span>
+                <span class="metric-icon-pill icon-blue">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                </span>
+              </div>
+              <div class="metric-value-row">
+                <span class="metric-value" id="kpiTotalActiveAlerts">7</span>
+                <span class="metric-unit">active</span>
+              </div>
+              <p class="metric-subtext" id="kpiTotalActiveAlertsSub">7 of 8 total alerts in scope</p>
+            </div>
+
+            <!-- 2. Critical & High-Priority Alerts -->
+            <div class="card summary-metric-card highlight-card">
+              <div class="metric-card-header">
+                <span class="metric-label">Critical &amp; High Priority</span>
+                <span class="metric-icon-pill icon-red">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                </span>
+              </div>
+              <div class="metric-value-row">
+                <span class="metric-value text-danger" id="kpiCriticalHighAlerts">3</span>
+                <span class="metric-unit text-danger">alerts</span>
+              </div>
+              <p class="metric-subtext" id="kpiCriticalHighAlertsSub">Require prompt administrator triage</p>
+            </div>
+
+            <!-- 3. Alerts Awaiting Action -->
+            <div class="card summary-metric-card">
+              <div class="metric-card-header">
+                <span class="metric-label">Alerts Awaiting Action</span>
+                <span class="metric-icon-pill icon-amber">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                </span>
+              </div>
+              <div class="metric-value-row">
+                <span class="metric-value" id="kpiAwaitingActionAlerts">5</span>
+                <span class="metric-unit">unreviewed</span>
+              </div>
+              <p class="metric-subtext" id="kpiAwaitingActionAlertsSub">New alerts pending review</p>
+            </div>
+
+            <!-- 4. Resolved Alerts -->
+            <div class="card summary-metric-card">
+              <div class="metric-card-header">
+                <span class="metric-label">Resolved Alerts</span>
+                <span class="metric-icon-pill icon-green">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </span>
+              </div>
+              <div class="metric-value-row">
+                <span class="metric-value text-success" id="kpiResolvedAlerts">1</span>
+                <span class="metric-unit text-success">resolved</span>
+              </div>
+              <p class="metric-subtext" id="kpiResolvedAlertsSub">Marked addressed in prototype</p>
+            </div>
+          </div>
+
+          <!-- Main Layout: Active Alerts List + Recommended Actions Panel -->
+          <div class="alerts-split-layout">
+
+            <!-- Left Main Column: Active Alerts Stream -->
+            <div class="alerts-main-panel card">
+              <div class="alerts-panel-header">
+                <div class="alerts-panel-title-group">
+                  <h3 class="alerts-panel-heading">Detected Anomalies &amp; Operational Alerts</h3>
+                  <span class="badge-alerts-count" id="alertsCountBadge">8 Alerts</span>
+                </div>
+                <div class="alerts-view-switcher">
+                  <span class="filter-label" style="font-size: 11px;">Display:</span>
+                  <div class="segmented-control">
+                    <button type="button" class="btn-segmented active" id="btnAlertsViewCards" title="Detailed Card View">Card View</button>
+                    <button type="button" class="btn-segmented" id="btnAlertsViewTable" title="Compact Table View">Table View</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Alerts Stream Container (Cards / Table) -->
+              <div id="alertsStreamContainer" class="alerts-stream-container">
+                <!-- Dynamically populated via JS -->
+              </div>
+
+              <!-- Empty State for Filters -->
+              <div id="alertsEmptyState" class="alerts-empty-state" style="display: none;">
+                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <h4>No alerts match the selected criteria</h4>
+                <p>Try clearing active filters or running a new demo rule analysis.</p>
+                <button type="button" class="btn-secondary btn-sm" id="btnClearAlertFilters">Clear All Filters</button>
+              </div>
+            </div>
+
+            <!-- Right Column: Recommended Actions Panel (Requirement 6) -->
+            <div class="recommended-actions-panel card">
+              <div class="rec-actions-header">
+                <div class="rec-actions-header-title">
+                  <div class="rec-actions-icon-bubble">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                  </div>
+                  <div>
+                    <h3 class="rec-actions-title">Recommended Actions</h3>
+                    <p class="rec-actions-subtitle">Ranked practical interventions by potential energy impact</p>
+                  </div>
+                </div>
+                <span class="badge-rec-count" id="recActionsCountBadge">5 Actions</span>
+              </div>
+
+              <!-- Disclaimer Callout on Action Estimates -->
+              <div class="rec-action-callout">
+                <div class="formula-badge">Impact Methodology</div>
+                <p class="rec-callout-text">
+                  Expected benefits are engineering estimates based on simulated telemetry and avoidable operating hours. 
+                  Direct savings claims require verified post-implementation sub-meter comparisons.
+                </p>
+              </div>
+
+              <!-- List of Recommended Actions -->
+              <div class="rec-actions-list" id="recActionsList">
+                <!-- Dynamically populated via JS -->
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- ==================================================================
+             VIEW 6: SMART CONTROLS SIMULATOR (Step 6)
+             ================================================================== -->
+        <section id="smartControlsView" class="dashboard-content-section" style="display: none;" aria-label="Smart Controls Simulator">
+
+          <!-- Section Header -->
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">Smart Controls Simulator</h2>
+              <p class="section-subtitle">Simulate energy-saving actions for unoccupied classrooms.</p>
+            </div>
+            <div class="header-badge-group">
+              <span class="badge-fictional-demo">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                Demo Mode &bull; Simulated Controls &amp; Logic
+              </span>
+            </div>
+          </div>
+
+          <!-- Prominent Notice Banner (Requirement 1 & 4) -->
+          <div class="smart-controls-notice-banner">
+            <div class="sc-notice-content">
+              <div class="sc-notice-icon-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              </div>
+              <div>
+                <strong class="sc-notice-title">Simulation only &mdash; no physical devices are connected.</strong>
+                <p class="sc-notice-desc">All classroom device states, occupancy sensors, power ratings, and automated shutdown routines are simulated models within the browser prototype. No relays, physical HVAC systems, or electrical grids are accessed.</p>
+              </div>
+            </div>
+            <div class="sc-notice-status-box">
+              <div class="sc-status-pill active" id="simStatusPill">
+                <span class="status-pulse-dot"></span>
+                <span id="simStatusText">Simulation Running</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Master Simulation Controls & Operating Mode Switcher -->
+          <div class="sc-master-toolbar card">
+            <div class="sc-toolbar-mode-col">
+              <label class="filter-label" style="margin-bottom: 4px;">Operating Mode:</label>
+              <div class="segmented-control mode-segmented-control" role="group" aria-label="Simulation Operating Mode">
+                <button type="button" class="btn-segmented active" id="btnModeManual" title="Manual Simulation Mode: User controls all toggles with advisory warnings">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -1px;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                  Manual Simulation
+                </button>
+                <button type="button" class="btn-segmented" id="btnModeAutomatic" title="Automatic Simulation: Automated rule evaluation with countdown delay and safety exclusions">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -1px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                  Automatic Simulation
+                </button>
+              </div>
+            </div>
+
+            <!-- Master Action Buttons -->
+            <div class="sc-toolbar-actions-col">
+              <label class="filter-label" style="margin-bottom: 4px;">Simulation Controls:</label>
+              <div class="sc-btn-group">
+                <button type="button" class="btn-primary btn-sm btn-sc-control" id="btnRunSimulation" title="Run active simulation rule evaluation">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                  <span>Run Simulation</span>
+                </button>
+                <button type="button" class="btn-secondary btn-sm btn-sc-control" id="btnPauseSimulation" title="Pause simulation timers and active countdowns">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                  <span>Pause</span>
+                </button>
+                <button type="button" class="btn-secondary btn-sm btn-sc-control" id="btnResumeSimulation" style="display: none;" title="Resume paused simulation">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                  <span>Resume</span>
+                </button>
+                <button type="button" class="btn-secondary btn-sm btn-sc-control text-danger-hover" id="btnResetSimulation" title="Reset all classrooms, devices, and occupancy to baseline defaults">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                  <span>Reset Demo</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Secondary Filter Controls Toolbar -->
+          <div class="sc-filter-toolbar">
+            <!-- Building Filter -->
+            <div class="toolbar-group">
+              <label for="scBuildingFilter" class="filter-label">Building Scope:</label>
+              <select id="scBuildingFilter" class="form-select alert-select-control" aria-label="Filter classrooms by building">
+                <option value="all">All Monitored Buildings</option>
+                <option value="engineering">Engineering Building</option>
+                <option value="science">Science Building</option>
+                <option value="business">Business Building</option>
+              </select>
+            </div>
+
+            <!-- Classroom Selector -->
+            <div class="toolbar-group">
+              <label for="scRoomSelect" class="filter-label">Classroom Selector:</label>
+              <select id="scRoomSelect" class="form-select alert-select-control" aria-label="Select individual classroom">
+                <option value="all">All Classrooms (24 Rooms)</option>
+              </select>
+            </div>
+
+            <!-- Device Status Filter -->
+            <div class="toolbar-group">
+              <label for="scStatusFilter" class="filter-label">Device Status:</label>
+              <select id="scStatusFilter" class="form-select alert-select-control" aria-label="Filter devices by operational state">
+                <option value="all">All Device States</option>
+                <option value="on_only">Active Devices (ON only)</option>
+                <option value="shutdown_recommended">Shutdown Recommended</option>
+                <option value="overridden_only">Manual Override Active</option>
+                <option value="essential_only">Essential Equipment</option>
+              </select>
+            </div>
+
+            <!-- Auto-Shutdown Delay Setting -->
+            <div class="toolbar-group">
+              <label for="scDelaySelect" class="filter-label">Auto-Off Delay:</label>
+              <select id="scDelaySelect" class="form-select alert-select-control" aria-label="Configurable automated shutdown delay">
+                <option value="3">3 Seconds (Fast Demo)</option>
+                <option value="4" selected>4 Seconds (Standard Demo)</option>
+                <option value="6">6 Seconds</option>
+                <option value="10">10 Seconds</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Summary KPI Cards (4 Cards - Dynamically calculated from simulated state) -->
+          <div class="sc-summary-grid">
+            <!-- 1. Rooms Simulated -->
+            <div class="card summary-metric-card">
+              <div class="metric-card-header">
+                <span class="metric-label">Rooms Simulated</span>
+                <span class="metric-icon-pill icon-blue">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                </span>
+              </div>
+              <div class="metric-value-row">
+                <span class="metric-value" id="kpiScRoomsSimulated">24</span>
+                <span class="metric-unit">rooms</span>
+              </div>
+              <p class="metric-subtext" id="kpiScRoomsSimulatedSub">24 monitored campus spaces</p>
+            </div>
+
+            <!-- 2. Rooms Currently Marked Unoccupied -->
+            <div class="card summary-metric-card">
+              <div class="metric-card-header">
+                <span class="metric-label">Rooms Marked Unoccupied</span>
+                <span class="metric-icon-pill icon-amber">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="17" y1="8" x2="23" y2="14"></line><line x1="23" y1="8" x2="17" y2="14"></line></svg>
+                </span>
+              </div>
+              <div class="metric-value-row">
+                <span class="metric-value text-amber" id="kpiScRoomsUnoccupied">18</span>
+                <span class="metric-unit">empty</span>
+              </div>
+              <p class="metric-subtext" id="kpiScRoomsUnoccupiedSub">75% of campus currently vacant</p>
+            </div>
+
+            <!-- 3. Simulated Devices On -->
+            <div class="card summary-metric-card">
+              <div class="metric-card-header">
+                <span class="metric-label">Simulated Devices On</span>
+                <span class="metric-icon-pill icon-red">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                </span>
+              </div>
+              <div class="metric-value-row">
+                <span class="metric-value text-danger" id="kpiScDevicesOn">35</span>
+                <span class="metric-unit">active</span>
+              </div>
+              <p class="metric-subtext" id="kpiScDevicesOnSub">Active electrical load in simulation</p>
+            </div>
+
+            <!-- 4. Estimated Energy Savings -->
+            <div class="card summary-metric-card highlight-card">
+              <div class="metric-card-header">
+                <span class="metric-label">Estimated Energy Savings</span>
+                <span class="metric-icon-pill icon-green">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </span>
+              </div>
+              <div class="metric-value-row">
+                <span class="metric-value text-success" id="kpiScEnergySavings">0.0</span>
+                <span class="metric-unit text-success">kWh saved</span>
+              </div>
+              <p class="metric-subtext" id="kpiScEnergySavingsSub">~$0.00 realized simulated savings</p>
+            </div>
+          </div>
+
+          <!-- Main Split Layout: Classroom Device Cards Grid + Event Log / Estimator Sidebar -->
+          <div class="sc-split-layout">
+
+            <!-- Left Main Column: Simulated Classroom Cards Grid -->
+            <div class="sc-main-column card">
+              <div class="sc-panel-header">
+                <div class="sc-panel-title-group">
+                  <h3 class="sc-panel-heading">Simulated Classroom Device Controls</h3>
+                  <span class="badge-alerts-count" id="scActiveRoomsBadge">24 Classrooms</span>
+                </div>
+                <div class="sc-quick-actions">
+                  <button type="button" class="btn-secondary btn-sm" id="btnScTurnAllOffScope" title="Simulate turning off all eligible non-essential devices in currently filtered unoccupied rooms">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
+                    <span>Turn Off All in Empty Rooms</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Classroom Cards Container -->
+              <div id="scRoomsContainer" class="sc-rooms-grid">
+                <!-- Dynamically populated via JS -->
+              </div>
+
+              <!-- Empty State -->
+              <div id="scEmptyState" class="alerts-empty-state" style="display: none;">
+                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <h4>No classrooms match the selected filters</h4>
+                <p>Try resetting building or device status filters to view simulated classrooms.</p>
+                <button type="button" class="btn-secondary btn-sm" id="btnScResetFilters">Reset Filters</button>
+              </div>
+            </div>
+
+            <!-- Right Column: Energy-Saving Estimator & Simulation Event Log -->
+            <div class="sc-sidebar-column">
+
+              <!-- Energy-Saving Estimator Panel (Requirement 7) -->
+              <div class="card sc-estimator-card">
+                <div class="sc-sidebar-header">
+                  <div class="rec-actions-icon-bubble">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                  </div>
+                  <div>
+                    <h3 class="sc-sidebar-title">Energy-Saving Estimator</h3>
+                    <p class="sc-sidebar-subtitle">Simulated kWh and cost recovery metrics</p>
+                  </div>
+                </div>
+
+                <div class="sc-savings-dual-box">
+                  <!-- Realized Savings -->
+                  <div class="sc-savings-metric-tile realized">
+                    <div class="sc-savings-label">Realized Simulated Savings</div>
+                    <div class="sc-savings-number text-success" id="scRealizedKWh">0.0 kWh</div>
+                    <div class="sc-savings-sub" id="scRealizedCost">~$0.00 avoided cost</div>
+                    <div class="sc-savings-co2" id="scRealizedCO2">0.0 kg CO₂e offset</div>
+                  </div>
+                  <!-- Potential Avoidable Load -->
+                  <div class="sc-savings-metric-tile potential">
+                    <div class="sc-savings-label">Potential Avoidable Load</div>
+                    <div class="sc-savings-number text-amber" id="scPotentialKWh">32.4 kW</div>
+                    <div class="sc-savings-sub" id="scPotentialCost">~$5.83 / hr potential</div>
+                    <div class="sc-savings-note">From active devices in empty rooms</div>
+                  </div>
+                </div>
+
+                <div class="sc-formula-box">
+                  <div class="formula-badge">Calculation Model &amp; Assumptions</div>
+                  <div class="sc-formula-code">
+                    <code>kWh = Power (kW) &times; Simulated Off-Hours</code>
+                  </div>
+                  <div class="sc-formula-code" style="margin-top: 4px;">
+                    <code>Cost ($) = kWh &times; $0.18/kWh Demo Tariff</code>
+                  </div>
+                  <p class="sc-formula-note">
+                    <strong>Demo Assumption:</strong> Energy savings are credited only after a device shutdown occurs in the simulation, avoiding double-counting.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Simulation Event Log Panel (Requirement 6) -->
+              <div class="card sc-event-log-card">
+                <div class="sc-sidebar-header">
+                  <div class="rec-actions-icon-bubble" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                  </div>
+                  <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <h3 class="sc-sidebar-title">Simulation Event Log</h3>
+                      <span class="badge-rec-count" id="scEventLogCountBadge">4 Events</span>
+                    </div>
+                    <p class="sc-sidebar-subtitle">Chronological record of demo actions &amp; safety rules</p>
+                  </div>
+                </div>
+
+                <div class="sc-log-toolbar">
+                  <span class="filter-label" style="font-size: 11px;">Real-Time Feed</span>
+                  <button type="button" class="btn-link-action" id="btnClearSimLog" style="font-size: 11px;">Clear Demo Log</button>
+                </div>
+
+                <!-- Event Log Stream -->
+                <div class="sc-event-log-feed" id="scEventLogFeed" aria-live="polite">
+                  <!-- Dynamically populated via JS -->
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- ==================================================================
+             VIEW 7: PREVENTIVE MAINTENANCE (Step 7A)
+             ================================================================== -->
+        <section id="maintenanceView" class="dashboard-content-section" style="display: none;" aria-label="Preventive Maintenance">
+
+          <!-- Section Header -->
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">Preventive Maintenance</h2>
+              <p class="section-subtitle">Track equipment issues before they lead to energy waste.</p>
+            </div>
+            <div class="header-badge-group">
+              <span class="badge-fictional-demo">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                Demo Mode &bull; Asset Register &amp; Work Orders
+              </span>
+            </div>
+          </div>
+
+          <!-- Prominent Notice Banner (Requirement 1 & 3) -->
+          <div class="smart-controls-notice-banner maint-notice-banner">
+            <div class="sc-notice-content">
+              <div class="sc-notice-icon-box" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+              </div>
+              <div>
+                <strong class="sc-notice-title">Simulation only &mdash; fictional equipment records &amp; demo diagnostic telemetry.</strong>
+                <p class="sc-notice-desc">All asset conditions, diagnostic alerts, and maintenance logs are simulated models. Unusually high electricity draw can indicate a problem (e.g. clogged filters or uncalibrated dampers) but does not prove mechanical failure without physical inspection.</p>
+              </div>
+            </div>
+            <div class="sc-notice-status-box">
+              <div class="sc-status-pill active" id="maintStatusPill">
+                <span class="status-pulse-dot" style="background: #f59e0b; box-shadow: 0 0 8px #f59e0b;"></span>
+                <span id="maintStatusText">Asset Register Active</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Master Action & Filter Toolbar -->
+          <div class="maint-master-toolbar card">
+            <div class="maint-toolbar-left">
+              <button type="button" class="btn-primary btn-sm" id="btnOpenAddMaintenanceModal">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>Add Maintenance Task</span>
+              </button>
+              <button type="button" class="btn-secondary btn-sm" id="btnResetMaintDemo" title="Restore initial equipment records and demo baseline">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                <span>Reset Demo State</span>
+              </button>
+            </div>
+
+            <div class="maint-toolbar-search">
+              <div class="search-input-wrapper">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="maintSearchInput" class="form-input search-input" placeholder="Search equipment ID, room, or issue..." aria-label="Search equipment records">
+              </div>
+            </div>
+          </div>
+
+          <!-- Filter Toolbar (Requirement 1) -->
+          <div class="sc-filter-toolbar maint-filters-bar">
+            <!-- Building Filter -->
+            <div class="toolbar-group">
+              <label for="maintBuildingFilter" class="filter-label">Building Scope:</label>
+              <select id="maintBuildingFilter" class="form-select alert-select-control" aria-label="Filter equipment by building">
+                <option value="all">All Monitored Buildings</option>
+                <option value="engineering">Engineering Building</option>
+                <option value="science">Science Building</option>
+                <option value="business">Business Building</option>
+              </select>
+            </div>
+
+            <!-- Equipment Type Filter -->
+            <div class="toolbar-group">
+              <label for="maintTypeFilter" class="filter-label">Equipment Type:</label>
+              <select id="maintTypeFilter" class="form-select alert-select-control" aria-label="Filter equipment by type">
+                <option value="all">All Equipment Types</option>
+                <option value="air_conditioner">Air Conditioner / HVAC</option>
+                <option value="fans">Circulation &amp; Exhaust Fans</option>
+                <option value="lighting">Ceiling Lighting Grid</option>
+                <option value="projector">Digital Projector &amp; AV</option>
+                <option value="specialized">Specialized Lab Units</option>
+              </select>
+            </div>
+
+            <!-- Maintenance Status / Condition Filter -->
+            <div class="toolbar-group">
+              <label for="maintStatusFilter" class="filter-label">Condition &amp; Status:</label>
+              <select id="maintStatusFilter" class="form-select alert-select-control" aria-label="Filter by condition or work order status">
+                <option value="all">All Conditions &amp; Statuses</option>
+                <option value="urgent_review">Urgent Review</option>
+                <option value="maintenance_due">Maintenance Due</option>
+                <option value="inspection_recommended">Inspection Recommended</option>
+                <option value="good">Good Condition</option>
+                <option value="status_open">Open Work Orders</option>
+                <option value="status_scheduled">Scheduled Tasks</option>
+                <option value="status_in_progress">In Progress</option>
+                <option value="status_completed">Completed Tasks</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Summary KPI Cards (Requirement 1) -->
+          <div class="kpi-grid sc-summary-grid">
+            <!-- Card 1: Total Equipment Records -->
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Total Equipment Records</span>
+                <div class="kpi-icon-wrapper" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                </div>
+              </div>
+              <div class="kpi-value" id="kpiMaintTotalRecords">14</div>
+              <div class="kpi-subtitle" id="kpiMaintTotalRecordsSub">Cataloged across 24 monitored rooms</div>
+            </div>
+
+            <!-- Card 2: Maintenance Due -->
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Maintenance Due</span>
+                <div class="kpi-icon-wrapper" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                </div>
+              </div>
+              <div class="kpi-value text-danger" id="kpiMaintDue">7</div>
+              <div class="kpi-subtitle" id="kpiMaintDueSub">Overdue or past recommended date</div>
+            </div>
+
+            <!-- Card 3: Open Issues -->
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Open Issues</span>
+                <div class="kpi-icon-wrapper" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                </div>
+              </div>
+              <div class="kpi-value text-amber" id="kpiMaintOpenIssues">10</div>
+              <div class="kpi-subtitle" id="kpiMaintOpenIssuesSub">Pending, scheduled, or in progress</div>
+            </div>
+
+            <!-- Card 4: Completed Tasks -->
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Completed Tasks</span>
+                <div class="kpi-icon-wrapper" style="background: rgba(34, 197, 94, 0.15); color: #22c55e;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                </div>
+              </div>
+              <div class="kpi-value text-success" id="kpiMaintCompleted">4</div>
+              <div class="kpi-subtitle" id="kpiMaintCompletedSub">Logged preventive services verified</div>
+            </div>
+          </div>
+
+          <!-- Equipment Register Card (Requirement 2, 3, 4) -->
+          <div class="card maint-register-card">
+            <div class="maint-card-header">
+              <div class="maint-title-group">
+                <div class="rec-actions-icon-bubble" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                </div>
+                <div>
+                  <h3 class="maint-section-title">Equipment Asset Register</h3>
+                  <p class="maint-section-subtitle">Monitored electrical and mechanical assets with maintenance schedule tracking</p>
+                </div>
+              </div>
+              <div class="maint-header-controls">
+                <span class="badge-rec-count" id="maintCountBadge">14 Records</span>
+                <div class="btn-group-toggle" role="group" aria-label="Register View Mode">
+                  <button type="button" class="btn-toggle-view active" id="btnMaintViewTable" title="Table View">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+                  </button>
+                  <button type="button" class="btn-toggle-view" id="btnMaintViewCards" title="Card Grid View">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Table Container -->
+            <div class="table-responsive maint-table-wrapper" id="maintTableContainer">
+              <table class="data-table maint-table">
+                <thead>
+                  <tr>
+                    <th>Equipment ID &amp; Name</th>
+                    <th>Location</th>
+                    <th>Type</th>
+                    <th>Condition</th>
+                    <th>Last Service</th>
+                    <th>Next Due</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="maintTableBody">
+                  <!-- Dynamically populated via JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Cards Container (Alternative Responsive View) -->
+            <div class="maint-cards-grid" id="maintCardsContainer" style="display: none;">
+              <!-- Dynamically populated via JS -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="maintEmptyState" class="alerts-empty-state" style="display: none;">
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+              <h4>No equipment records match the selected filters</h4>
+              <p>Try resetting building, equipment type, or status filters to view the full equipment register.</p>
+              <button type="button" class="btn-secondary btn-sm" id="btnResetMaintFilters">Reset Filters</button>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ==================================================================
+             VIEW 8: DEPARTMENT ENERGY CHALLENGE (Step 7B)
+             ================================================================== -->
+        <section id="deptChallengeView" class="dashboard-content-section" style="display: none;" aria-label="Department Energy Challenge">
+
+          <!-- Section Header -->
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">Department Energy Challenge</h2>
+              <p class="section-subtitle">Encourage fair, measurable energy-saving improvements across campus.</p>
+            </div>
+            <div class="header-badge-group">
+              <span class="badge-fictional-demo">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                Demo Mode &bull; Normalized Scoring &amp; Gamification
+              </span>
+            </div>
+          </div>
+
+          <!-- Prominent Notice Banner (Requirement 7 & 9) -->
+          <div class="smart-controls-notice-banner dept-notice-banner">
+            <div class="sc-notice-content">
+              <div class="sc-notice-icon-box" style="background: rgba(168, 85, 247, 0.15); color: #a855f7;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+              </div>
+              <div>
+                <strong class="sc-notice-title">Simulated campus competition &mdash; normalized scoring models.</strong>
+                <p class="sc-notice-desc">All rankings, participation points, and consumption deltas are demo models. Departments vary in size, room counts, and lab equipment. To ensure fairness, rankings incorporate normalized consumption (kWh per occupied hour), verified energy-saving actions, and participation&mdash;rather than rewarding departments simply for having fewer rooms.</p>
+              </div>
+            </div>
+            <div class="sc-notice-status-box">
+              <div class="sc-status-pill active" id="deptStatusPill">
+                <span class="status-pulse-dot" style="background: #a855f7; box-shadow: 0 0 8px #a855f7;"></span>
+                <span id="deptStatusText">Fall 2026 Active</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Master Toolbar: Period Selector & Filters (Requirement 7) -->
+          <div class="sc-master-toolbar card">
+            <div class="sc-toolbar-mode-col" style="flex: 2;">
+              <label class="filter-label" style="margin-bottom: 4px;">Competition Evaluation Period:</label>
+              <div class="segmented-control mode-segmented-control" role="group" aria-label="Competition Evaluation Period">
+                <button type="button" class="btn-segmented active" id="btnDeptPeriodMonth" data-period="month">
+                  Month to Date (Oct 2026)
+                </button>
+                <button type="button" class="btn-segmented" id="btnDeptPeriodSemester" data-period="semester">
+                  Fall Semester 2026
+                </button>
+                <button type="button" class="btn-segmented" id="btnDeptPeriodYear" data-period="academic_year">
+                  Academic Year 2025-26
+                </button>
+              </div>
+            </div>
+
+            <div class="sc-toolbar-actions-col">
+              <label class="filter-label" style="margin-bottom: 4px;">Challenge Controls:</label>
+              <div class="sc-btn-group">
+                <button type="button" class="btn-primary btn-sm" id="btnOpenRecordActionModal">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  <span>Record Energy Action</span>
+                </button>
+                <button type="button" class="btn-secondary btn-sm" id="btnResetChallengeDemo" title="Reset all department action records and demo baseline">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                  <span>Reset Demo</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Summary KPI Cards -->
+          <div class="kpi-grid sc-summary-grid">
+            <!-- Card 1: Competing Departments -->
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Competing Departments</span>
+                <div class="kpi-icon-wrapper" style="background: rgba(168, 85, 247, 0.15); color: #a855f7;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                </div>
+              </div>
+              <div class="kpi-value" id="kpiDeptCount">5</div>
+              <div class="kpi-subtitle" id="kpiDeptCountSub">4 Active &bull; 1 Sensor Pilot</div>
+            </div>
+
+            <!-- Card 2: Average Energy Reduction -->
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Average Energy Reduction</span>
+                <div class="kpi-icon-wrapper" style="background: rgba(34, 197, 94, 0.15); color: #22c55e;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                </div>
+              </div>
+              <div class="kpi-value text-success" id="kpiDeptAvgReduction">8.2%</div>
+              <div class="kpi-subtitle" id="kpiDeptAvgReductionSub">Across validated baseline departments</div>
+            </div>
+
+            <!-- Card 3: Actions Completed -->
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Challenge Actions Logged</span>
+                <div class="kpi-icon-wrapper" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                </div>
+              </div>
+              <div class="kpi-value text-blue" id="kpiDeptTotalActions">11</div>
+              <div class="kpi-subtitle" id="kpiDeptTotalActionsSub">Campaigns &amp; verified protocols</div>
+            </div>
+
+            <!-- Card 4: Current Leader -->
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Current Leader</span>
+                <div class="kpi-icon-wrapper" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+                </div>
+              </div>
+              <div class="kpi-value text-amber" id="kpiDeptLeading" style="font-size: 1.25rem; line-height: 1.3;">Faculty of Science</div>
+              <div class="kpi-subtitle" id="kpiDeptLeadingSub">445 Overall Points &bull; Rank #1</div>
+            </div>
+          </div>
+
+          <!-- Split Layout: Leaderboard & Scoring (Left) vs Department Detail Panel (Right) -->
+          <div class="dept-split-layout">
+
+            <!-- Left Main Column: Leaderboard & Scoring Explanation -->
+            <div class="dept-main-column">
+
+              <!-- Leaderboard Card (Requirement 8 & 9) -->
+              <div class="card dept-leaderboard-card">
+                <div class="maint-card-header">
+                  <div class="maint-title-group">
+                    <div class="rec-actions-icon-bubble" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+                    </div>
+                    <div>
+                      <h3 class="maint-section-title">Department Leaderboard</h3>
+                      <p class="maint-section-subtitle">Ranked by combined energy reduction, verified actions, and normalized participation</p>
+                    </div>
+                  </div>
+                  <span class="badge-rec-count" id="deptLeaderboardPeriodBadge">October 2026</span>
+                </div>
+
+                <!-- Leaderboard Stream / Table -->
+                <div class="dept-leaderboard-container" id="deptLeaderboardContainer">
+                  <!-- Dynamically populated via JS -->
+                </div>
+              </div>
+
+              <!-- Transparent Scoring System & Rules Card (Requirement 9 & 10) -->
+              <div class="card dept-scoring-card">
+                <div class="maint-card-header">
+                  <div class="maint-title-group">
+                    <div class="rec-actions-icon-bubble" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                    <div>
+                      <h3 class="maint-section-title">Transparent Scoring System</h3>
+                      <p class="maint-section-subtitle">Formula breakdown to guarantee fair comparison across different department sizes</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="dept-rules-grid">
+                  <div class="dept-rule-item">
+                    <div class="dept-rule-icon" style="color: #22c55e;">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                    </div>
+                    <div>
+                      <h4 class="dept-rule-title">1. Normalized Energy Reduction</h4>
+                      <code class="dept-rule-code">Reduction % = (Baseline - Current) / Baseline &times; 100</code>
+                      <p class="dept-rule-desc">Awards <strong>25 points</strong> per 1.0% reduction. Uses normalized <em>kWh per occupied room-hour</em> so departments with more rooms or heavy lab sessions are not penalized.</p>
+                    </div>
+                  </div>
+
+                  <div class="dept-rule-item">
+                    <div class="dept-rule-icon" style="color: #38bdf8;">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                    </div>
+                    <div>
+                      <h4 class="dept-rule-title">2. Verified Action Completion</h4>
+                      <code class="dept-rule-code">Action Points = Completed Actions &times; 50 pts</code>
+                      <p class="dept-rule-desc">Awards <strong>50 points</strong> for each practical energy initiative (e.g. Fume Hood sash campaigns, workstation sleep profiles, or chiller setbacks).</p>
+                    </div>
+                  </div>
+
+                  <div class="dept-rule-item">
+                    <div class="dept-rule-icon" style="color: #a855f7;">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                    </div>
+                    <div>
+                      <h4 class="dept-rule-title">3. Participation &amp; Pledge Rate</h4>
+                      <code class="dept-rule-code">Participation Score = Participation % &times; 2.0</code>
+                      <p class="dept-rule-desc">Awards up to <strong>200 points</strong> based on faculty participation in energy audits, daylighting pledges, and staff engagement.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Defined Achievements (Requirement 10) -->
+                <div class="dept-achievements-legend">
+                  <span class="filter-label" style="display: block; margin-bottom: 8px;">Configured Challenge Achievements:</span>
+                  <div class="dept-achievements-badges-row">
+                    <div class="dept-badge-explainer">
+                      <span class="dept-achieve-pill amber">⚡ Energy Saver</span>
+                      <span>Awarded for &ge; 7.0% verified reduction vs normalized baseline.</span>
+                    </div>
+                    <div class="dept-badge-explainer">
+                      <span class="dept-achieve-pill teal">📈 Consistent Improver</span>
+                      <span>Awarded for steady reductions across 2+ consecutive evaluation periods.</span>
+                    </div>
+                    <div class="dept-badge-explainer">
+                      <span class="dept-achieve-pill purple">🏆 Action Champion</span>
+                      <span>Awarded for completing 3 or more verified energy-saving actions.</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- Right Column: Department Detail & Actions Panel (Requirement 11 & 12) -->
+            <div class="dept-sidebar-column">
+
+              <div class="card dept-detail-card" id="deptDetailCard">
+                <div class="dept-detail-header">
+                  <div class="dept-detail-title-row">
+                    <div>
+                      <div class="dept-code-tag" id="deptDetailCode">SCI</div>
+                      <h3 class="dept-detail-name" id="deptDetailName">Faculty of Science</h3>
+                    </div>
+                    <div class="dept-rank-badge" id="deptDetailRankBadge">Rank #1</div>
+                  </div>
+                  <p class="dept-detail-sub" id="deptDetailSub">Science Building &bull; Prof. Elena Rostova &bull; 8 Monitored Rooms</p>
+                </div>
+
+                <!-- Consumption Comparison Tile -->
+                <div class="dept-consumption-tile">
+                  <div class="dept-metric-header">
+                    <span class="filter-label">Baseline vs Current Consumption</span>
+                    <span class="dept-reduction-tag" id="deptDetailReductionTag">+10.0% Reduction</span>
+                  </div>
+
+                  <div class="dept-bars-visual">
+                    <div class="dept-bar-group">
+                      <div class="dept-bar-label-row">
+                        <span>Baseline Consumption</span>
+                        <strong id="deptDetailBaselineVal">3,100 kWh</strong>
+                      </div>
+                      <div class="dept-bar-track">
+                        <div class="dept-bar-fill baseline" style="width: 100%;"></div>
+                      </div>
+                    </div>
+                    <div class="dept-bar-group" style="margin-top: 8px;">
+                      <div class="dept-bar-label-row">
+                        <span>Current Period Consumption</span>
+                        <strong class="text-success" id="deptDetailCurrentVal">2,790 kWh</strong>
+                      </div>
+                      <div class="dept-bar-track">
+                        <div class="dept-bar-fill current" id="deptDetailCurrentBar" style="width: 90%;"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="dept-normalized-box" id="deptDetailNormalizedBox">
+                    <span class="text-muted">Fair Normalized Rate:</span>
+                    <strong id="deptDetailNormalizedRate">10.73 kWh / occupied room-hour</strong>
+                    <span class="text-muted">(down from 11.92 baseline)</span>
+                  </div>
+                </div>
+
+                <!-- Points Breakdown Tile -->
+                <div class="dept-points-tile">
+                  <span class="filter-label" style="display: block; margin-bottom: 8px;">Total Score Breakdown</span>
+                  <div class="dept-points-pill-grid">
+                    <div class="dept-pt-pill">
+                      <span class="pt-label">Energy Reduction</span>
+                      <strong class="pt-val text-success" id="deptPointsReduction">+250 pts</strong>
+                    </div>
+                    <div class="dept-pt-pill">
+                      <span class="pt-label">Actions Completed</span>
+                      <strong class="pt-val text-blue" id="deptPointsActions">+150 pts</strong>
+                    </div>
+                    <div class="dept-pt-pill">
+                      <span class="pt-label">Participation Rate</span>
+                      <strong class="pt-val text-purple" id="deptPointsParticipation">+184 pts</strong>
+                    </div>
+                    <div class="dept-pt-pill total">
+                      <span class="pt-label">Overall Points</span>
+                      <strong class="pt-val text-amber" id="deptPointsTotal">584 pts</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Unlocked Achievements -->
+                <div class="dept-achievements-tile">
+                  <span class="filter-label" style="display: block; margin-bottom: 6px;">Earned Achievements:</span>
+                  <div class="dept-achieve-tag-list" id="deptDetailAchievements">
+                    <!-- Populated dynamically -->
+                  </div>
+                </div>
+
+                <!-- Department Energy Actions List (Requirement 11) -->
+                <div class="dept-actions-section">
+                  <div class="dept-actions-header">
+                    <span class="filter-label">Challenge Actions:</span>
+                    <button type="button" class="btn-link-action" id="btnQuickRecordActionForDept" style="font-size: 11px;">+ Add Action</button>
+                  </div>
+                  <div class="dept-actions-list" id="deptActionsList">
+                    <!-- Populated dynamically -->
+                  </div>
+                </div>
+
+                <!-- Tailored Recommendations -->
+                <div class="dept-rec-section">
+                  <span class="filter-label" style="display: block; margin-bottom: 6px;">Recommended Next Steps:</span>
+                  <ul class="dept-rec-list" id="deptRecommendationsList">
+                    <!-- Populated dynamically -->
+                  </ul>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- ==================================================================
+             VIEW 9: COMING SOON PLACEHOLDER (For Modules 9 & 10)
              ================================================================== -->
         <section id="placeholderView" class="placeholder-view" aria-label="Module Coming Soon">
           <div class="placeholder-card">
@@ -1390,6 +2708,801 @@
           </svg>
           View Classroom Analytics
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       TIMETABLE OPTIMIZER: SUGGESTION DETAIL MODAL
+       ====================================================================== -->
+  <div id="suggestionDetailModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="sugModalTitle">
+    <div class="modal-container modal-wide">
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <span class="modal-label" id="sugModalCategory">Consolidation Opportunity</span>
+          <h3 id="sugModalTitle">Suggestion Details</h3>
+        </div>
+        <button id="sugModalCloseBtn" class="modal-close-btn" type="button" aria-label="Close modal">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Top Metrics Cards -->
+        <div class="modal-metric-box">
+          <div>
+            <span class="metric-label">Estimated Energy Avoided</span>
+            <span class="metric-val text-success" id="sugModalEnergyVal">9.4 kWh</span>
+            <span class="metric-sub" id="sugModalCostVal">$1.69 / session</span>
+          </div>
+          <div>
+            <span class="metric-label">Confidence Rating</span>
+            <span class="metric-val" id="sugModalConfidence">High</span>
+            <span class="metric-sub">Transparent calculation</span>
+          </div>
+          <div>
+            <span class="metric-label">Schedule Slot</span>
+            <span class="metric-val" id="sugModalTime">Mon 14:00 - 16:00</span>
+            <span class="metric-sub" id="sugModalDuration">2.0 operating hours</span>
+          </div>
+        </div>
+
+        <!-- Room Comparison Grid -->
+        <div class="sug-comparison-table-wrap">
+          <span class="modal-label">Room Allocation Comparison</span>
+          <table class="sug-comparison-table">
+            <thead>
+              <tr>
+                <th scope="col">Parameter</th>
+                <th scope="col">Current Allocation</th>
+                <th scope="col">Proposed Allocation</th>
+                <th scope="col">Delta / Benefit</th>
+              </tr>
+            </thead>
+            <tbody id="sugModalComparisonTbody">
+              <!-- Dynamically populated via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Transparent Formula & Savings Calculation Breakdown -->
+        <div class="sug-formula-box">
+          <span class="modal-label">Transparent Savings Formula Breakdown</span>
+          <p class="formula-breakdown-code" id="sugModalFormulaText">
+            (Current Room Draw: 6.8 kW - Proposed Room Draw: 2.1 kW) &times; 2.0 Operating Hours = 9.4 kWh avoided
+          </p>
+          <p class="formula-breakdown-note">
+            Cost savings calculation: <code>Energy Avoided &times; Demo Tariff ($0.18/kWh)</code>. 
+            Only avoidable operating hours are counted as saved; base campus infrastructure remains active.
+          </p>
+        </div>
+
+        <!-- Rationale -->
+        <div class="modal-detail-row">
+          <span class="modal-label">Engineering Rationale &amp; Opportunity</span>
+          <p class="modal-detail-text" id="sugModalReasonText"></p>
+        </div>
+
+        <!-- Confidence Reason -->
+        <div class="modal-detail-row">
+          <span class="modal-label">Data Quality &amp; Confidence Basis</span>
+          <p class="modal-detail-text" id="sugModalConfidenceReason"></p>
+        </div>
+
+        <!-- Administrator Review Constraints -->
+        <div class="modal-detail-row">
+          <span class="modal-label">Constraints Requiring Facilities &amp; Faculty Review</span>
+          <ul class="waste-causes-list" id="sugModalConstraintsList">
+            <!-- Dynamically populated via JS -->
+          </ul>
+        </div>
+
+        <!-- Prototype Disclaimer -->
+        <div class="modal-simulation-disclaimer">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <span>Demo only &mdash; no real university timetable has been changed.</span>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <div class="modal-footer-nav-buttons">
+          <button id="btnSugGoCurrentRoom" type="button" class="btn-secondary btn-sm" title="Analyze Current Room in Classroom Analytics">
+            Analyze Current Room
+          </button>
+          <button id="btnSugGoProposedRoom" type="button" class="btn-secondary btn-sm" title="Analyze Proposed Room in Classroom Analytics">
+            Analyze Proposed Room
+          </button>
+        </div>
+        <div class="modal-footer-action-buttons">
+          <button id="btnSugModalDismiss" type="button" class="btn-secondary">Dismiss</button>
+          <button id="btnSugModalAccept" type="button" class="btn-primary">Accept for Demo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       TIMETABLE OPTIMIZER: CLASS DETAIL MODAL
+       ====================================================================== -->
+  <div id="classDetailModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="classModalTitle">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <span class="modal-label" id="classModalDept">Department</span>
+          <h3 id="classModalTitle">Course Title</h3>
+        </div>
+        <button id="classModalCloseBtn" class="modal-close-btn" type="button" aria-label="Close modal">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-metric-box">
+          <div>
+            <span class="metric-label">Estimated Power Demand</span>
+            <span class="metric-val" id="classModalPowerKW">6.8 kW</span>
+            <span class="metric-sub" id="classModalEnergyKWh">13.6 kWh / session</span>
+          </div>
+          <div>
+            <span class="metric-label">Enrolled Students</span>
+            <span class="metric-val" id="classModalEnrollment">42 / 120</span>
+            <span class="metric-sub" id="classModalOccupancyPercent">35% capacity</span>
+          </div>
+          <div>
+            <span class="metric-label">Time &amp; Schedule</span>
+            <span class="metric-val" id="classModalSlot">08:00 - 10:00</span>
+            <span class="metric-sub" id="classModalDay">Monday</span>
+          </div>
+        </div>
+
+        <div class="modal-detail-row">
+          <span class="modal-label">Assigned Room &amp; Building</span>
+          <div class="class-room-badge-row">
+            <span class="room-id-tag" id="classModalRoomId">ENG-101</span>
+            <span class="room-type-tag" id="classModalRoomType">Lecture Theater</span>
+            <span class="building-tag" id="classModalBuilding">Engineering Building</span>
+          </div>
+        </div>
+
+        <div class="modal-detail-row">
+          <span class="modal-label">Instructor</span>
+          <p class="modal-detail-text" id="classModalInstructor">Dr. Marcus Vance</p>
+        </div>
+
+        <div class="modal-detail-row">
+          <span class="modal-label">Required Equipment &amp; Features</span>
+          <div class="equipment-tags-wrap" id="classModalEquipment">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+
+        <div class="modal-detail-row" id="classModalConsolidationNotice" style="display: none;">
+          <span class="modal-label">Optimization Opportunity</span>
+          <div class="class-consolidation-alert">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <span id="classModalConsolidationText">This class is flagged for potential room consolidation to reduce energy consumption.</span>
+          </div>
+        </div>
+
+        <div class="modal-simulation-disclaimer">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <span>Fictional demo timetable &mdash; simulated academic schedule.</span>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btnClassGoHeatmap" type="button" class="btn-secondary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -2px;">
+            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+            <line x1="8" y1="2" x2="8" y2="18"></line>
+            <line x1="16" y1="6" x2="16" y2="22"></line>
+          </svg>
+          Locate in Heatmap
+        </button>
+        <button id="btnClassGoAnalytics" type="button" class="btn-secondary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -2px;">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+            <path d="M6 6h10M6 10h10M6 14h6"></path>
+          </svg>
+          View Classroom Analytics
+        </button>
+        <button id="btnClassModalClose" type="button" class="btn-primary">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       STEP 5: ALERT DETAIL MODAL
+       ====================================================================== -->
+  <div id="alertDetailModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="alertModalTitle">
+    <div class="modal-container modal-wide">
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <span class="modal-label" id="alertModalCategory">After-Hours Consumption</span>
+          <h3 id="alertModalTitle">Alert Details</h3>
+        </div>
+        <button id="alertModalCloseBtn" class="modal-close-btn" type="button" aria-label="Close modal">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Top Metric Grid -->
+        <div class="modal-metric-box">
+          <div>
+            <span class="metric-label">Severity Level</span>
+            <span id="alertModalSeverity" class="severity-pill critical">Critical</span>
+            <span class="metric-sub" id="alertModalId">ID #ALT-101</span>
+          </div>
+          <div>
+            <span class="metric-label">Triage Status</span>
+            <span id="alertModalStatus" class="status-pill new">New</span>
+            <span class="metric-sub" id="alertModalTimestamp">Today, 02:45 AM</span>
+          </div>
+          <div>
+            <span class="metric-label">Measured Demand</span>
+            <span class="metric-val text-danger" id="alertModalDraw">6.8 kW</span>
+            <span class="metric-sub" id="alertModalStandby">Baseline: 0.4 kW</span>
+          </div>
+          <div>
+            <span class="metric-label">Avoidable Impact</span>
+            <span class="metric-val text-success" id="alertModalWaste">28.8 kWh</span>
+            <span class="metric-sub" id="alertModalCost">~$5.18 avoidable</span>
+          </div>
+        </div>
+
+        <!-- Target Facility & Classroom Row -->
+        <div class="modal-detail-row">
+          <span class="modal-label">Target Facility &amp; Classroom Location</span>
+          <div class="class-room-badge-row">
+            <span class="room-id-tag" id="alertModalRoom">ENG-101</span>
+            <span class="building-tag" id="alertModalBuilding">Engineering Building</span>
+            <span class="room-type-tag" id="alertModalRoomType">Lecture Theater</span>
+          </div>
+        </div>
+
+        <!-- Data Quality Notice Banner (Shown only for data-quality / missing sensor alerts) -->
+        <div id="alertModalDataQualityNotice" class="alert-data-quality-banner" style="display: none;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          <div>
+            <strong>Data Quality / Telemetry Communication Loss:</strong>
+            <p>Missing sensor readings indicate an IoT sub-meter communication gap. This condition represents an observability issue and must <em>not</em> be claimed as proof of energy waste.</p>
+          </div>
+        </div>
+
+        <!-- Investigation Findings -->
+        <div class="modal-detail-row">
+          <span class="modal-label">Investigation Findings &amp; Context</span>
+          <p class="modal-detail-text" id="alertModalDetails"></p>
+        </div>
+
+        <!-- Rule Trigger Details -->
+        <div class="modal-detail-row">
+          <span class="modal-label">Triggered Automated Rule &amp; Threshold Logic</span>
+          <div class="alert-rule-callout">
+            <code id="alertModalRuleTriggered">After-Hours Anomaly: Active draw (6.8 kW) exceeded 1.5 kW threshold.</code>
+          </div>
+        </div>
+
+        <!-- Recommended Remediation -->
+        <div class="modal-detail-row">
+          <span class="modal-label">Recommended Remediation Next Steps</span>
+          <p class="modal-detail-text font-semibold" id="alertModalAction"></p>
+        </div>
+
+        <!-- Prototype Disclaimer -->
+        <div class="modal-simulation-disclaimer">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <span>Demo only &mdash; simulated anomaly event. All telemetry is generated from prototype data models.</span>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <div class="modal-footer-nav-buttons">
+          <button id="btnAlertModalHeatmap" type="button" class="btn-secondary btn-sm" title="Locate Room in Energy Heatmap">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -2px;"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+            Locate in Heatmap
+          </button>
+          <button id="btnAlertModalAnalytics" type="button" class="btn-secondary btn-sm" title="View Granular Room Analytics">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -2px;"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path><path d="M6 6h10M6 10h10M6 14h6"></path></svg>
+            View Room Analytics
+          </button>
+        </div>
+        <div class="modal-footer-action-buttons">
+          <button id="btnAlertModalAck" type="button" class="btn-secondary">Acknowledge</button>
+          <button id="btnAlertModalResolve" type="button" class="btn-primary">Resolve Alert</button>
+          <button id="btnAlertModalClose" type="button" class="btn-secondary">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       STEP 6: CONFIRMATION MODALS (Auto Simulation, Reset Demo, Clear Log)
+       ====================================================================== -->
+  <!-- 1. Auto Simulation Confirmation Modal -->
+  <div id="autoSimConfirmModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="autoSimModalTitle">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <span class="modal-label">Automated Energy Rules</span>
+          <h3 id="autoSimModalTitle">Enable Automatic Simulation?</h3>
+        </div>
+        <button id="autoSimModalCloseBtn" class="modal-close-btn" type="button" aria-label="Close modal">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-detail-row">
+          <p class="modal-text" style="font-size: 13.5px; line-height: 1.6;">
+            Enabling <strong>Automatic Simulation</strong> activates automated rule evaluation across all monitored classrooms:
+          </p>
+          <ul style="padding-left: 18px; margin-top: 8px; font-size: 13px; line-height: 1.7; color: var(--color-text-secondary);">
+            <li>Identifies unnecessary equipment left ON in unoccupied classrooms.</li>
+            <li>Initiates a simulated countdown delay (default 4s) before turning off eligible equipment.</li>
+            <li><strong>Safety Rules Enforced:</strong> Devices in occupied rooms, equipment protected by <em>Manual Override</em>, and <em>Essential Equipment</em> are strictly protected from shutdown.</li>
+            <li>All actions are recorded in the real-time event log.</li>
+          </ul>
+        </div>
+        <div class="modal-simulation-disclaimer">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <span>Demo only &mdash; browser simulation. No physical electrical circuits or hardware are connected.</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btnCancelAutoSim" type="button" class="btn-secondary">Cancel</button>
+        <button id="btnConfirmAutoSim" type="button" class="btn-primary">Enable Auto Simulation</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Reset Simulation Confirmation Modal -->
+  <div id="resetSimConfirmModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="resetSimModalTitle">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <span class="modal-label">Prototype Reset</span>
+          <h3 id="resetSimModalTitle">Reset Simulator Demo State?</h3>
+        </div>
+        <button id="resetSimModalCloseBtn" class="modal-close-btn" type="button" aria-label="Close modal">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-text" style="font-size: 13.5px; line-height: 1.6;">
+          This will restore all 24 classrooms, device on/off states, manual overrides, and occupancy statuses to their initial demo baseline.
+        </p>
+        <p class="modal-text text-muted" style="font-size: 12.5px; margin-top: 6px;">
+          Note: This action only resets the Smart Controls simulation and preserves your dashboard analytics, timetable, and alert history.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button id="btnCancelResetSim" type="button" class="btn-secondary">Cancel</button>
+        <button id="btnConfirmResetSim" type="button" class="btn-primary" style="background-color: var(--color-danger); border-color: var(--color-danger);">Reset Demo State</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Clear Log Confirmation Modal -->
+  <div id="clearLogConfirmModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="clearLogModalTitle">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <span class="modal-label">Audit Log</span>
+          <h3 id="clearLogModalTitle">Clear Simulation Event Log?</h3>
+        </div>
+        <button id="clearLogModalCloseBtn" class="modal-close-btn" type="button" aria-label="Close modal">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-text" style="font-size: 13.5px; line-height: 1.6;">
+          Are you sure you want to clear the chronological event feed? Current classroom states and simulated energy savings will not be affected.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button id="btnCancelClearLog" type="button" class="btn-secondary">Cancel</button>
+        <button id="btnConfirmClearLog" type="button" class="btn-primary">Clear Log</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       STEP 7: PREVENTIVE MAINTENANCE DETAIL MODAL
+       ====================================================================== -->
+  <div id="maintenanceDetailModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="maintModalTitle">
+    <div class="modal-container modal-wide">
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <span class="modal-label" id="maintModalCategory">Preventive Maintenance Asset</span>
+          <h3 id="maintModalTitle">Equipment Task Details</h3>
+        </div>
+        <button id="maintModalCloseBtn" class="modal-close-btn" type="button" aria-label="Close modal">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-metric-box maint-metric-box">
+          <div>
+            <span class="metric-label">Equipment ID &amp; Type</span>
+            <span class="metric-val" id="maintModalId">EQ-ENG-101-AC1</span>
+            <span class="metric-sub" id="maintModalType">Air Conditioner / HVAC</span>
+          </div>
+          <div>
+            <span class="metric-label">Location / Zone</span>
+            <span class="metric-val" id="maintModalRoom">ENG-101</span>
+            <span class="metric-sub" id="maintModalBuilding">Engineering Building</span>
+          </div>
+          <div>
+            <span class="metric-label">Condition &amp; Priority</span>
+            <div style="display: flex; gap: 6px; align-items: center; margin-top: 4px;">
+              <span class="maint-condition-pill" id="maintModalCondition">Urgent Review</span>
+              <span class="maint-priority-badge" id="maintModalPriority">Critical</span>
+            </div>
+          </div>
+          <div>
+            <span class="metric-label">Work Order Status</span>
+            <span class="maint-status-badge" id="maintModalStatus" style="margin-top: 4px; display: inline-block;">Open</span>
+          </div>
+        </div>
+
+        <div class="modal-detail-row">
+          <span class="modal-label">Reported Issue / Diagnostic Finding</span>
+          <p id="maintModalIssue" class="modal-detail-text" style="font-weight: 600; color: var(--color-text-main);"></p>
+        </div>
+
+        <div class="modal-detail-row">
+          <span class="modal-label">Telemetry Trigger &amp; Energy Anomaly</span>
+          <p id="maintModalReason" class="modal-text"></p>
+        </div>
+
+        <div class="modal-detail-row">
+          <span class="modal-label">Recommended Remediation Action</span>
+          <p id="maintModalAction" class="modal-text" style="color: var(--color-primary); font-weight: 500;"></p>
+        </div>
+
+        <div class="modal-grid-2col">
+          <div class="modal-detail-row">
+            <span class="modal-label">Assigned Engineering Team</span>
+            <p id="maintModalAssignedTeam" class="modal-detail-text"></p>
+          </div>
+          <div class="modal-detail-row">
+            <span class="modal-label">Target Completion Date</span>
+            <p id="maintModalTargetDate" class="modal-detail-text"></p>
+          </div>
+        </div>
+
+        <div class="modal-grid-2col">
+          <div class="modal-detail-row">
+            <span class="modal-label">Last Maintenance Date</span>
+            <p id="maintModalLastDate" class="modal-detail-text"></p>
+          </div>
+          <div class="modal-detail-row">
+            <span class="modal-label">Next Maintenance Due</span>
+            <p id="maintModalDueDate" class="modal-detail-text"></p>
+          </div>
+        </div>
+
+        <!-- Maintenance History Log -->
+        <div class="modal-detail-row">
+          <span class="modal-label">Maintenance History &amp; Event Log</span>
+          <div class="maint-history-wrap" id="maintModalHistoryTimeline">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+
+        <!-- Status Transition Controls in Modal -->
+        <div class="modal-detail-row maint-status-actions-box">
+          <span class="modal-label">Update Work Order Status:</span>
+          <div class="maint-status-btn-group" id="maintModalStatusBtnGroup">
+            <button type="button" class="btn-sm btn-secondary" id="btnMaintSetScheduled">Mark Scheduled</button>
+            <button type="button" class="btn-sm btn-secondary" id="btnMaintSetInProgress">Mark In Progress</button>
+            <button type="button" class="btn-sm btn-primary" id="btnMaintSetCompleted">Mark Completed</button>
+            <button type="button" class="btn-sm btn-secondary" id="btnMaintSetReopen" style="display: none;">Reopen Task</button>
+          </div>
+        </div>
+
+        <!-- Simulation Disclaimer Notice -->
+        <div class="modal-simulation-disclaimer">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <span>Simulation only &mdash; fictional equipment records &amp; diagnostic telemetry. Unusually high consumption indicates a potential problem but does not prove mechanical failure. Completing a task does not automatically fabricate electricity savings without interval measurement.</span>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btnMaintModalAnalytics" type="button" class="btn-secondary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -2px;">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+            <path d="M6 6h10M6 10h10M6 14h6"></path>
+          </svg>
+          View Classroom Analytics
+        </button>
+        <button id="btnMaintModalHeatmap" type="button" class="btn-secondary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -2px;">
+            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+            <line x1="8" y1="2" x2="8" y2="18"></line>
+            <line x1="16" y1="6" x2="16" y2="22"></line>
+          </svg>
+          Locate in Heatmap
+        </button>
+        <button id="btnMaintModalClose" type="button" class="btn-primary">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       STEP 7: ADD MAINTENANCE TASK MODAL
+       ====================================================================== -->
+  <div id="addMaintenanceModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="addMaintModalTitle">
+    <div class="modal-container modal-wide">
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <span class="modal-label">Preventive Maintenance</span>
+          <h3 id="addMaintModalTitle">Add Maintenance Task</h3>
+        </div>
+        <button id="addMaintModalCloseBtn" class="modal-close-btn" type="button" aria-label="Close modal">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="addMaintForm">
+        <div class="modal-body">
+          <div id="addMaintValidationMsg" class="form-validation-alert" style="display: none;"></div>
+
+          <div class="modal-grid-2col">
+            <div class="form-group">
+              <label for="addMaintRoomSelect" class="form-label">Target Classroom / Room: <span class="text-danger">*</span></label>
+              <select id="addMaintRoomSelect" class="form-select" required>
+                <!-- Populated dynamically with all 24 classrooms -->
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="addMaintEquipmentName" class="form-label">Equipment Name / Asset: <span class="text-danger">*</span></label>
+              <input type="text" id="addMaintEquipmentName" class="form-input" placeholder="e.g. Dual Split Chiller Unit Beta" required>
+            </div>
+          </div>
+
+          <div class="modal-grid-3col">
+            <div class="form-group">
+              <label for="addMaintTypeSelect" class="form-label">Equipment Type: <span class="text-danger">*</span></label>
+              <select id="addMaintTypeSelect" class="form-select" required>
+                <option value="air_conditioner">Air Conditioner / HVAC</option>
+                <option value="fans">Circulation &amp; Exhaust Fans</option>
+                <option value="lighting">Ceiling Lighting Grid</option>
+                <option value="projector">Digital Projector &amp; AV</option>
+                <option value="specialized">Specialized Lab Unit</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="addMaintPrioritySelect" class="form-label">Priority: <span class="text-danger">*</span></label>
+              <select id="addMaintPrioritySelect" class="form-select" required>
+                <option value="Critical">Critical / Urgent</option>
+                <option value="High">High Priority</option>
+                <option value="Medium" selected>Medium Priority</option>
+                <option value="Low">Low Priority</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="addMaintConditionSelect" class="form-label">Initial Condition: <span class="text-danger">*</span></label>
+              <select id="addMaintConditionSelect" class="form-select" required>
+                <option value="Urgent Review">Urgent Review</option>
+                <option value="Maintenance Due" selected>Maintenance Due</option>
+                <option value="Inspection Recommended">Inspection Recommended</option>
+                <option value="Good">Good Condition</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="modal-grid-2col">
+            <div class="form-group">
+              <label for="addMaintTeamSelect" class="form-label">Assigned Engineering Team: <span class="text-danger">*</span></label>
+              <select id="addMaintTeamSelect" class="form-select" required>
+                <option value="HVAC Rapid Response Unit">HVAC Rapid Response Unit</option>
+                <option value="Campus Facilities Mechanical Team" selected>Campus Facilities Mechanical Team</option>
+                <option value="Electrical &amp; Lighting Group">Electrical &amp; Lighting Group</option>
+                <option value="AV &amp; Instructional Tech Team">AV &amp; Instructional Tech Team</option>
+                <option value="Lab Safety &amp; Ventilation Services">Lab Safety &amp; Ventilation Services</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="addMaintTargetDate" class="form-label">Target Completion Date: <span class="text-danger">*</span></label>
+              <input type="date" id="addMaintTargetDate" class="form-input" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="addMaintIssue" class="form-label">Reported Issue Summary: <span class="text-danger">*</span></label>
+            <input type="text" id="addMaintIssue" class="form-input" placeholder="e.g. AC filter inspection overdue, air intake restricted" required>
+          </div>
+
+          <div class="form-group">
+            <label for="addMaintReason" class="form-label">Reason for Inspection &amp; Observed Telemetry:</label>
+            <textarea id="addMaintReason" class="form-textarea" rows="2" placeholder="e.g. Observed persistent 6.8 kW standby draw after hours. Airflow sensors suggest dirty filter coil."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="addMaintRecommendedAction" class="form-label">Recommended Action:</label>
+            <input type="text" id="addMaintRecommendedAction" class="form-input" placeholder="e.g. Replace HEPA pre-filter and inspect return damper actuators.">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button id="btnCancelAddMaint" type="button" class="btn-secondary">Cancel</button>
+          <button id="btnSubmitAddMaint" type="submit" class="btn-primary">Create Maintenance Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       STEP 7: RECORD DEPARTMENT ENERGY ACTION MODAL
+       ====================================================================== -->
+  <div id="recordActionModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="recordActionModalTitle">
+    <div class="modal-container modal-md">
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <span class="modal-label">Department Energy Challenge</span>
+          <h3 id="recordActionModalTitle">Record Energy-Saving Action</h3>
+        </div>
+        <button id="recordActionModalCloseBtn" class="modal-close-btn" type="button" aria-label="Close modal">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="recordActionForm">
+        <div class="modal-body">
+          <div id="recordActionValidationMsg" class="form-validation-alert" style="display: none;"></div>
+
+          <div class="form-group">
+            <label for="recordActionDeptSelect" class="form-label">Participating Department: <span class="text-danger">*</span></label>
+            <select id="recordActionDeptSelect" class="form-select" required>
+              <option value="dept_science">Faculty of Science (SCI)</option>
+              <option value="dept_engineering">School of Engineering (ENG)</option>
+              <option value="dept_business">College of Business &amp; Management (BUS)</option>
+              <option value="dept_admin">Central Campus Administration (ADM)</option>
+              <option value="dept_humanities">Faculty of Arts &amp; Humanities (HUM)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="recordActionTitle" class="form-label">Action Title / Initiative: <span class="text-danger">*</span></label>
+            <input type="text" id="recordActionTitle" class="form-input" placeholder="e.g. Fume Hood Sash Campaign, Lighting Audit, AC Schedule Review" required>
+          </div>
+
+          <div class="modal-grid-2col">
+            <div class="form-group">
+              <label for="recordActionCategory" class="form-label">Action Category: <span class="text-danger">*</span></label>
+              <select id="recordActionCategory" class="form-select" required>
+                <option value="Behavioral Campaign">Behavioral Campaign</option>
+                <option value="Operational Adjustment">Operational Adjustment</option>
+                <option value="Safety &amp; Lab Protocols">Safety &amp; Lab Protocols</option>
+                <option value="Equipment Optimization">Equipment Optimization</option>
+                <option value="Energy Awareness Campaign">Energy Awareness Campaign</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="recordActionPoints" class="form-label">Points Awarded: <span class="text-danger">*</span></label>
+              <input type="number" id="recordActionPoints" class="form-input" value="50" min="10" max="150" step="10" required>
+            </div>
+          </div>
+
+          <div class="modal-grid-2col">
+            <div class="form-group">
+              <label for="recordActionDate" class="form-label">Completion / Log Date: <span class="text-danger">*</span></label>
+              <input type="date" id="recordActionDate" class="form-input" required>
+            </div>
+
+            <div class="form-group">
+              <label for="recordActionStatus" class="form-label">Status: <span class="text-danger">*</span></label>
+              <select id="recordActionStatus" class="form-select" required>
+                <option value="completed" selected>Completed (+50 pts to Participation)</option>
+                <option value="in_progress">In Progress (Pending Completion)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="recordActionNote" class="form-label">Action Description &amp; Verification Note:</label>
+            <textarea id="recordActionNote" class="form-textarea" rows="2" placeholder="Describe the measures taken, participating personnel, and verification method."></textarea>
+          </div>
+
+          <div class="modal-simulation-disclaimer">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <span>Transparency rule: Recording a challenge action awards participation and action points, but does NOT falsely claim electricity reduction without measured interval data.</span>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button id="btnCancelRecordAction" type="button" class="btn-secondary">Cancel</button>
+          <button id="btnSubmitRecordAction" type="submit" class="btn-primary">Record Action</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Reset Maintenance Confirmation Modal -->
+  <div id="resetMaintConfirmModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="resetMaintModalTitle">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <span class="modal-label">Preventive Maintenance</span>
+          <h3 id="resetMaintModalTitle">Reset Maintenance Demo State?</h3>
+        </div>
+        <button id="resetMaintModalCloseBtn" class="modal-close-btn" type="button" aria-label="Close modal">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-text" style="font-size: 13.5px; line-height: 1.6;">
+          This will restore the 14 baseline equipment records, reset work order statuses, and remove any user-created maintenance tasks from local storage.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button id="btnCancelResetMaint" type="button" class="btn-secondary">Cancel</button>
+        <button id="btnConfirmResetMaint" type="button" class="btn-primary" style="background-color: var(--color-danger); border-color: var(--color-danger);">Reset Records</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reset Department Challenge Confirmation Modal -->
+  <div id="resetDeptConfirmModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="resetDeptModalTitle">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <span class="modal-label">Department Challenge</span>
+          <h3 id="resetDeptModalTitle">Reset Challenge Demo State?</h3>
+        </div>
+        <button id="resetDeptModalCloseBtn" class="modal-close-btn" type="button" aria-label="Close modal">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-text" style="font-size: 13.5px; line-height: 1.6;">
+          This will restore the department leaderboards, reset all recorded challenge actions, and revert scores to their initial demo baseline.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button id="btnCancelResetDept" type="button" class="btn-secondary">Cancel</button>
+        <button id="btnConfirmResetDept" type="button" class="btn-primary" style="background-color: var(--color-danger); border-color: var(--color-danger);">Reset Challenge</button>
       </div>
     </div>
   </div>
