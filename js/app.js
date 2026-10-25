@@ -204,8 +204,6 @@
   // DOM Elements Cache
   const elements = {
     // Step 10: Competition Guided Demo Elements
-    btnStartGuidedDemo: document.getElementById('btnStartGuidedDemo'),
-    btnTopStartDemo: document.getElementById('btnTopStartDemo'),
     guidedDemoDock: document.getElementById('guidedDemoDock'),
     demoStagePill: document.getElementById('demoStagePill'),
     demoViewPill: document.getElementById('demoViewPill'),
@@ -314,6 +312,7 @@
     kpiActiveAlerts: document.getElementById('kpiActiveAlerts'),
     kpiAlertsSub: document.getElementById('kpiAlertsSub'),
     kpiMonitoredRooms: document.getElementById('kpiMonitoredRooms'),
+    kpiMonitoredUnit: document.getElementById('kpiMonitoredUnit'),
     kpiRoomsSub: document.getElementById('kpiRoomsSub'),
 
     // Charts
@@ -325,6 +324,15 @@
     chartFallback: document.getElementById('chartFallback'),
     fallbackBarsContainer: document.getElementById('fallbackBarsContainer'),
     buildingComparisonList: document.getElementById('buildingComparisonList'),
+    distPeriodBadge: document.getElementById('distPeriodBadge'),
+
+    // Overview Heatmap & Recommended Action
+    overviewHeatmapTilesGrid: document.getElementById('overviewHeatmapTilesGrid'),
+    btnGoToFullHeatmap: document.getElementById('btnGoToFullHeatmap'),
+    btnGoToAllAlerts: document.getElementById('btnGoToAllAlerts'),
+    overviewRecommendedAction: document.getElementById('overviewRecommendedAction'),
+    recActionSummary: document.getElementById('recActionSummary'),
+    btnRecActionApply: document.getElementById('btnRecActionApply'),
 
     // Operational Sections
     priorityActionsList: document.getElementById('priorityActionsList'),
@@ -1004,6 +1012,7 @@
       elements.placeholderView.style.display = 'none';
       elements.topHeading.textContent = 'Campus Overview';
       elements.topBreadcrumb.textContent = 'Campus Management / Overview';
+      renderOverviewHeatmap();
     } else if (viewKey === 'energy-heatmap') {
       elements.overviewView.style.display = 'none';
       if (elements.heatmapView) elements.heatmapView.style.display = 'block';
@@ -1288,8 +1297,19 @@
     elements.kpiPotentialSavings.textContent = formatNumber(potentialSavings);
     elements.kpiSavingsSub.textContent = sublabelSavings;
 
-    elements.kpiActiveAlerts.textContent = formatNumber(Math.max(0, activeAlerts));
-    elements.kpiMonitoredRooms.textContent = formatNumber(monitoredRooms);
+    if (elements.kpiActiveAlerts) elements.kpiActiveAlerts.textContent = formatNumber(Math.max(0, activeAlerts));
+
+    if (elements.kpiMonitoredRooms) {
+      if (state.selectedBuilding === 'all') {
+        elements.kpiMonitoredRooms.textContent = '3';
+        if (elements.kpiMonitoredUnit) elements.kpiMonitoredUnit.textContent = 'Buildings';
+        if (elements.kpiRoomsSub) elements.kpiRoomsSub.textContent = '24 rooms online';
+      } else {
+        elements.kpiMonitoredRooms.textContent = '1';
+        if (elements.kpiMonitoredUnit) elements.kpiMonitoredUnit.textContent = 'Building';
+        if (elements.kpiRoomsSub) elements.kpiRoomsSub.textContent = `${monitoredRooms} rooms online`;
+      }
+    }
 
     // Update Topbar Badge
     elements.notifBadge.textContent = Math.max(0, activeAlerts);
@@ -1469,6 +1489,53 @@
   /**
    * Render Building Energy Distribution Chart & Progress Breakdown
    */
+  /**
+   * Render Room Energy Heatmap (Compact Grid for Overview)
+   */
+  function renderOverviewHeatmap() {
+    if (!elements.overviewHeatmapTilesGrid) return;
+    elements.overviewHeatmapTilesGrid.innerHTML = '';
+
+    const periodKey = state.dateRange === '30d' ? 'thirtyDays' : 'sevenDays';
+
+    // Filter by selected building if not 'all'
+    const filteredRooms = SCEO_DATA.classrooms.filter(room => {
+      if (state.selectedBuilding === 'all') return true;
+      return room.buildingId === state.selectedBuilding;
+    });
+
+    filteredRooms.forEach(room => {
+      const pInfo = getRoomPriorityInfo(room, periodKey);
+      const tile = document.createElement('div');
+      tile.className = `overview-hm-tile ${pInfo.colorClass}`;
+      tile.setAttribute('title', `${room.name} (${room.buildingName}) - Intensity: ${pInfo.intensityFormatted || pInfo.intensityText} - Click to inspect`);
+      tile.setAttribute('role', 'button');
+      tile.setAttribute('tabindex', '0');
+
+      const shortCode = room.id.replace(/^(ENG|SCI|BUS)-/, '');
+      tile.innerHTML = `
+        <span class="tile-code">${shortCode}</span>
+        <span class="tile-val">${pInfo.intensityVal > 0 ? pInfo.intensityVal.toFixed(1) : (room.currentPowerKW ? room.currentPowerKW.toFixed(1) + 'k' : '--')}</span>
+      `;
+
+      tile.addEventListener('click', () => {
+        openRoomModal(room.id);
+      });
+
+      tile.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openRoomModal(room.id);
+        }
+      });
+
+      elements.overviewHeatmapTilesGrid.appendChild(tile);
+    });
+  }
+
+  /**
+   * Render Building Energy Distribution Chart & Progress Breakdown
+   */
   function renderBuildingDistribution() {
     const buildingColors = {
       engineering: '#12304A', // Deep Navy
@@ -1476,9 +1543,14 @@
       business: '#38BDF8'     // Light Blue Accent
     };
 
+    const is30d = state.dateRange === '30d';
+    if (elements.distPeriodBadge) {
+      elements.distPeriodBadge.textContent = is30d ? 'Last 30 Days (Simulated)' : 'Last 7 Days (Simulated)';
+    }
+
     const bldgNames = SCEO_DATA.buildings.map(b => b.name);
     const bldgShares = SCEO_DATA.buildings.map(b => b.sharePercentage);
-    const bldgKWh = SCEO_DATA.buildings.map(b => b.kpi7Days.totalKWh);
+    const bldgKWh = SCEO_DATA.buildings.map(b => is30d ? b.kpi30Days.totalKWh : b.kpi7Days.totalKWh);
 
     // Render Progress Bar Breakdown
     if (elements.buildingComparisonList) {
@@ -1486,23 +1558,32 @@
       SCEO_DATA.buildings.forEach(bldg => {
         const color = buildingColors[bldg.id] || '#176B73';
         const isSelected = state.selectedBuilding === bldg.id;
+        const kWhVal = is30d ? bldg.kpi30Days.totalKWh : bldg.kpi7Days.totalKWh;
 
         const item = document.createElement('div');
         item.className = 'comparison-item';
-        item.style.opacity = (state.selectedBuilding === 'all' || isSelected) ? '1' : '0.4';
+        item.style.cursor = 'pointer';
+        item.style.opacity = (state.selectedBuilding === 'all' || isSelected) ? '1' : '0.45';
+        item.setAttribute('title', `Filter by ${bldg.name}`);
         
         item.innerHTML = `
           <div class="comparison-meta">
             <span class="comparison-name">
               <span class="comparison-dot" style="background-color: ${color};"></span>
-              ${bldg.name} ${isSelected ? '(Selected)' : ''}
+              ${bldg.name} ${isSelected ? '<span class="selected-scope-tag">(Filtered)</span>' : ''}
             </span>
-            <span class="comparison-value">${formatNumber(bldg.kpi7Days.totalKWh)} kWh (${bldg.sharePercentage}%)</span>
+            <span class="comparison-value"><strong>${bldg.sharePercentage}%</strong> <span style="color: var(--color-text-muted); font-size: 0.6875rem;">(${formatNumber(kWhVal)} kWh)</span></span>
           </div>
           <div class="progress-track">
             <div class="progress-fill" style="width: ${bldg.sharePercentage}%; background-color: ${color};"></div>
           </div>
         `;
+
+        item.addEventListener('click', () => {
+          const newTarget = state.selectedBuilding === bldg.id ? 'all' : bldg.id;
+          handleBuildingChange(newTarget);
+        });
+
         elements.buildingComparisonList.appendChild(item);
       });
     }
@@ -1549,21 +1630,45 @@
   }
 
   /**
-   * Render Priority Actions
+   * Render Priority Actions & Overview Recommended Action Banner
    */
   function renderPriorityActions() {
-    if (!elements.priorityActionsList) return;
-
-    elements.priorityActionsList.innerHTML = '';
-
     // Filter actions if a specific building is chosen
     const actions = SCEO_DATA.priorityActions.filter(action => {
       if (state.selectedBuilding === 'all') return true;
       return action.buildingId === state.selectedBuilding;
     });
 
-    const activeCount = actions.filter(a => !state.resolvedActions.has(a.id)).length;
-    elements.actionsCountBadge.textContent = `${activeCount} Active`;
+    const activeActions = actions.filter(a => !state.resolvedActions.has(a.id));
+    const activeCount = activeActions.length;
+
+    if (elements.actionsCountBadge) {
+      elements.actionsCountBadge.textContent = `${activeCount} Active`;
+    }
+
+    // Update compact Recommended Action Banner on Overview
+    const topAction = activeActions[0] || actions[0] || SCEO_DATA.priorityActions[0];
+    if (elements.recActionSummary && topAction) {
+      const isResolved = state.resolvedActions.has(topAction.id);
+      if (isResolved) {
+        elements.recActionSummary.innerHTML = `
+          <strong>Action Completed:</strong> ${topAction.title} marked resolved. Monitored schedule setback active.
+        `;
+      } else {
+        elements.recActionSummary.innerHTML = `
+          <strong>${topAction.title}:</strong> ${topAction.summary} ${topAction.recommendedAction} (Est. <strong>${topAction.estimatedSavings}</strong>).
+        `;
+      }
+
+      if (elements.btnRecActionApply) {
+        elements.btnRecActionApply.onclick = () => {
+          openActionModal(topAction);
+        };
+      }
+    }
+
+    if (!elements.priorityActionsList) return;
+    elements.priorityActionsList.innerHTML = '';
 
     if (actions.length === 0) {
       elements.priorityActionsList.innerHTML = `
@@ -1685,7 +1790,7 @@
   }
 
   /**
-   * Render Recent Alerts List
+   * Render Recent Alerts List (Compact for Overview)
    */
   function renderRecentAlerts() {
     if (!elements.recentAlertsList) return;
@@ -1697,42 +1802,70 @@
       return alert.buildingId === state.selectedBuilding;
     });
 
-    elements.alertsFilterStatus.textContent = state.selectedBuilding === 'all'
-      ? `${filteredAlerts.length} Active Feeds`
-      : `${filteredAlerts.length} in Building`;
+    if (elements.alertsFilterStatus) {
+      elements.alertsFilterStatus.textContent = state.selectedBuilding === 'all'
+        ? `${filteredAlerts.length} Active Feeds`
+        : `${filteredAlerts.length} in Building`;
+    }
 
     if (filteredAlerts.length === 0) {
       elements.recentAlertsList.innerHTML = `
-        <div style="text-align: center; padding: 24px; color: #64748B; font-size: 13px;">
+        <div style="text-align: center; padding: 18px; color: #64748B; font-size: 12px;">
           No active telemetry anomalies reported for this building.
         </div>
       `;
       return;
     }
 
-    filteredAlerts.forEach(alert => {
-      const isRead = state.readAlerts.has(alert.id);
-      const row = document.createElement('div');
-      row.className = 'alert-item-row';
-      if (isRead) row.style.opacity = '0.65';
+    // Display top 3 compact alerts for overview dashboard
+    const displayAlerts = filteredAlerts.slice(0, 3);
 
-      let statusDotClass = 'info';
-      if (alert.severity === 'critical') statusDotClass = 'critical';
-      else if (alert.severity === 'warning') statusDotClass = 'warning';
+    displayAlerts.forEach(alert => {
+      const isRead = state.readAlerts && state.readAlerts.has(alert.id);
+      const row = document.createElement('div');
+      row.className = 'compact-alert-row';
+      if (isRead) row.style.opacity = '0.65';
+      row.setAttribute('role', 'button');
+      row.setAttribute('tabindex', '0');
+      row.setAttribute('title', `Click to triage alert for ${alert.room}`);
+
+      let sevClass = 'review';
+      let sevLabel = 'Review';
+      let sevIconSvg = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
+
+      if (alert.severity === 'critical') {
+        sevClass = 'high';
+        sevLabel = 'High';
+        sevIconSvg = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
+      } else if (alert.severity === 'warning') {
+        sevClass = 'medium';
+        sevLabel = 'Medium';
+        sevIconSvg = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+      }
 
       row.innerHTML = `
-        <span class="alert-status-dot ${statusDotClass}"></span>
-        <div class="alert-content">
-          <div class="alert-meta-top">
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <span class="alert-room-tag">${alert.room}</span>
-              <span class="alert-category-label">${alert.category} • ${alert.buildingName}</span>
-            </div>
-            <span class="alert-timestamp">${alert.timestamp}</span>
+        <div class="compact-alert-left">
+          <div class="compact-alert-icon ${sevClass}" aria-hidden="true">
+            ${sevIconSvg}
           </div>
-          <p class="alert-message">${alert.message} <strong style="color: var(--color-text-main);">Current Draw: ${alert.currentDraw}</strong></p>
+          <div class="compact-alert-text">
+            <div class="compact-alert-title">${alert.buildingName} — ${alert.room}</div>
+            <div class="compact-alert-desc">${alert.message}</div>
+          </div>
         </div>
+        <span class="compact-alert-badge ${sevClass}">${sevLabel}</span>
       `;
+
+      row.addEventListener('click', () => {
+        openAlertModal(alert.id);
+      });
+
+      row.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openAlertModal(alert.id);
+        }
+      });
 
       elements.recentAlertsList.appendChild(row);
     });
@@ -3398,6 +3531,7 @@
 
     updateKPIs();
     renderConsumptionChart();
+    renderOverviewHeatmap();
     renderBuildingDistribution();
     renderPriorityActions();
     renderRecentAlerts();
@@ -3437,6 +3571,8 @@
 
     updateKPIs();
     renderConsumptionChart();
+    renderOverviewHeatmap();
+    renderBuildingDistribution();
 
     if (state.currentView === 'energy-heatmap') {
       renderHeatmap();
@@ -4894,7 +5030,7 @@
    */
   function openAlertModal(alertId) {
     const alerts = getAllAlerts();
-    const alert = alerts.find(a => a.id === alertId);
+    const alert = alerts.find(a => a.id.toLowerCase() === alertId.toLowerCase());
     if (!alert) return;
 
     state.activeAlertInModal = alert;
@@ -8049,6 +8185,14 @@
       elements.btnRange30d.addEventListener('click', () => handleDateRangeChange('30d'));
     }
 
+    // Overview Quick Jump Navigation
+    if (elements.btnGoToFullHeatmap) {
+      elements.btnGoToFullHeatmap.addEventListener('click', () => switchView('energy-heatmap'));
+    }
+    if (elements.btnGoToAllAlerts) {
+      elements.btnGoToAllAlerts.addEventListener('click', () => switchView('alerts-actions'));
+    }
+
     // Heatmap Date Range Buttons
     if (elements.hmBtnRange7d) {
       elements.hmBtnRange7d.addEventListener('click', () => handleDateRangeChange('7d'));
@@ -9466,12 +9610,6 @@
     // ========================================================================
     // 13. Step 10: Competition Guided Demo Event Listeners
     // ========================================================================
-    if (elements.btnStartGuidedDemo) {
-      elements.btnStartGuidedDemo.addEventListener('click', () => startGuidedDemo(1));
-    }
-    if (elements.btnTopStartDemo) {
-      elements.btnTopStartDemo.addEventListener('click', () => startGuidedDemo(1));
-    }
     if (elements.btnDemoNext) {
       elements.btnDemoNext.addEventListener('click', nextDemoStage);
     }
@@ -9839,6 +9977,7 @@
 
     updateKPIs();
     renderConsumptionChart();
+    renderOverviewHeatmap();
     renderBuildingDistribution();
     renderPriorityActions();
     renderRecentAlerts();
