@@ -223,22 +223,6 @@
         </div>
 
         <div class="top-bar-right">
-          <!-- Simulated Demo Environment Badge -->
-          <div class="demo-env-badge" title="Telemetry data is simulated for demo evaluation">
-            <span class="dot"></span>
-            <span>Simulated Demo Env</span>
-          </div>
-
-          <!-- Quick Guided Demo Launcher (Step 10) -->
-          <button type="button" class="btn-topbar-demo" id="btnTopStartDemo"
-            title="Launch Competition Guided Walkthrough">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-              style="margin-right: 4px; vertical-align: -1px;">
-              <polygon points="5 3 19 12 5 21 5 3"></polygon>
-            </svg>
-            <span>Guided Demo</span>
-          </button>
-
           <!-- Building Selector -->
           <div class="building-selector-wrapper">
             <label for="buildingSelector" class="visually-hidden" style="display:none;">Select Campus Building</label>
@@ -313,16 +297,6 @@
             </div>
 
             <div class="dashboard-controls">
-              <!-- Start Guided Demo Entry Point -->
-              <button type="button" class="btn btn-primary btn-start-guided-demo" id="btnStartGuidedDemo"
-                title="Launch guided 6-stage energy optimization demonstration">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                  stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; vertical-align: -2px;">
-                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                </svg>
-                <span>Start Guided Demo</span>
-              </button>
-
               <!-- Date Range Selector -->
               <div class="date-range-switcher" role="group" aria-label="Select Date Range">
                 <button type="button" class="date-range-btn active" data-range="7d" id="btnRange7d">Last 7 Days</button>
@@ -332,13 +306,13 @@
           </div>
 
           <!-- ==============================================================
-               KPI CARDS ROW (4 Metric Cards)
+               KPI CARDS ROW (4 Metric Cards in One Compact Row)
                ============================================================== -->
-          <div class="kpi-grid">
-            <!-- 1. Total Energy Consumed -->
+          <div class="kpi-grid overview-kpi-grid">
+            <!-- 1. Energy Used -->
             <div class="kpi-card kpi-primary">
               <div class="kpi-card-header">
-                <span class="kpi-title">Total Energy Consumed</span>
+                <span class="kpi-title">Energy Used</span>
                 <div class="kpi-icon-badge teal">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                     stroke-linejoin="round">
@@ -352,7 +326,7 @@
               </div>
               <div class="kpi-card-footer">
                 <span class="trend-badge positive">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <polyline points="6 9 12 15 18 9" />
                   </svg>
                   8.0%
@@ -361,10 +335,10 @@
               </div>
             </div>
 
-            <!-- 2. Potential Energy Savings -->
+            <!-- 2. Saving Target -->
             <div class="kpi-card kpi-success">
               <div class="kpi-card-header">
-                <span class="kpi-title">Potential Energy Savings</span>
+                <span class="kpi-title">Saving Target</span>
                 <div class="kpi-icon-badge green">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                     stroke-linejoin="round">
@@ -378,11 +352,33 @@
               </div>
               <div class="kpi-card-footer">
                 <span class="trend-badge positive">7.5%</span>
-                <span id="kpiSavingsSub">Recoverable after-hours waste</span>
+                <span id="kpiSavingsSub">Recoverable waste</span>
               </div>
             </div>
 
-            <!-- 3. Active Alerts -->
+            <!-- 3. Buildings Monitored -->
+            <div class="kpi-card kpi-info">
+              <div class="kpi-card-header">
+                <span class="kpi-title">Buildings Monitored</span>
+                <div class="kpi-icon-badge blue">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                  </svg>
+                </div>
+              </div>
+              <div class="kpi-card-body">
+                <span class="kpi-value" id="kpiMonitoredRooms">3</span>
+                <span class="kpi-unit" id="kpiMonitoredUnit">Buildings</span>
+              </div>
+              <div class="kpi-card-footer">
+                <span class="trend-badge positive">100%</span>
+                <span id="kpiRoomsSub">24 rooms online</span>
+              </div>
+            </div>
+
+            <!-- 4. Active Alerts -->
             <div class="kpi-card kpi-warning">
               <div class="kpi-card-header">
                 <span class="kpi-title">Active Alerts</span>
@@ -397,44 +393,22 @@
               </div>
               <div class="kpi-card-body">
                 <span class="kpi-value" id="kpiActiveAlerts">8</span>
-                <span class="kpi-unit">anomalies</span>
+                <span class="kpi-unit">issues</span>
               </div>
               <div class="kpi-card-footer">
-                <span class="trend-badge warning">2 Critical</span>
+                <span class="trend-badge warning">2 High</span>
                 <span id="kpiAlertsSub">Across 3 buildings</span>
-              </div>
-            </div>
-
-            <!-- 4. Monitored Classrooms -->
-            <div class="kpi-card kpi-info">
-              <div class="kpi-card-header">
-                <span class="kpi-title">Monitored Classrooms</span>
-                <div class="kpi-icon-badge blue">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                    stroke-linejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                  </svg>
-                </div>
-              </div>
-              <div class="kpi-card-body">
-                <span class="kpi-value" id="kpiMonitoredRooms">24</span>
-                <span class="kpi-unit">rooms</span>
-              </div>
-              <div class="kpi-card-footer">
-                <span class="trend-badge positive">100%</span>
-                <span id="kpiRoomsSub">Telemetry sensors online</span>
               </div>
             </div>
           </div>
 
           <!-- ==============================================================
-               CHARTS SECTION (Consumption Trend & Building Distribution)
+               ROW 1: CHARTS & HEATMAP (Side-by-Side on Desktop)
                ============================================================== -->
-          <div class="charts-grid">
+          <div class="overview-charts-grid">
 
             <!-- Main Electricity Consumption Chart -->
-            <div class="card">
+            <div class="card overview-chart-card">
               <div class="card-header">
                 <div class="card-title-group">
                   <h3 id="chartMainTitle">Daily Electricity Consumption</h3>
@@ -445,7 +419,7 @@
                 </div>
               </div>
               <div class="card-body">
-                <div class="chart-wrapper">
+                <div class="chart-wrapper overview-chart-wrapper">
                   <!-- Chart.js Canvas -->
                   <canvas id="consumptionChart" aria-label="Daily Electricity Consumption Chart"></canvas>
 
@@ -457,79 +431,129 @@
                   </div>
                 </div>
               </div>
-              <div class="card-footer chart-footer-legend">
+              <div class="card-footer chart-footer-legend compact-legend">
                 <div class="legend-item">
-                  <span class="legend-color-dot" style="background-color: #176B73;"></span>
-                  <span>Daily Electricity Consumption</span>
+                  <span class="legend-color-dot" style="background-color: #168C86;"></span>
+                  <span>Daily Consumption</span>
                 </div>
                 <div class="legend-item">
                   <span class="legend-color-dot" style="background-color: #CBD5E1;"></span>
-                  <span>Target Efficient Baseline</span>
+                  <span>Target Baseline</span>
                 </div>
               </div>
             </div>
 
-            <!-- Energy Performance Distribution Across Buildings -->
-            <div class="card">
+            <!-- Room Energy Heatmap (Compact Overview) -->
+            <div class="card overview-heatmap-card">
               <div class="card-header">
                 <div class="card-title-group">
-                  <h3>Building Distribution</h3>
-                  <p>Energy share across 3 campus facilities</p>
+                  <h3>Room Energy Heatmap</h3>
+                  <p>Waste intensity across all 24 monitored rooms (Simulated)</p>
                 </div>
                 <div class="card-actions">
-                  <span class="card-badge">7-Day Aggregated</span>
+                  <button type="button" class="btn-link-action" id="btnGoToFullHeatmap" title="Switch to Full Energy Heatmap">
+                    <span>Full Heatmap</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                  </button>
                 </div>
               </div>
-              <div class="card-body">
-                <div class="chart-wrapper" style="height: 180px;">
-                  <canvas id="buildingDistributionChart" aria-label="Building Energy Share Doughnut Chart"></canvas>
+              <div class="card-body overview-heatmap-body">
+                <div class="overview-heatmap-tiles-grid" id="overviewHeatmapTilesGrid">
+                  <!-- Injected via JavaScript from classrooms data -->
                 </div>
-                <div class="building-comparison-list" id="buildingComparisonList">
-                  <!-- Injected via JS -->
+              </div>
+              <div class="card-footer overview-heatmap-legend">
+                <div class="heatmap-legend-items">
+                  <span class="legend-pill-item"><span class="hm-dot dot-low"></span> Low (&lt;4.0)</span>
+                  <span class="legend-pill-item"><span class="hm-dot dot-medium"></span> Medium (4.0-5.5)</span>
+                  <span class="legend-pill-item"><span class="hm-dot dot-high"></span> High (&gt;5.5)</span>
                 </div>
+                <span class="heatmap-legend-caption">Click room to inspect</span>
               </div>
             </div>
           </div>
 
           <!-- ==============================================================
-               OPERATIONAL SECTION (Priority Actions & Recent Alerts)
+               ROW 2: BUILDING DISTRIBUTION & ALERTS (Side-by-Side Balanced Layout)
                ============================================================== -->
-          <div class="operations-grid">
+          <div class="overview-secondary-grid">
 
-            <!-- Priority Actions -->
-            <div class="card">
+            <!-- Building Distribution Panel -->
+            <div class="card overview-distribution-card">
               <div class="card-header">
                 <div class="card-title-group">
-                  <h3>Priority Actions</h3>
-                  <p>Recommended interventions to eliminate identified energy waste</p>
+                  <h3>Building Distribution</h3>
+                  <p>Campus energy consumption distribution (100% total)</p>
                 </div>
                 <div class="card-actions">
-                  <span class="card-badge" id="actionsCountBadge">3 Active</span>
+                  <span class="card-badge" id="distPeriodBadge">Simulated Demo Data</span>
                 </div>
               </div>
               <div class="card-body">
-                <div class="priority-actions-list" id="priorityActionsList">
-                  <!-- Injected via JavaScript from data.js -->
+                <!-- Hidden canvas preserved for API compatibility -->
+                <canvas id="buildingDistributionChart" style="display: none;"></canvas>
+                <div class="building-comparison-list" id="buildingComparisonList">
+                  <!-- Horizontal percentage bars injected via JS -->
                 </div>
+              </div>
+              <div class="card-footer distribution-footer">
+                <span class="simulated-footnote">* Consistent illustrative demo values totaling 100% campus load.</span>
               </div>
             </div>
 
-            <!-- Recent Alerts -->
-            <div class="card">
+            <!-- Alerts Panel -->
+            <div class="card overview-alerts-card">
               <div class="card-header">
                 <div class="card-title-group">
-                  <h3>Recent Alerts</h3>
-                  <p>Automated telemetry anomaly detections by room</p>
+                  <h3>Active Alerts</h3>
+                  <p>Priority telemetry anomaly detections by space</p>
                 </div>
                 <div class="card-actions">
-                  <span class="card-badge" id="alertsFilterStatus">Live Telemetry</span>
+                  <span class="card-badge" id="alertsFilterStatus">Live Feeds</span>
+                  <button type="button" class="btn-link-action" id="btnGoToAllAlerts" title="View all alerts & actions" style="margin-left: 6px;">
+                    <span>All Alerts</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                  </button>
                 </div>
               </div>
               <div class="card-body">
-                <div class="alerts-list" id="recentAlertsList">
+                <div class="alerts-list compact-alerts-list" id="recentAlertsList">
                   <!-- Injected via JavaScript from data.js -->
                 </div>
               </div>
+              <div class="card-footer alerts-footer">
+                <span class="simulated-footnote">* Automated rule evaluation modeled for campus facilities.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==============================================================
+               ROW 3: RECOMMENDED ACTION (Compact Panel beneath main sections)
+               ============================================================== -->
+          <div class="card recommended-action-banner" id="overviewRecommendedAction">
+            <div class="rec-action-content">
+              <div class="rec-action-icon" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+              </div>
+              <div class="rec-action-text-group">
+                <span class="rec-action-tag">Recommended Action</span>
+                <p class="rec-action-summary" id="recActionSummary">
+                  <strong>Set back unoccupied ENG-101 HVAC heating cycle:</strong> Engineering Block demonstrates high after-hours draw (6.8 kW). Enforcing automated schedule setback avoids an estimated <strong>52 kWh / week</strong>.
+                </p>
+              </div>
+            </div>
+            <div class="rec-action-controls">
+              <!-- Hidden container for priorityActionsList backward compatibility -->
+              <div id="priorityActionsList" style="display: none;"></div>
+              <span id="actionsCountBadge" style="display: none;">3 Active</span>
+              <button type="button" class="btn-primary btn-sm" id="btnRecActionApply">
+                <span>Inspect Action</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
             </div>
           </div>
 
@@ -1478,10 +1502,6 @@
                 </div>
                 <div class="matrix-actions-group">
                   <div class="table-search-box">
-                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <circle cx="11" cy="11" r="8"></circle>
-                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
                     <input type="search" id="ttSearchInput" class="table-search-input"
                       placeholder="Search course, code, or room..." aria-label="Search schedule">
                   </div>
